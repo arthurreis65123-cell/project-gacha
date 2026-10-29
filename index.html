@@ -5256,20 +5256,20 @@ function cdMeta(sis){
 function cdLerPremio(txt){
   if(!txt) return null;
   if(txt.charAt(0) === '#'){
-    var it = CD_CATALOGO[cdDe36(txt.substring(1)) - 1];
+    var it = CD_CATALOGO[Number(txt.substring(1))];
     return it ? { modo:'item', catalogo:it } : null;
   }
   if(txt.charAt(0) === 'c'){
-    var si = cdDe36(txt.charAt(1)), ci = cdDe36(txt.charAt(2));
+    var s1 = txt.substring(1).split(':');
+    var si = Number(s1[0]), ci = Number(s1[1]);
     var sis = ['hab','arma','nivel','poder','prof','vilao','maest','geracao','unica'][si];
     var meta = cdMeta(sis);
     if(!meta || !meta.classes[ci]) return null;
     return { modo:'classe', sis:sis, classe:meta.classes[ci] };
   }
   if(txt.charAt(0) === 'a'){
-    var p = txt.substring(1).split(':');
-    var g = cdDe36(p[0].charAt(0)), n = cdDe36(p[0].charAt(1));
-    var sti = cdDe36((p[1]||'0').charAt(0)), vl = cdDe36((p[1]||'0').substring(1));
+    var s2 = txt.substring(1).split(':');
+    var g = Number(s2[0]), n = Number(s2[1]), sti = Number(s2[2]), vl = Number(s2[3]);
     var nomeArt = (CD_ART_NOMES[CD_ART_GRUPOS[g]] || [])[n];
     if(!nomeArt) return null;
     return { modo:'artefato', grupo:CD_ART_GRUPOS[g], nome:nomeArt, status:CD_ART_STATUS[sti] || 'pod', valor:vl || 1 };
@@ -5364,7 +5364,7 @@ function codLer(codigo){
   }
 
   // valida formato dos campos
-  if(campos.length !== 6) return { erro:'Estrutura do código está diferente do esperado.' };
+  if(campos.length !== 6 && campos.length !== 7) return { erro:'Estrutura do código está diferente do esperado (' + campos.length + ' campos).' };
 
   var itensBrutos = campos[0];
   var xp = Number(campos[1]) || 0;
