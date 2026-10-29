@@ -5269,7 +5269,10 @@ function cdLerPremio(txt){
   }
   if(txt.charAt(0) === 'a'){
     var s2 = txt.substring(1).split(':');
+    if(s2.length !== 4) return null;
     var g = Number(s2[0]), n = Number(s2[1]), sti = Number(s2[2]), vl = Number(s2[3]);
+    if(!(g >= 0 && g < 4)) return null;
+    if(!(vl >= 1 && vl <= 999)) return null;
     var nomeArt = (CD_ART_NOMES[CD_ART_GRUPOS[g]] || [])[n];
     if(!nomeArt) return null;
     return { modo:'artefato', grupo:CD_ART_GRUPOS[g], nome:nomeArt, status:CD_ART_STATUS[sti] || 'pod', valor:vl || 1 };
