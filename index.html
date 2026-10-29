@@ -263,7 +263,6 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:25;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;border-top:1px solid var(--line);background:rgba(8,11,24,.96);backdrop-filter:blur(12px);padding-bottom:env(safe-area-inset-bottom)}
 .nav button{display:grid;gap:3px;justify-items:center;align-items:center;border:0;background:none;color:var(--muted);padding:10px 2px 12px;font-size:9.5px;font-weight:900;letter-spacing:.2px;cursor:pointer;min-width:0;overflow:hidden}
 .nav button i{font-size:18px;font-style:normal;line-height:1}
-.nav #navAdm{grid-column:auto}
 .nav button.active{color:var(--accent)}
 .nav button.active i{filter:drop-shadow(0 0 8px var(--glow))}
 .stage{padding:14px 16px calc(var(--navh) + 34px)}
@@ -315,9 +314,6 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   }
   .nav button i{font-size:17px}
   .nav button.active{background:var(--panel2)}
-
-  /* Admin sempre por ultimo na lateral */
-  .nav #navAdm{order:99;margin-top:10px;border-top:1px solid var(--line);border-radius:0 0 12px 12px}
 
   .stage{padding:22px 26px 40px}
   .stats2{grid-template-columns:repeat(4,1fr)}
@@ -382,31 +378,7 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .verdict h4{margin:0 0 8px;font-size:15px}
 .verdict .who{font-size:12px;color:var(--muted);margin-bottom:10px}
 
-/* ===== PAINEL ADMIN (v13.8) ===== */
-.adm-lock{padding:16px}
-.adm-lock input{width:100%}
-.adm-row{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;margin-top:9px}
-.adm-warn{border:1px solid rgba(251,113,133,.5);background:rgba(251,113,133,.1);color:#fecdd3;border-radius:13px;padding:11px 13px;font-size:12px;line-height:1.5;margin:12px 0}
-.adm-ok{border:1px solid rgba(74,222,128,.45);background:rgba(74,222,128,.08);color:#bbf7d0;border-radius:13px;padding:11px 13px;font-size:12px;margin:12px 0}
-.adm-sys{margin-bottom:12px}
-.adm-sys h4{margin:0 0 8px;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.adm-sys h4 .sum{font-size:11px;font-weight:900;color:var(--muted)}
-.adm-sys h4 .sum.bad{color:#FB7185}
-.adm-row2{display:grid;grid-template-columns:1fr 78px;gap:8px;align-items:center;margin-bottom:6px}
-.adm-row2 .nm{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.adm-row2 .nm b{color:var(--muted);font-weight:900;font-size:10px;margin-right:6px}
-.adm-row2 input{width:100%;min-height:38px;border:1px solid var(--line);border-radius:11px;background:var(--bg2);color:var(--text);padding:0 10px;text-align:right;font-variant-numeric:tabular-nums}
-.adm-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.adm-tools button{min-height:40px;border-radius:12px;padding:9px 13px;font-size:12px;font-weight:900;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
-.adm-tools button.pri{border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--btnText)}
-.adm-tools button.dang{border-color:rgba(251,113,133,.5);background:rgba(251,113,133,.1);color:#fecdd3}
-.adm-list{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:13px;padding:10px;background:var(--bg2)}
-.adm-chip{display:inline-block;margin:3px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:11px;cursor:pointer;background:var(--panel2)}
-.adm-chip:hover{border-color:var(--accent)}
-.adm-note{font-size:11px;color:var(--muted);line-height:1.6;margin-top:8px}
-.adm-ta{width:100%;min-height:120px;border:1px solid var(--line);border-radius:13px;background:var(--bg2);color:var(--text);padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;resize:vertical}
 
-/* ===== ADMIN: todos os sistemas numa tela (v13.13) ===== */
 .adm-sysblock{border:1px solid var(--line);border-radius:15px;background:var(--panel2);margin-bottom:10px;overflow:hidden}
 .adm-sysblock>.hd2{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;cursor:pointer;user-select:none}
 .adm-sysblock>.hd2 .tl{display:flex;align-items:center;gap:9px;font-weight:950;font-size:13.5px;min-width:0}
@@ -742,13 +714,62 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .cd-linha{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;background:rgba(0,0,0,.16);padding:9px 11px;font-size:11.5px}
 .cd-linha .qz{color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px}
 .cd-linha .qc{margin-left:auto;color:#7f8cac;font-size:10px;white-space:nowrap}
+
+/* ===== PERFIL (v18) ===== */
+.pf-avatares{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:7px}
+.pf-av{aspect-ratio:1;border:1px solid var(--line);border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:20px;cursor:pointer;transition:.15s}
+.pf-av:hover{border-color:var(--accent)}
+.pf-av.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow);background:#252044}
+.pf-cores{display:flex;gap:8px;flex-wrap:wrap}
+.pf-cor{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.15s}
+.pf-cor.on{border-color:#fff;transform:scale(1.1)}
+.pf-ta{width:100%;min-height:70px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--text);padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;outline:none}
+.pf-ta:focus{border-color:var(--accent)}
+.pf-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pf-head{display:flex;gap:14px;align-items:flex-start}
+.pf-avatar{width:74px;height:74px;border-radius:20px;display:grid;place-items:center;font-size:34px;flex:0 0 auto;border:2px solid}
+.pf-nome{font-size:20px;font-weight:1000;letter-spacing:-.02em;line-height:1.1}
+.pf-titulo{font-size:12px;font-weight:900;margin-top:3px;letter-spacing:.3px}
+.pf-bio{font-size:12px;color:var(--muted);line-height:1.5;margin-top:7px}
+.pf-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:14px}
+.pf-st{​​border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.18);padding:10px;text-align:center}
+.pf-st b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.pf-st span{font-size:9.5px;color:var(--muted);letter-spacing:.8px}
+.pf-edit{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+
+/* ===== PERSONAGENS (v19) ===== */
+.pers-av{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:0 0 auto;border:1px solid}
+.pers-tit{display:block;font-style:normal;font-size:10.5px;font-weight:900;margin-top:2px}
+.coll-on{margin-left:auto;font-size:9px;font-weight:950;letter-spacing:1px;color:#4ade80;border:1px solid rgba(74,222,128,.45);background:rgba(74,222,128,.08);border-radius:999px;padding:4px 8px}
+.pers-edit{display:grid;gap:9px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.pers-avatares{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:7px}
+.pers-av-op{aspect-ratio:1;border:1px solid var(--line);border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:18px;cursor:pointer}
+.pers-av-op.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow)}
+.pers-cores{display:flex;gap:8px;flex-wrap:wrap}
+.pers-cor{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+.pers-cor.on{border-color:#fff;transform:scale(1.1)}
+
+/* ===== PERSONAGEM: itens e botoes (v20) ===== */
+.pers-item{border:1px solid var(--line);border-radius:15px;background:var(--panel2);overflow:hidden}
+.pers-item.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--glow)}
+.pers-top{display:flex;align-items:center;gap:11px;padding:11px 12px;cursor:pointer}
+.pers-av{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:0 0 auto;border:1px solid}
+.pers-tit{display:block;font-style:normal;font-size:10.5px;font-weight:900;margin-top:2px}
+.coll-on{margin-left:auto;font-size:9px;font-weight:950;letter-spacing:1px;color:#4ade80;border:1px solid rgba(74,222,128,.45);background:rgba(74,222,128,.08);border-radius:999px;padding:4px 8px}
+.pers-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 12px 12px}
+.pers-b{min-height:38px;border:1px solid var(--line);border-radius:11px;background:var(--bg2);color:var(--text);font-size:11.5px;font-weight:900;cursor:pointer;padding:8px 6px}
+.pers-b:hover{border-color:var(--accent)}
+.pers-b.on-ativo{color:#4ade80;border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.08);cursor:default}
+.pers-b.reb{color:#facc15;border-color:rgba(250,204,21,.4);background:rgba(250,204,21,.07)}
+.pers-b.reb:hover{border-color:#facc15}
+@media(max-width:520px){.pers-acts{grid-template-columns:1fr 1fr}.pers-acts .pers-b:first-child{grid-column:1/-1}}
 </style>
 </head>
 <body>
 <div class="sh-wrap">
   <nav class="nav" id="nav">
     <button class="active" data-view="v-gacha"><i>✦</i>Gacha</button>
-    <button data-view="v-coll"><i>▦</i>Coleção</button>
+    <button data-view="v-coll"><i>▦</i>Personagens</button>
     <button data-view="v-cmp"><i>⚖</i>Comparar</button>
     <button data-view="v-pvp"><i>⚔</i>PvP</button>
     <button data-view="v-nivel"><i>▲</i>Nível</button>
@@ -756,7 +777,8 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
     <button data-view="v-diario"><i>🎁</i>Diário</button>
     <button data-view="v-codigos"><i>🎟</i>Códigos</button>
     <button data-view="v-set"><i>⚙</i>Ajustes</button>
-    <button data-view="v-adm" id="navAdm"><i>🔑</i>Admin</button>
+    <button data-view="v-perfil"><i>👤</i>Perfil</button>
+    
   </nav>
 
   <div class="maincol">
@@ -835,8 +857,8 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
         <div class="card2">
           <div class="hd"><h3>Minhas coleções</h3><span id="collCount">1</span></div>
           <div class="coll-add" style="padding-top:0">
-            <input id="newColl" class="search" type="text" placeholder="Nome da nova coleção..." autocomplete="off">
-            <button class="primary" id="addColl">+ Criar</button>
+            <input id="newColl" class="search" type="text" placeholder="Nome do novo personagem..." autocomplete="off">
+            <button class="primary" id="addColl">+ Criar personagem</button>
           </div>
           <div id="rebirthBar"></div>
           <div class="coll-list" id="collList"></div>
@@ -904,97 +926,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
         </div>
       </section>
 
-      <!-- ============ ABA: ADMIN ============ -->
-      <section class="view" id="v-adm">
-        <div class="vtitle"><h2>Painel Admin</h2><span id="admWho">acesso restrito</span></div>
-
-        <div class="card2" id="admGate">
-          <div class="hd"><h3>Chave de acesso</h3><span>obrigatória</span></div>
-          <div class="adm-lock">
-
-            <!-- modo A: ainda nao existe chave (primeiro acesso) -->
-            <div id="admSetup">
-              <div class="lbl">primeiro acesso — crie sua chave</div>
-              <input id="admNewKey0" class="search" type="password" placeholder="Crie uma chave" autocomplete="off">
-              <div class="adm-row" style="grid-template-columns:1fr">
-                <input id="admNewKey0b" class="search" type="password" placeholder="Repita a chave" autocomplete="off">
-              </div>
-              <div class="adm-row">
-                <button class="primary" id="admCreate">Criar chave</button>
-              </div>
-              <div class="adm-note">Esta chave fica gravada apenas neste aparelho. Nao ha recuperacao: se esquecer, sera preciso restaurar o padrao de fabrica.</div>
-            </div>
-
-            <!-- modo B: ja existe chave -->
-            <div id="admLogin" style="display:none">
-              <div class="lbl">digite a chave</div>
-              <input id="admKey" class="search" type="password" placeholder="Chave de acesso" autocomplete="off">
-              <div class="adm-row">
-                <button class="primary" id="admEnter">Entrar</button>
-                <button class="secondary" id="admLeave" style="display:none">Sair</button>
-              </div>
-            </div>
-
-            <div id="admGateMsg"></div>
-          </div>
-        </div>
-
-        <div id="admBody" style="display:none">
-
-          <div class="card2">
-            <div class="hd"><h3>Probabilidades dos gachas</h3><span id="admProbInfo">-</span></div>
-            <div class="bd">
-              <div class="adm-tools" style="margin-bottom:10px">
-                <button id="admProbOpenAll">Abrir todos</button>
-                <button id="admProbCloseAll">Fechar todos</button>
-                <button id="admProbExpand">Expandir cada sistema</button>
-              </div>
-              <div id="admProbAll"></div>
-              <div class="adm-tools" style="position:sticky;bottom:0;background:var(--panel);padding:12px 0 2px;border-top:1px solid var(--line)">
-                <button class="pri" id="admProbApplyAll">Salvar TODAS as probabilidades</button>
-                <button id="admProbResetAll">Restaurar padrão de TODOS</button>
-                <button id="admProbNormAll">Normalizar TODOS para 100%</button>
-              </div>
-              <div id="admProbMsg"></div>
-            </div>
-          </div>
-
-          <div class="card2">
-            <div class="hd"><h3>Coleção e itens</h3><span>ferramentas de teste</span></div>
-            <div class="bd">
-              <div class="lbl">coleção alvo</div>
-              <select id="admColl" class="search" style="width:100%;padding:0 10px"></select>
-              <div class="adm-tools">
-                <button id="admUnlock">Desbloquear tudo do sistema atual</button>
-                <button class="dang" id="admWipeColl">Esvaziar esta coleção</button>
-              </div>
-              <div class="lbl" style="margin-top:16px">dar item específico do sistema atual</div>
-              <div class="adm-list" id="admItems"></div>
-            </div>
-          </div>
-
-          <div class="card2">
-            <div class="hd"><h3>Chave e dados</h3><span>segurança local</span></div>
-            <div class="bd">
-              <div class="lbl">trocar a chave</div>
-              <div class="adm-row2"><span class="nm">Nova chave</span><input id="admNewKey" type="password" placeholder="nova"></div>
-              <div class="adm-row2"><span class="nm">Repetir</span><input id="admNewKey2" type="password" placeholder="repetir"></div>
-              <div class="adm-tools"><button class="pri" id="admSaveKey">Salvar nova chave</button></div>
-              <div id="admKeyMsg"></div>
-
-              <div class="lbl" style="margin-top:18px">exportar / importar ajustes</div>
-              <textarea id="admExport" class="adm-ta" spellcheck="false" placeholder="Aqui aparece o código dos seus ajustes. Cole um código e aperte Importar."></textarea>
-              <div class="adm-tools">
-                <button id="admDoExport">Gerar código</button>
-                <button id="admDoImport">Importar código</button>
-                <button class="dang" id="admFactory">Restaurar padrão de fábrica</button>
-              </div>
-              <div id="admDataMsg"></div>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      
 
       <!-- ============ ABA: DIARIO ============ -->
       <section class="view" id="v-diario">
@@ -1138,6 +1070,66 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       </section>
 
       <!-- ============ ABA: AJUSTES ============ -->
+      <!-- ============ ABA: PERFIL ============ -->
+      <section class="view" id="v-perfil">
+        <div class="vtitle"><h2>Perfil</h2><span id="pfSub">seu personagem</span></div>
+
+        <div class="card2" id="pfSemPersonagem">
+          <div class="hd"><h3>Criar personagem</h3><span>leva menos de um minuto</span></div>
+          <div class="bd">
+            <div class="lbl">Nome do personagem</div>
+            <input id="pfNome" class="search" type="text" maxlength="18" placeholder="ex.: Kael, Rin, Zero..." autocomplete="off">
+
+            <div class="lbl" style="margin-top:12px">Escolha um avatar</div>
+            <div class="pf-avatares" id="pfAvatares"></div>
+
+            <div class="lbl" style="margin-top:12px">Título</div>
+            <input id="pfTitulo" class="search" type="text" maxlength="24" placeholder="ex.: Caçador de Portais" autocomplete="off">
+
+            <div class="lbl" style="margin-top:12px">Cor do perfil</div>
+            <div class="pf-cores" id="pfCores"></div>
+
+            <div class="lbl" style="margin-top:12px">Sobre você</div>
+            <textarea id="pfBio" class="pf-ta" maxlength="160" placeholder="Duas linhas sobre o seu personagem..." spellcheck="false"></textarea>
+
+            <div class="pf-row">
+              <button class="pri" id="pfCriar">Criar personagem</button>
+            </div>
+            <div id="pfMsgCriar"></div>
+          </div>
+        </div>
+
+        <div class="card2" id="pfCard" style="display:none">
+          <div class="hd"><h3>Meu personagem</h3><span id="pfDesde">-</span></div>
+          <div class="bd">
+            <div class="pf-head">
+              <div class="pf-avatar" id="pfAvatarBig">?</div>
+              <div style="min-width:0;flex:1">
+                <div class="pf-nome" id="pfNomeShow">-</div>
+                <div class="pf-titulo" id="pfTituloShow">-</div>
+                <div class="pf-bio" id="pfBioShow">-</div>
+              </div>
+            </div>
+
+            <div class="pf-stats" id="pfStats"></div>
+
+            <div class="pf-edit">
+              <div class="lbl">Editar</div>
+              <input id="pfNomeEdit" class="search" type="text" maxlength="18" placeholder="Nome">
+              <div class="pf-avatares" id="pfAvataresEdit" style="margin-top:10px"></div>
+              <input id="pfTituloEdit" class="search" type="text" maxlength="24" placeholder="Título" style="margin-top:10px">
+              <div class="pf-cores" id="pfCoresEdit" style="margin-top:10px"></div>
+              <textarea id="pfBioEdit" class="pf-ta" maxlength="160" style="margin-top:10px" spellcheck="false"></textarea>
+              <div class="pf-row">
+                <button class="pri" id="pfSalvar">Salvar alterações</button>
+                <button class="sec" id="pfApagar">Apagar personagem</button>
+              </div>
+              <div id="pfMsgEdit"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="view" id="v-set">
         <div class="vtitle"><h2>Ajustes</h2><span>tema e identidade</span></div>
         <div class="card2" id="settingsPanel">
@@ -1214,7 +1206,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 <div class="modal" id="collModal">
   <div class="modal-card">
     <div class="modal-head">
-      <div><h3 id="mTitle">Coleção</h3><small id="mSub">-</small></div>
+      <div><h3 id="mTitle">Personagem</h3><small id="mSub">-</small></div>
       <button class="mini" id="mClose">Fechar</button>
     </div>
     <div class="modal-tabs" id="mTabs"></div>
@@ -1316,9 +1308,55 @@ function el(id){ return document.getElementById(id); }
 function loadJSON(k,d){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):d; }catch(e){ return d; } }
 function saveJSON(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 
-function loadColls(){ var c=loadJSON(STORE_COLL,null); if(c && typeof c==='object' && Object.keys(c).length) return c; return { 'Principal': { id:'Principal', name:'Principal' } }; }
-function saveColls(c){ saveJSON(STORE_COLL,c); }
+var STORE_PERFIS = 'projectGachaPerfis.v1';
+
+var PERS_AVATARES = ['⚔️','🔥','❄️','⚡','🌙','☀️','🐉','👑','💀','🌟','🌀','🦅','🐺','🛡️','🔮','🗡️'];
+var PERS_CORES = ['#8b5cf6','#22d3ee','#4ade80','#facc15','#fb7185','#fb923c','#c084fc','#38bdf8'];
+
+// a chave de armazenamento continua a MESMA: o que era colecao e agora personagem
+function loadColls(){
+  var p = loadJSON(STORE_PERFIS, null);
+  if(p && typeof p === 'object' && Object.keys(p).length) return p;
+  // migracao: converte as colecoes antigas em personagens
+  var velhas = loadJSON(STORE_COLL, null);
+  var out = {};
+  if(velhas && typeof velhas === 'object' && Object.keys(velhas).length){
+    for(var k in velhas){
+      out[k] = {
+        id: k,
+        name: (velhas[k] && velhas[k].name) || k,
+        avatar: PERS_AVATARES[Object.keys(out).length % PERS_AVATARES.length],
+        cor: PERS_CORES[Object.keys(out).length % PERS_CORES.length],
+        titulo: '',
+        bio: '',
+        criado: new Date().toISOString().slice(0, 10),
+        migrado: true
+      };
+    }
+  } else {
+    out['Principal'] = { id:'Principal', name:'Principal', avatar:'⚔️', cor:'#8b5cf6', titulo:'', bio:'', criado: new Date().toISOString().slice(0,10) };
+  }
+  saveJSON(STORE_PERFIS, out);
+  return out;
+}
+function saveColls(c){ saveJSON(STORE_PERFIS, c); }
 function activeColl(){ return localStorage.getItem(STORE_ACTIVE) || 'Principal'; }
+
+// ---- helpers de personagem ----
+function persDe(id2){
+  var all = loadColls();
+  return all[id2] || null;
+}
+function persSalvar(id2, dados){
+  var all = loadColls();
+  if(!all[id2]) all[id2] = { id:id2, name:id2, avatar:'⚔️', cor:'#8b5cf6', titulo:'', bio:'', criado:new Date().toISOString().slice(0,10) };
+  all[id2] = Object.assign(all[id2], dados);
+  saveColls(all);
+  return all[id2];
+}
+function persAtivo(){ return persDe(coll) || { name:coll, avatar:'⚔️', cor:'#8b5cf6', titulo:'' }; }
+// nome de exibicao usado em qualquer tela
+function nomeDo(j){ var p = persDe(j); return p ? p.name : j; }
 function invKey(s,c){ return 'gachaInv.v5.'+s+'.'+c; }
 function loadInv(s,c){
   var v = loadJSON(invKey(s,c),[]);
@@ -1665,42 +1703,48 @@ function collTotals(id2){
 
 function renderColls(){
   var all = loadColls(), keys = Object.keys(all), out = '', i;
-  el('collCount').textContent = keys.length + (keys.length===1 ? ' coleção' : ' coleções');
+  el('collCount').textContent = keys.length + (keys.length===1 ? ' personagem' : ' personagens');
   for(i=0;i<keys.length;i++){
-    var id2 = keys[i], tot = collTotals(id2).total, on = (id2===coll);
+    var id2 = keys[i], p = all[id2], tot = collTotals(id2).total, on = (id2===coll);
     var nreb = (typeof rebDe === 'function') ? rebDe(id2) : 0;
-    out += '<div class="coll-item coll-open" data-open="'+esc(id2)+'">'
-        +  '<div style="flex:1;min-width:0"><strong>'+esc(all[id2].name)+'</strong>'
-        +  '<small>'+tot+(tot===1?' item':' itens')
-        +  ' · <span class="rebirth-tag'+(nreb?'':' zero')+'">♻ '+nreb+'</span>'
-        +  ' · sorte +'+Math.round((typeof sorteRenascimento==='function'?sorteRenascimento(id2):0)*100)+'%</small></div>'
-        +  '<button class="reb-mini" data-reb="'+esc(id2)+'" title="Renascimento">♻</button>'
-        +  '<button class="mini'+(on?' on':'')+'" data-use="'+esc(id2)+'">'+(on?'Ativa':'Usar')+'</button>'
-        +  '<button class="mini danger" data-del="'+esc(id2)+'">Apagar</button></div>';
+    var av = p.avatar || '⚔️', co = p.cor || '#8b5cf6';
+    var lim = (typeof LIMITE_RENASCIMENTO === 'number') ? LIMITE_RENASCIMENTO : 150;
+    out += '<div class="pers-item'+(on?' on':'')+'">'
+        +  '<div class="pers-top" data-open="'+esc(id2)+'">'
+        +    '<div class="pers-av" style="color:'+co+';border-color:'+co+'66;background:'+co+'1a">'+av+'</div>'
+        +    '<div style="min-width:0;flex:1"><strong>'+esc(p.name || id2)+'</strong>'
+        +    (p.titulo ? '<em class="pers-tit" style="color:'+co+'">'+esc(p.titulo)+'</em>' : '')
+        +    '<small>'+tot+(tot===1?' item':' itens')
+        +    ' · <span class="rebirth-tag'+(nreb?'':' zero')+'">♻ '+nreb+'/'+lim+'</span>'
+        +    ' · sorte +'+Math.round((typeof sorteRenascimento==='function'?sorteRenascimento(id2):0)*100)+'%</small>'
+        +    '</div>'
+        +    (on ? '<span class="coll-on">ATIVO</span>' : '')
+        +  '</div>'
+        +  '<div class="pers-acts">'
+        +    (on
+              ? '<button class="pers-b on-ativo" disabled>✓ Ativo</button>'
+              : '<button class="pers-b ativar" data-ativar="'+esc(id2)+'">Deixar ativo</button>')
+        +    '<button class="pers-b" data-renomear="'+esc(id2)+'">Renomear</button>'
+        +    '<button class="pers-b reb" data-renascer="'+esc(id2)+'">♻ Renascer</button>'
+        +  '</div>'
+        + '</div>';
   }
   el('collList').innerHTML = out;
 
-  var opens = el('collList').querySelectorAll('[data-open]');
-  for(i=0;i<opens.length;i++){
-    opens[i].onclick = (function(v){ return function(ev){
-      if(ev.target && ev.target.getAttribute && (ev.target.getAttribute('data-use')!==null || ev.target.getAttribute('data-del')!==null || ev.target.getAttribute('data-reb')!==null)) return;
-      openCollModal(v);
-    }; })(opens[i].getAttribute('data-open'));
+  function ligar(sel, fn){
+    var b = el('collList').querySelectorAll(sel);
+    for(var k=0;k<b.length;k++){
+      b[k].onclick = (function(v){ return function(ev){ ev.stopPropagation(); fn(v); }; })(b[k].getAttribute(sel.slice(1, -1)));
+    }
   }
-  var uses = el('collList').querySelectorAll('[data-use]');
-  for(i=0;i<uses.length;i++){
-    uses[i].onclick = (function(v){ return function(ev){ ev.stopPropagation(); openColl(v); }; })(uses[i].getAttribute('data-use'));
+  ligar('[data-ativar]', persAtivar);
+  ligar('[data-renomear]', persRenomear);
+  ligar('[data-renascer]', persRenascer);
+  var abrir = el('collList').querySelectorAll('[data-open]');
+  for(var r=0;r<abrir.length;r++){
+    abrir[r].onclick = (function(v){ return function(){ openCollModal(v); }; })(abrir[r].getAttribute('data-open'));
   }
-  var rebs = el('collList').querySelectorAll('[data-reb]');
-  for(i=0;i<rebs.length;i++){
-    rebs[i].onclick = (function(v){ return function(ev){ ev.stopPropagation(); renascer(v); }; })(rebs[i].getAttribute('data-reb'));
-  }
-  try{ if(typeof codRenderHist === 'function') codRenderHist(); }catch(e){}
-  if(typeof renderRebirthBar === 'function') renderRebirthBar();
-  var dels = el('collList').querySelectorAll('[data-del]');
-  for(i=0;i<dels.length;i++){
-    dels[i].onclick = (function(v){ return function(ev){ ev.stopPropagation(); delColl(v); }; })(dels[i].getAttribute('data-del'));
-  }
+  var at = el('collActive'); if(at) at.textContent = (persAtivo().name || coll);
 }
 
 function openColl(id2){
@@ -1742,14 +1786,22 @@ function delColl(id2){
 
 function addColl(){
   var input = el('newColl'), name = (input.value||'').trim();
-  if(!name){ toast('Digite um nome para a coleção.'); return; }
+  if(!name){ toast('Digite o nome do personagem.'); return; }
+  if(name.length > 18){ toast('O nome pode ter no máximo 18 caracteres.'); return; }
   var all = loadColls();
-  if(all[name]){ toast('Já existe uma coleção com esse nome.'); return; }
-  all[name] = { id:name, name:name };
+  if(all[name]){ toast('Já existe um personagem com esse nome.'); return; }
+  var n = Object.keys(all).length;
+  all[name] = {
+    id: name, name: name,
+    avatar: PERS_AVATARES[n % PERS_AVATARES.length],
+    cor: PERS_CORES[n % PERS_CORES.length],
+    titulo: '', bio: '',
+    criado: new Date().toISOString().slice(0,10)
+  };
   saveColls(all);
   input.value = '';
   renderColls();
-  toast('Coleção criada: '+name);
+  toast('Personagem criado: ' + name);
 }
 
 /* ---- modal: abre a colecao com todo o conteudo ---- */
@@ -3369,503 +3421,6 @@ el('pvpClear').onclick = function(){
 };
 
 
-/* ================= PAINEL ADMIN (v13.8) ================= */
-var STORE_ADMKEY = 'projectGachaAdminKey.v1';
-var STORE_PROBS  = 'projectGachaProbs.v1';
-var admOk = false;
-var admSys = 'power';
-var admAbertos = {};   // quais sistemas ficam expandidos no painel
-
-// devolve a chave guardada neste aparelho, ou null se ainda nao existe
-function admKeyAtual(){
-  try{ return localStorage.getItem(STORE_ADMKEY) || null; }catch(e){ return null; }
-}
-function admTemChave(){ return !!admKeyAtual(); }
-
-// mostra o modo certo: criar (primeiro acesso) ou entrar
-function admGateModo(){
-  var tem = admTemChave();
-  if(el('admSetup')) el('admSetup').style.display = tem ? 'none' : '';
-  if(el('admLogin')) el('admLogin').style.display = tem ? '' : 'none';
-}
-
-// guarda apenas as probabilidades ALTERADAS, por sistema
-function loadProbOverride(){
-  try{ return JSON.parse(localStorage.getItem(STORE_PROBS) || '{}') || {}; }catch(e){ return {}; }
-}
-function saveProbOverride(o){
-  try{ localStorage.setItem(STORE_PROBS, JSON.stringify(o)); }catch(e){}
-}
-
-// aplica os ajustes salvos por cima das tabelas de classe
-function aplicarOverrides(){
-  var ov = loadProbOverride();
-  for(var k in ov){
-    if(!SYSTEMS[k]) continue;
-    var mapa = ov[k];
-    var cl = SYSTEMS[k].classes;
-    for(var i=0;i<cl.length;i++){
-      if(mapa[cl[i].rank] !== undefined && mapa[cl[i].rank] !== null){
-        cl[i].prob = Number(mapa[cl[i].rank]);
-      }
-    }
-  }
-}
-aplicarOverrides();
-
-// ---------- entrar / sair ----------
-function admEntrar(){
-  if(!admTemChave()){
-    el('admGateMsg').innerHTML = '<div class="adm-warn">Nenhuma chave criada ainda. Use o campo acima para criar a sua.</div>';
-    return;
-  }
-  var v = el('admKey').value || '';
-  if(v === admKeyAtual()){
-    admOk = true;
-    try{ localStorage.setItem('projectGachaAdmOk', '1'); }catch(e){}
-    admMostrar(true);
-  } else {
-    el('admGateMsg').innerHTML = '<div class="adm-warn">Chave incorreta.</div>';
-  }
-}
-function admMostrar(ok){
-  admGateModo();
-  el('admGate').style.display = ok ? 'none' : '';
-  el('admBody').style.display = ok ? '' : 'none';
-  el('admLeave').style.display = ok ? '' : 'none';
-  el('navAdm').style.display = '';   // o botao Admin fica SEMPRE visivel
-  el('admWho').textContent = ok ? 'acesso liberado' : 'acesso restrito';
-  if(ok){ try{ admRender(); }catch(e){} }
-}
-function admSair(){
-  admOk = false;
-  try{ localStorage.removeItem('projectGachaAdmOk'); }catch(e){}
-  admMostrar(false);
-  el('admGateMsg').innerHTML = '';
-  if(el('admKey')) el('admKey').value = '';
-}
-
-function admCriar(){
-  var a = (el('admNewKey0') && el('admNewKey0').value) || '';
-  var b = (el('admNewKey0b') && el('admNewKey0b').value) || '';
-  if(a.length < 4){
-    el('admGateMsg').innerHTML = '<div class="adm-warn">A chave precisa ter pelo menos 4 caracteres.</div>';
-    return;
-  }
-  if(a !== b){
-    el('admGateMsg').innerHTML = '<div class="adm-warn">As duas chaves nao sao iguais.</div>';
-    return;
-  }
-  try{ localStorage.setItem(STORE_ADMKEY, a); }catch(e){}
-  el('admNewKey0').value = '';
-  el('admNewKey0b').value = '';
-  el('admGateMsg').innerHTML = '<div class="adm-ok">Chave criada. Guarde bem: nao ha recuperacao.</div>';
-  admOk = true;
-  try{ localStorage.setItem('projectGachaAdmOk', '1'); }catch(e){}
-  admMostrar(true);
-}
-
-el('admEnter').onclick = admEntrar;
-el('admLeave').onclick = admSair;
-el('admCreate').onclick = admCriar;
-el('admKey').onkeydown = function(e){ if(e.key === 'Enter') admEntrar(); };
-if(el('admNewKey0b')) el('admNewKey0b').onkeydown = function(e){ if(e.key === 'Enter') admCriar(); };
-
-// ---------- render geral ----------
-function admRender(){
-  admRenderAll();
-  admRenderCols();
-  admRenderItems();
-}
-
-// sistemas editaveis (os que tem tabela de classes)
-function admSistemasEditaveis(){
-  var lista = [], i;
-  for(i=0;i<SYS_ORDER.length;i++){
-    var k = SYS_ORDER[i];
-    var s = SYSTEMS[k];
-    if(s && s.classes && s.classes.length) lista.push(k);
-  }
-  return lista;
-}
-
-function admSoma(cl){
-  var s = 0;
-  for(var i=0;i<cl.length;i++) s += Number(cl[i].prob) || 0;
-  return Math.round(s * 1000) / 1000;
-}
-
-// desenha TODOS os sistemas, um bloco por gacha
-function admRenderAll(){
-  var keys = admSistemasEditaveis();
-  var ov = loadProbOverride();
-  var out = '';
-
-  // resumo do topo
-  out += '<div class="adm-totalbox" id="admTotalBox"></div>';
-
-  for(var s=0;s<keys.length;s++){
-    var k = keys[s];
-    var cl = SYSTEMS[k].classes;
-    var m = SYSTEMS[k];
-    var soma = admSoma(cl);
-    var ok = Math.abs(soma - 100) <= 0.01;
-    var temOv = !!ov[k];
-    var aberto = admAbertos[k] ? ' open' : '';
-
-    out += '<div class="adm-sysblock' + aberto + '" data-block="' + k + '">'
-      +  '<div class="hd2" data-head="' + k + '">'
-      +    '<span class="tl"><span class="ico">▸</span>' + esc(m.label) + '</span>'
-      +    '<span class="tag" style="color:' + (ok ? '#4ADE80' : '#FB7185') + '" data-tag="' + k + '">' + soma + '%' + (temOv ? ' •' : '') + '</span>'
-      +  '</div>'
-      +  '<div class="body2">'
-      +    '<div class="adm-grid2">';
-
-    for(var i=0;i<cl.length;i++){
-      out += '<div class="adm-cell">'
-          +  '<span class="nm"><b>' + esc(cl[i].rank) + '</b>' + esc(cl[i].name) + '</span>'
-          +  '<input type="number" step="0.001" min="0" max="100" data-sys="' + k + '" data-rank="' + esc(cl[i].rank) + '" value="' + cl[i].prob + '">'
-          +  '</div>';
-    }
-
-    out +=    '</div>'
-      +    '<div class="adm-mini-acts">'
-      +      '<button data-norm="' + k + '">Normalizar este para 100%</button>'
-      +      '<button data-reset="' + k + '">Restaurar padrão deste</button>'
-      +      '<button data-save="' + k + '">Salvar só este</button>'
-      +    '</div>'
-      +  '</div>'
-      + '</div>';
-  }
-
-  el('admProbAll').innerHTML = out;
-
-  // abrir / fechar bloco
-  var heads = el('admProbAll').querySelectorAll('[data-head]');
-  for(var h=0;h<heads.length;h++){
-    heads[h].onclick = (function(key){ return function(){
-      admAbertos[key] = !admAbertos[key];
-      var blk = el('admProbAll').querySelector('[data-block="' + key + '"]');
-      if(blk) blk.classList.toggle('open', !!admAbertos[key]);
-    }; })(heads[h].getAttribute('data-head'));
-  }
-
-  // recalcular o selo ao digitar
-  var ins = el('admProbAll').querySelectorAll('input[data-sys]');
-  for(var q=0;q<ins.length;q++){
-    ins[q].oninput = (function(key){ return function(){ admUpdateTag(key); admUpdateTotalBox(); }; })(ins[q].getAttribute('data-sys'));
-  }
-
-  // botoes por sistema
-  var norms = el('admProbAll').querySelectorAll('[data-norm]');
-  for(var n=0;n<norms.length;n++){
-    norms[n].onclick = (function(key){ return function(){ admNormOne(key); }; })(norms[n].getAttribute('data-norm'));
-  }
-  var resets = el('admProbAll').querySelectorAll('[data-reset]');
-  for(var r=0;r<resets.length;r++){
-    resets[r].onclick = (function(key){ return function(){ admResetOne(key); }; })(resets[r].getAttribute('data-reset'));
-  }
-  var saves = el('admProbAll').querySelectorAll('[data-save]');
-  for(var sv=0;sv<saves.length;sv++){
-    saves[sv].onclick = (function(key){ return function(){ admSaveOne(key); }; })(saves[sv].getAttribute('data-save'));
-  }
-
-  admUpdateTotalBox();
-}
-
-// soma de um sistema, lendo os campos da tela
-function admLerSoma(key){
-  var ins = el('admProbAll').querySelectorAll('input[data-sys="' + key + '"]');
-  var s = 0;
-  for(var i=0;i<ins.length;i++) s += Number(ins[i].value) || 0;
-  return Math.round(s * 1000) / 1000;
-}
-
-function admUpdateTag(key){
-  var s = admLerSoma(key);
-  var tag = el('admProbAll').querySelector('[data-tag="' + key + '"]');
-  if(!tag) return;
-  var ov = loadProbOverride();
-  tag.textContent = s + '%' + (ov[key] ? ' •' : '');
-  tag.style.color = (Math.abs(s - 100) <= 0.01) ? '#4ADE80' : '#FB7185';
-}
-
-function admUpdateTotalBox(){
-  var keys = admSistemasEditaveis();
-  var fora = [], i;
-  for(i=0;i<keys.length;i++){
-    var s = admLerSoma(keys[i]);
-    if(Math.abs(s - 100) > 0.01) fora.push(SYSTEMS[keys[i]].label + ' (' + s + '%)');
-  }
-  var box = el('admTotalBox');
-  if(!box) return;
-  box.innerHTML = keys.length + ' sistemas editáveis. '
-    + (fora.length
-        ? '<b style="color:#FB7185">' + fora.length + '</b> fora de 100%: ' + esc(fora.slice(0,4).join(', ')) + (fora.length > 4 ? '…' : '')
-        : '<b style="color:#4ADE80">Todas as somas estão em 100%</b>');
-}
-
-// aplica um mapa na tabela em memoria e no sorteio
-function admAplicarMapa(key, mapa){
-  var cl = SYSTEMS[key].classes, i;
-  for(i=0;i<cl.length;i++) if(mapa[cl[i].rank] !== undefined) cl[i].prob = mapa[cl[i].rank];
-  var ov = loadProbOverride();
-  ov[key] = mapa;
-  saveProbOverride(ov);
-}
-
-// le os campos de UM sistema e salva
-function admSaveOne(key, silencioso){
-  var ins = el('admProbAll').querySelectorAll('input[data-sys="' + key + '"]');
-  var mapa = {}, s = 0, i;
-  for(i=0;i<ins.length;i++){
-    var v = Number(ins[i].value);
-    if(isNaN(v) || v < 0){
-      el('admProbMsg').innerHTML = '<div class="adm-warn">Valor inválido em ' + esc(key) + ' / ' + esc(ins[i].getAttribute('data-rank')) + '.</div>';
-      return false;
-    }
-    mapa[ins[i].getAttribute('data-rank')] = v;
-    s += v;
-  }
-  admAplicarMapa(key, mapa);
-  admUpdateTag(key);
-  admUpdateTotalBox();
-  if(!silencioso) renderRates();
-  return true;
-}
-
-// salva TODOS os sistemas de uma vez
-function admSaveAll(){
-  var keys = admSistemasEditaveis();
-  var ruins = [], i;
-  // valida tudo antes de gravar qualquer coisa
-  for(i=0;i<keys.length;i++){
-    var ins = el('admProbAll').querySelectorAll('input[data-sys="' + keys[i] + '"]');
-    for(var j=0;j<ins.length;j++){
-      var v = Number(ins[j].value);
-      if(isNaN(v) || v < 0){
-        el('admProbMsg').innerHTML = '<div class="adm-warn">Valor inválido em ' + esc(SYSTEMS[keys[i]].label) + ' / ' + esc(ins[j].getAttribute('data-rank')) + '. Nada foi salvo.</div>';
-        return;
-      }
-    }
-  }
-  for(i=0;i<keys.length;i++){ admSaveOne(keys[i], true); if(Math.abs(admLerSoma(keys[i]) - 100) > 0.01) ruins.push(SYSTEMS[keys[i]].label); }
-  renderRates();
-  el('admProbInfo').textContent = 'salvo: ' + keys.length + ' sistemas';
-  el('admProbMsg').innerHTML = ruins.length
-    ? '<div class="adm-warn">Salvo em ' + keys.length + ' sistemas. Ainda fora de 100%: ' + esc(ruins.join(', ')) + '. O sorteio continua funcionando — ele usa a soma real como base.</div>'
-    : '<div class="adm-ok">Todas as probabilidades salvas. Os ' + keys.length + ' sistemas somam 100%.</div>';
-}
-
-// normalizar um sistema
-function admNormOne(key){
-  var ins = el('admProbAll').querySelectorAll('input[data-sys="' + key + '"]');
-  var soma = 0, i;
-  for(i=0;i<ins.length;i++) soma += Number(ins[i].value) || 0;
-  if(soma <= 0) return;
-  var acumulado = 0;
-  for(i=0;i<ins.length;i++){
-    var bruto = (Number(ins[i].value) || 0) / soma * 100;
-    var v = (i === ins.length - 1) ? Math.round((100 - acumulado) * 1000) / 1000 : Math.round(bruto * 1000) / 1000;
-    acumulado += v;
-    ins[i].value = v;
-  }
-  admUpdateTag(key);
-  admUpdateTotalBox();
-}
-
-function admNormAll(){
-  var keys = admSistemasEditaveis(), i;
-  for(i=0;i<keys.length;i++) admNormOne(keys[i]);
-  el('admProbMsg').innerHTML = '<div class="adm-ok">Todos os sistemas normalizados para 100%. Aperte Salvar TODAS para gravar.</div>';
-}
-
-// restaurar um sistema ao padrao
-function admResetOne(key){
-  var ov = loadProbOverride();
-  delete ov[key];
-  saveProbOverride(ov);
-  // recarrega a tabela padrao reconstruindo pelo que sobrou nos overrides
-  location.reload();
-}
-
-function admResetAll(){
-  if(!confirm('Restaurar o padrão de TODOS os sistemas? Seus ajustes de probabilidade serão apagados.')) return;
-  try{ localStorage.removeItem(STORE_PROBS); }catch(e){}
-  location.reload();
-}
-
-el('admProbApplyAll').onclick = admSaveAll;
-el('admProbResetAll').onclick = admResetAll;
-el('admProbNormAll').onclick = admNormAll;
-
-el('admProbOpenAll').onclick = function(){
-  var keys = admSistemasEditaveis(), i;
-  for(i=0;i<keys.length;i++) admAbertos[keys[i]] = true;
-  admRenderAll();
-};
-el('admProbCloseAll').onclick = function(){
-  admAbertos = {};
-  admRenderAll();
-};
-el('admProbExpand').onclick = function(){
-  var keys = admSistemasEditaveis(), i;
-  // expandir cada sistema: deixa a grade mais larga em telas grandes
-  var box = el('admProbAll');
-  var grids = box.querySelectorAll('.adm-grid2');
-  for(i=0;i<grids.length;i++) grids[i].style.gridTemplateColumns = 'repeat(auto-fill,minmax(160px,1fr))';
-  el('admProbMsg').innerHTML = '<div class="adm-ok">Grade compactada para caber mais níveis por linha.</div>';
-};
-
-// ---------- coleções e itens ----------
-function admRenderCols(){
-  var all = loadColls(), keys = Object.keys(all), out = '', i;
-  for(i=0;i<keys.length;i++){
-    out += '<option value="' + esc(keys[i]) + '"' + (keys[i] === coll ? ' selected' : '') + '>' + esc(all[keys[i]].name) + '</option>';
-  }
-  el('admColl').innerHTML = out;
-}
-el('admColl').onchange = function(){
-  coll = el('admColl').value;
-  try{ localStorage.setItem(STORE_ACTIVE, coll); }catch(e){}
-  inv = loadInv(current, coll);
-  renderSys(); renderColls(); renderStats(); renderList();
-  if(typeof renderPvpPick === 'function') renderPvpPick();
-  toast('Coleção alvo: ' + coll);
-};
-
-function admRenderItems(){
-  var box = el('admItems');
-  if(current === 'weapons'){
-    box.innerHTML = '<div class="adm-note">O sistema de armas tem ' + ((DATA && DATA.armas) ? DATA.armas.length : 0) + ' itens. Use "Desbloquear tudo" para liberar todas de uma vez.</div>';
-    return;
-  }
-  var sysAtual = SYSTEMS[current];
-  if(!sysAtual || !sysAtual.classes){
-    box.innerHTML = '<div class="cmp-empty">Sistema indisponivel.</div>';
-    return;
-  }
-  var cl = sysAtual.classes, out = '', i, j;
-  for(i=0;i<cl.length;i++){
-    var bag = itemsOf(current)[cl[i].rank] || [];
-    for(j=0;j<bag.length;j++){
-      out += '<span class="adm-chip" data-give="' + esc(cl[i].rank + '||' + bag[j] + '||' + cl[i].name + '||' + cl[i].color) + '">' + esc(bag[j]) + '</span>';
-    }
-  }
-  box.innerHTML = out || '<div class="adm-empty">Nada aqui.</div>';
-  var cs = box.querySelectorAll('[data-give]');
-  for(i=0;i<cs.length;i++){
-    cs[i].onclick = (function(raw){ return function(){
-      var p = raw.split('||');
-      var item = { uid:'adm'+Date.now()+Math.random().toString(36).slice(2,6), rank:p[0], name:p[1], cls:p[2], color:p[3], prob:0, ts:Date.now() };
-      inv.unshift(item);
-      saveInv(current, coll, inv);
-      renderStats(); renderList(); renderColls();
-      toast('Item dado: ' + p[1]);
-    }; })(cs[i].getAttribute('data-give'));
-  }
-}
-
-el('admUnlock').onclick = function(){
-  if(!confirm('Liberar TODOS os itens de ' + SYS().label + ' na coleção "' + coll + '"?')) return;
-  var add = 0;
-  if(current === 'weapons'){
-    for(var i=0;i<DATA.armas.length;i++){
-      var w = DATA.armas[i];
-      var g = ARMA_GRADES[(i*7)%ARMA_GRADES.length];
-      inv.unshift({ uid:'adm'+Date.now()+i+Math.random().toString(36).slice(2,5), rank:g.g.substring(0,2).toUpperCase(), name:w.n, cls:g.g, color:g.color, prob:0, p:g.p, v:g.v, i:g.i, a:g.a, c:g.c, ts:Date.now() });
-      add++;
-    }
-  } else {
-    var cl = SYSTEMS[current].classes;
-    for(var c=0;c<cl.length;c++){
-      var bag = itemsOf(current)[cl[c].rank] || [];
-      for(var b=0;b<bag.length;b++){
-        inv.unshift({ uid:'adm'+Date.now()+c+'_'+b+Math.random().toString(36).slice(2,5), rank:cl[c].rank, name:bag[b], cls:cl[c].name, color:cl[c].color, prob:cl[c].prob, ts:Date.now() });
-        add++;
-      }
-    }
-  }
-  saveInv(current, coll, inv);
-  renderStats(); renderList(); renderColls();
-  toast(add + ' itens liberados.');
-};
-
-el('admWipeColl').onclick = function(){
-  if(!confirm('Esvaziar a coleção "' + coll + '" em TODOS os sistemas?')) return;
-  for(var j=0;j<SYS_ORDER.length;j++){
-    try{ localStorage.removeItem(invKey(SYS_ORDER[j], coll)); }catch(e){}
-  }
-  inv = loadInv(current, coll);
-  renderStats(); renderList(); renderColls(); renderSys();
-  if(typeof renderPvpPick === 'function') renderPvpPick();
-  toast('Coleção esvaziada.');
-};
-
-// ---------- chave ----------
-el('admSaveKey').onclick = function(){
-  var a = el('admNewKey').value || '', b = el('admNewKey2').value || '';
-  if(a.length < 4){ el('admKeyMsg').innerHTML = '<div class="adm-warn">A chave precisa ter pelo menos 4 caracteres.</div>'; return; }
-  if(a !== b){ el('admKeyMsg').innerHTML = '<div class="adm-warn">As duas chaves não são iguais.</div>'; return; }
-  try{ localStorage.setItem(STORE_ADMKEY, a); }catch(e){}
-  el('admNewKey').value = ''; el('admNewKey2').value = '';
-  el('admKeyMsg').innerHTML = '<div class="adm-ok">Chave trocada. Guarde bem: não há recuperação.</div>';
-  admGateModo();
-};
-
-// ---------- exportar / importar ----------
-el('admDoExport').onclick = function(){
-  var pacote = {
-    app: 'PROJECT GACHA',
-    tipo: 'ajustes',
-    versao: 1,
-    probs: loadProbOverride(),
-    chaveHash: null
-  };
-  el('admExport').value = JSON.stringify(pacote);
-  el('admDataMsg').innerHTML = '<div class="adm-ok">Código gerado. Copie e guarde.</div>';
-};
-
-el('admDoImport').onclick = function(){
-  var txt = el('admExport').value || '';
-  try{
-    var p = JSON.parse(txt);
-    if(!p || p.app !== 'PROJECT GACHA'){ el('admDataMsg').innerHTML = '<div class="adm-warn">Código inválido.</div>'; return; }
-    saveProbOverride(p.probs || {});
-    el('admDataMsg').innerHTML = '<div class="adm-ok">Ajustes importados.</div>';
-    aplicarOverrides();
-    renderRates(); admRender();
-  }catch(e){
-    el('admDataMsg').innerHTML = '<div class="adm-warn">Não consegui ler esse código.</div>';
-  }
-};
-
-el('admFactory').onclick = function(){
-  if(!confirm('Apagar TODOS os ajustes, coleções e itens, e voltar a chave padrão?')) return;
-  try{
-    localStorage.removeItem(STORE_PROBS);
-    localStorage.removeItem(STORE_ADMKEY);
-    localStorage.removeItem('projectGachaAdmOk');
-    localStorage.removeItem(STORE_REB);
-    var all = loadColls(), keys = Object.keys(all);
-    for(var i=0;i<keys.length;i++) for(var j=0;j<SYS_ORDER.length;j++) localStorage.removeItem(invKey(SYS_ORDER[j], keys[i]));
-    saveColls({ 'Principal': { id:'Principal', name:'Principal' } });
-    localStorage.setItem(STORE_ACTIVE, 'Principal');
-  }catch(e){}
-  location.reload();
-};
-
-// ---------- entrada na aba ----------
-(function(){
-  var entrou = false;
-  try{ entrou = localStorage.getItem('projectGachaAdmOk') === '1'; }catch(e){}
-  admOk = entrou;
-  try{ admGateModo(); }catch(e){}
-  try{ admMostrar(entrou); }catch(e){}
-  try{ el('navAdm').style.display = ''; }catch(e){}
-})();
-
-
 /* ================= ELOS E RANK (v13.16) ================= */
 var STORE_ELO = 'projectGachaElo.v1';
 
@@ -4681,6 +4236,63 @@ function sorteRenascimento(id2){
   return Math.round(n * SORTE_POR_RENASCIMENTO * 100) / 100;
 }
 
+
+/* ===== acoes do personagem (v20) ===== */
+function persAtivar(id2){
+  var all = loadColls();
+  if(!all[id2]) return;
+  coll = id2;
+  try{ localStorage.setItem(STORE_ACTIVE, id2); }catch(e){}
+  inv = loadInv(current, coll);
+  selection = {};
+  renderColls(); renderSys(); renderStats(); renderList();
+  try{ renderRebirthBar(); }catch(e){}
+  try{ renderRebirthBox(); }catch(e){}
+  try{ renderNivelBox(); }catch(e){}
+  try{ renderCmpPick(); }catch(e){}
+  try{ renderPvpPick(); }catch(e){}
+  try{ renderElos(); }catch(e){}
+  try{ pfRender(); }catch(e){}
+  toast('Agora jogando com ' + (all[id2].name || id2) + '.');
+}
+
+function persRenomear(id2){
+  var all = loadColls();
+  if(!all[id2]) return;
+  var atual = all[id2].name || id2;
+  var novo = prompt('Novo nome do personagem:', atual);
+  if(novo === null) return;
+  novo = (novo || '').trim();
+  if(novo.length < 2){ toast('O nome precisa ter pelo menos 2 caracteres.'); return; }
+  if(novo.length > 18){ toast('O nome pode ter no máximo 18 caracteres.'); return; }
+  if(novo !== id2 && all[novo]){ toast('Já existe um personagem com esse nome.'); return; }
+  var dados = {
+    id: id2, name: novo,
+    avatar: all[id2].avatar || '⚔️',
+    cor: all[id2].cor || '#8b5cf6',
+    titulo: all[id2].titulo || '',
+    bio: all[id2].bio || '',
+    criado: all[id2].criado || new Date().toISOString().slice(0,10)
+  };
+  delete all[id2];
+  all[id2] = dados;          // a chave do armazenamento NAO muda: o progresso fica
+  saveColls(all);
+  renderColls();
+  if(id2 === coll) try{ pfRender(); }catch(e){}
+  toast('Personagem renomeado para ' + novo + '.');
+}
+
+function persRenascer(id2){
+  if(typeof renascer !== 'function'){ toast('Renascimento indisponível.'); return; }
+  var p = persDe(id2);
+  renascer(id2);
+  // renascer ja avisa e confirma; aqui so garantimos que a lista se atualize
+  renderColls();
+  try{ renderRebirthBar(); }catch(e){}
+  try{ renderRebirthBox(); }catch(e){}
+  try{ pfRender(); }catch(e){}
+}
+
 // ---------- renascimento da colecao ----------
 function renascer(id2){
   id2 = id2 || coll;
@@ -5198,6 +4810,181 @@ function lutarTorre(){
    Itens = "sistema-classe" por indice, na TABELA abaixo. */
 
 var STORE_COD = 'projectGachaCodes.v2';
+
+/* ================= PERFIL / PERSONAGEM (v18) ================= */
+var STORE_PERFIL = 'projectGachaPerfil.v1';
+var PF_AVATARES = ['⚔️','🔥','❄️','⚡','🌙','☀️','🐉','👑','💀','🌟','🌀','🦅','🐺','🛡️','🔮','🗡️'];
+var PF_CORES = ['#8b5cf6','#22d3ee','#4ade80','#facc15','#fb7185','#fb923c','#c084fc','#38bdf8'];
+
+function pfLer(){
+  try{
+    var p = JSON.parse(localStorage.getItem(STORE_PERFIL) || 'null');
+    if(!p || !p.nome) return null;
+    return p;
+  }catch(e){ return null; }
+}
+function pfGravar(p){
+  try{ localStorage.setItem(STORE_PERFIL, JSON.stringify(p)); }catch(e){}
+}
+function pfEscolhido(tipo, valor){
+  pfSel[tipo] = valor;
+  pfPintar(tipo);
+}
+var pfSel = { avatar:'⚔️', cor:'#8b5cf6' };
+
+function pfPintar(prefixo){
+  var alvoA = document.getElementById(prefixo + 'Avatares');
+  var alvoC = document.getElementById(prefixo + 'Cores');
+  if(!alvoA && !alvoC) return;
+  var atualA = pfSel.avatar, atualC = pfSel.cor;
+  if(document.getElementById(prefixo + 'NomeEdit')){
+    var p = pfLer();
+    if(p && p.avatar) atualA = p.avatar;
+    if(p && p.cor) atualC = p.cor;
+  }
+  if(alvoA){
+    var h = '';
+    for(var i=0;i<PF_AVATARES.length;i++){
+      h += '<div class="pf-av'+(PF_AVATARES[i]===pfSel.avatar?' on':'')+'" data-av="'+PF_AVATARES[i]+'">'+PF_AVATARES[i]+'</div>';
+    }
+    alvoA.innerHTML = h;
+    var ops = alvoA.querySelectorAll('[data-av]');
+    for(var j=0;j<ops.length;j++){
+      ops[j].onclick = (function(v){ return function(){ pfSel.avatar = v; pfPintar(prefixo); }; })(ops[j].getAttribute('data-av'));
+    }
+  }
+  if(alvoC){
+    var h2 = '';
+    for(var k=0;k<PF_CORES.length;k++){
+      h2 += '<div class="pf-cor'+(PF_CORES[k]===pfSel.cor?' on':'')+'" data-cor="'+PF_CORES[k]+'" style="background:'+PF_CORES[k]+'"></div>';
+    }
+    alvoC.innerHTML = h2;
+    var ops2 = alvoC.querySelectorAll('[data-cor]');
+    for(var m=0;m<ops2.length;m++){
+      ops2[m].onclick = (function(v){ return function(){ pfSel.cor = v; pfPintar(prefixo); }; })(ops2[m].getAttribute('data-cor'));
+    }
+  }
+}
+
+function pfCriar(){
+  var msg = document.getElementById('pfMsgCriar');
+  var nome = (document.getElementById('pfNome').value || '').trim();
+  if(nome.length < 2){ msg.innerHTML = '<div class="adm-warn">O nome precisa ter pelo menos 2 caracteres.</div>'; return; }
+  var p = {
+    nome: nome,
+    avatar: pfSel.avatar,
+    cor: pfSel.cor,
+    titulo: (document.getElementById('pfTitulo').value || '').trim(),
+    bio: (document.getElementById('pfBio').value || '').trim(),
+    criado: new Date().toISOString().slice(0,10)
+  };
+  pfGravar(p);
+  msg.innerHTML = '';
+  pfRender();
+  toast('Personagem criado: ' + nome);
+}
+
+function pfSalvar(){
+  var p = pfLer();
+  if(!p) return;
+  var msg = document.getElementById('pfMsgEdit');
+  var nome = (document.getElementById('pfNomeEdit').value || '').trim();
+  if(nome.length < 2){ msg.innerHTML = '<div class="adm-warn">O nome precisa ter pelo menos 2 caracteres.</div>'; return; }
+  p.nome = nome;
+  p.avatar = pfSel.avatar;
+  p.cor = pfSel.cor;
+  p.titulo = (document.getElementById('pfTituloEdit').value || '').trim();
+  p.bio = (document.getElementById('pfBioEdit').value || '').trim();
+  pfGravar(p);
+  msg.innerHTML = '<div class="adm-ok">Alterações salvas.</div>';
+  pfRender();
+  toast('Perfil atualizado.');
+}
+
+function pfApagar(){
+  if(!confirm('Apagar o personagem? A coleção não será afetada.')) return;
+  try{ localStorage.removeItem(STORE_PERFIL); }catch(e){}
+  pfRender();
+  toast('Personagem apagado.');
+}
+
+function pfRender(){
+  var sem = document.getElementById('pfSemPersonagem');
+  var com = document.getElementById('pfCard');
+  if(!sem || !com) return;
+  var p = pfLer();
+
+  if(!p){
+    sem.style.display = '';
+    com.style.display = 'none';
+    document.getElementById('pfSub').textContent = 'crie seu personagem';
+    pfSel = { avatar: PF_AVATARES[0], cor: PF_CORES[0] };
+    pfPintar('pf');
+    return;
+  }
+
+  sem.style.display = 'none';
+  com.style.display = '';
+  document.getElementById('pfSub').textContent = p.nome;
+  document.getElementById('pfDesde').textContent = 'desde ' + (p.criado || '-');
+
+  var av = document.getElementById('pfAvatarBig');
+  av.textContent = p.avatar || '?';
+  av.style.color = p.cor || '#8b5cf6';
+  av.style.borderColor = (p.cor || '#8b5cf6') + '66';
+  av.style.background = (p.cor || '#8b5cf6') + '1a';
+
+  document.getElementById('pfNomeShow').textContent = p.nome;
+  var t = document.getElementById('pfTituloShow');
+  t.textContent = p.titulo || 'Sem título';
+  t.style.color = p.cor || '#8b5cf6';
+  document.getElementById('pfBioShow').textContent = p.bio || 'Sem descrição.';
+
+  document.getElementById('pfNomeEdit').value = p.nome;
+  document.getElementById('pfTituloEdit').value = p.titulo || '';
+  document.getElementById('pfBioEdit').value = p.bio || '';
+  pfSel = { avatar: p.avatar || PF_AVATARES[0], cor: p.cor || PF_CORES[0] };
+  pfPintar('pfEdit');
+
+  // estatisticas da colecao ativa
+  var box = document.getElementById('pfStats');
+  var h = '', total = 0, i;
+  for(i=0;i<SYS_ORDER.length;i++){
+    var n = loadInv(SYS_ORDER[i], coll).length;
+    total += n;
+  }
+  var st = (typeof pvpRead === 'function') ? pvpRead(coll) : null;
+  var nivel = 1, xp = 0, reb = 0, arts = 0;
+  try{
+    var reg = lvlDe(coll);
+    xp = Number(reg.xp) || 0;
+    nivel = nivelDoXp(xp).nivel;
+    arts = (reg.art || []).length;
+  }catch(e){}
+  try{ reb = (typeof rebDe === 'function') ? rebDe(coll) : 0; }catch(e){}
+
+  function cel(v, r){
+    return '<div class="pf-st"><b>'+v+'</b><span>'+r+'</span></div>';
+  }
+  h += cel(esc(coll), 'COLEÇÃO');
+  h += cel(total, 'ITENS');
+  h += cel(nivel, 'NÍVEL');
+  h += cel(arts, 'ARTEFATOS');
+  h += cel(reb, 'RENASCIMENTOS');
+  if(st) h += cel(st.pv, 'PODER DE LUTA');
+  box.innerHTML = h;
+}
+
+function pfInit(){
+  var b = document.getElementById('pfCriar');
+  if(b) b.onclick = pfCriar;
+  var s = document.getElementById('pfSalvar');
+  if(s) s.onclick = pfSalvar;
+  var a = document.getElementById('pfApagar');
+  if(a) a.onclick = pfApagar;
+  pfRender();
+}
+
 var CHAVE_COD = 'PROJECT-GACHA-2026';
 var PREFIXO_COD = 'GACHA-';
 
@@ -5450,6 +5237,7 @@ function codRenderHist(){
 /* ---------- INIT ---------- */
 el('showRates').onclick = function(){ el('ratesPanel').scrollIntoView({behavior:'smooth',block:'center'}); };
 el('tabCollection').onclick = function(){ tab='collection'; el('tabCollection').classList.add('active'); el('tabAll').classList.remove('active'); renderList(); };
+try{ pfRender(); }catch(e){}
 el('tabAll').onclick = function(){ tab='all'; el('tabAll').classList.add('active'); el('tabCollection').classList.remove('active'); renderList(); };
 el('search').oninput = function(e){ query = e.target.value; renderList(); };
 el('clearInventory').onclick = clearOne;
@@ -5512,6 +5300,8 @@ renderThemes();
 applyTheme(savedTheme);
 
 choose(current);
+
+try{ pfInit(); }catch(e){}
 </script>
 </body>
 </html>
