@@ -5283,19 +5283,28 @@ function cdRankDoNome(item){
   return it;
 }
 // aplica um premio de item/classe/artefato na colecao
+function cdAddArtefato(id2, art){
+  var s = lvlStore();
+  var r = s[id2];
+  if(!r) r = { xp:0, nivel:1, art:[] };
+  if(!r.art) r.art = [];
+  r.art.push(art);
+  s[id2] = r;
+  lvlSaveKey(s);
+  return art;
+}
 function cdAplicarPremio(p, id2, i){
   if(!p) return null;
 
   if(p.modo === 'artefato'){
-    if(typeof lvlDe !== 'function' || typeof lvlSet !== 'function') return null;
-    var r = lvlDe(id2);
-    r.art = r.art || [];
-    r.art.push({
+    var coresArt = { 'Comum':'#9CA3AF', 'Raro':'#38BDF8', 'Épico':'#FB7185', 'Lendário':'#C084FC' };
+    var art = {
       id:'art' + Date.now() + Math.random().toString(36).slice(2,6),
-      nome:p.nome, grupo:p.grupo, cor:'#C084FC', status:p.status, valor:p.valor, nivel:1, ts:Date.now()
-    });
-    lvlSet(id2, r);
-    return { rank:'ART', name:p.nome + ' (+' + p.valor + ')', cls:p.grupo, color:'#C084FC', prob:0, ts:Date.now() };
+      nome:p.nome, grupo:p.grupo, cor:(coresArt[p.grupo] || '#C084FC'),
+      status:p.status, valor:p.valor, nivel:1, ts:Date.now()
+    };
+    cdAddArtefato(id2, art);
+    return { rank:'ART', name:p.nome + ' (+' + p.valor + ')', cls:p.grupo, color:art.cor, prob:0, ts:Date.now() };
   }
 
   var sis, rank, nome;
@@ -5498,9 +5507,12 @@ function codResgatar(){
 
   campo.value = '';
   msg.className = 'cd-msg ok';
-  msg.textContent = 'Resgatado! ' + (ganhos.length ? (ganhos.length + ' item(ns) foram para a coleção "' + coll + '".') : 'Prêmio aplicado.')
+  var temArt = false;
+  if(pacote.itensNovos){ for(var q=0;q<pacote.itensNovos.length;q++){ if(pacote.itensNovos[q].modo==='artefato') temArt = true; } }
+  msg.textContent = 'Resgatado! ' + (ganhos.length ? (ganhos.length + ' item(ns) foram para a coleção \"' + coll + '\".') : 'Prêmio aplicado.')
     + (pacote.xp ? (' +' + pacote.xp + ' XP.') : '')
-    + (pacote.tokens ? (' +' + pacote.tokens + ' token(s).') : '');
+    + (pacote.tokens ? (' +' + pacote.tokens + ' token(s).') : '')
+    + (temArt ? ' Artefato enviado para a aba Nível.' : '');
 
   var card = document.getElementById('cdPremiosCard');
   var boxP = document.getElementById('cdPremios');
@@ -5518,6 +5530,7 @@ function codResgatar(){
     card.style.display = '';
   }
 
+  try{ renderNivelBox(); }catch(e){}
   try{ renderStats(); }catch(e){}
   try{ renderList(); }catch(e){}
   try{ renderColls(); }catch(e){}
