@@ -763,9 +763,79 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .pers-b.reb{color:#facc15;border-color:rgba(250,204,21,.4);background:rgba(250,204,21,.07)}
 .pers-b.reb:hover{border-color:#facc15}
 @media(max-width:520px){.pers-acts{grid-template-columns:1fr 1fr}.pers-acts .pers-b:first-child{grid-column:1/-1}}
+
+/* ===== LOGIN (v21) ===== */
+#lgOverlay{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;padding:18px;
+  background:radial-gradient(circle at 50% 0%,rgba(139,92,246,.28),transparent 55%),rgba(4,6,14,.94);backdrop-filter:blur(6px)}
+#lgOverlay.on{display:flex}
+.lg-box{width:min(400px,100%);border:1px solid var(--line);border-radius:22px;background:var(--panel);overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.55);animation:lgPop .22s ease}
+@keyframes lgPop{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
+.lg-head{padding:22px 22px 0;text-align:center}
+.lg-logo{width:52px;height:52px;border-radius:16px;margin:0 auto 12px;display:grid;place-items:center;font-size:26px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 30px var(--glow)}
+.lg-head h2{margin:0;font-size:21px;letter-spacing:-.02em}
+.lg-head p{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+.lg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:18px 22px 0}
+.lg-tab{border:1px solid #283451;border-radius:12px;background:var(--bg2);color:var(--muted);padding:10px;font-weight:900;font-size:12.5px;cursor:pointer}
+.lg-tab.on{color:#fff;border-color:var(--accent);background:#252044}
+.lg-body{padding:16px 22px 22px;display:grid;gap:10px}
+.lg-lbl{font-size:10px;letter-spacing:1.5px;font-weight:950;text-transform:uppercase;color:var(--muted);margin:2px 0 -4px 2px}
+.lg-in{width:100%;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--text);padding:0 13px;font-size:13.5px;outline:none}
+.lg-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.lg-btn{width:100%;min-height:46px;border:0;border-radius:13px;font-weight:950;font-size:14px;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 26px rgba(113,92,255,.28);margin-top:4px}
+.lg-btn:disabled{opacity:.55;cursor:wait}
+.lg-msg{border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.5;display:none}
+.lg-msg.on{display:block}
+.lg-msg.bad{border:1px solid rgba(251,113,133,.5);background:rgba(251,113,133,.1);color:#fecdd3}
+.lg-msg.ok{border:1px solid rgba(74,222,128,.45);background:rgba(74,222,128,.08);color:#bbf7d0}
+.lg-msg.info{border:1px solid var(--line);background:rgba(0,0,0,.2);color:var(--muted)}
+.lg-foot{padding:0 22px 20px;text-align:center;font-size:10.5px;color:var(--muted);line-height:1.6}
+.lg-user{display:flex;align-items:center;gap:9px}
+.lg-user .nm{font-size:12.5px;font-weight:900}
+.lg-user .em{font-size:10.5px;color:var(--muted)}
+.lg-out{border:1px solid rgba(251,113,133,.45);background:rgba(251,113,133,.09);color:#fecdd3;border-radius:10px;
+  padding:7px 11px;font-size:11px;font-weight:900;cursor:pointer;margin-left:auto}
 </style>
 </head>
 <body>
+<!-- ============ TELA DE LOGIN ============ -->
+<div id="lgOverlay">
+  <div class="lg-box">
+    <div class="lg-head">
+      <div class="lg-logo" id="lgLogo">✦</div>
+      <h2>PROJECT GACHA</h2>
+      <p id="lgSub">Entre para salvar seus personagens na conta.</p>
+    </div>
+
+    <div class="lg-tabs" id="lgTabs">
+      <button class="lg-tab on" data-modo="entrar">Entrar</button>
+      <button class="lg-tab" data-modo="criar">Criar conta</button>
+    </div>
+
+    <div class="lg-body">
+      <div class="lg-lbl">Usuário</div>
+      <input id="lgUsuario" class="lg-in" type="text" autocomplete="username" placeholder="seu usuário" maxlength="16">
+
+      <div id="lgBlocoEmail" style="display:none">
+        <div class="lg-lbl">E-mail</div>
+        <input id="lgEmail" class="lg-in" type="email" autocomplete="email" placeholder="seu@email.com">
+      </div>
+
+      <div class="lg-lbl">Senha</div>
+      <input id="lgSenha" class="lg-in" type="password" autocomplete="current-password" placeholder="sua senha">
+
+      <button class="lg-btn" id="lgAcao">Entrar</button>
+      <div class="lg-msg" id="lgMsg"></div>
+    </div>
+
+    <div class="lg-foot" id="lgFoot">
+      Seu progresso continua salvo neste aparelho.<br>A conta serve para levar os personagens entre dispositivos.
+    </div>
+  </div>
+</div>
+
 <div class="sh-wrap">
   <nav class="nav" id="nav">
     <button class="active" data-view="v-gacha"><i>✦</i>Gacha</button>
@@ -5301,7 +5371,187 @@ applyTheme(savedTheme);
 
 choose(current);
 
+
+/* ================= LOGIN (v21) ================= */
+var LG_API = 'https://project-gacha-api-fdcqbpevcsareqaj.brazilsouth-01.azurewebsites.net/api';
+var STORE_SESSAO = 'projectGachaSessao.v1';
+
+function lgSessao(){
+  try{ return JSON.parse(localStorage.getItem(STORE_SESSAO) || 'null'); }catch(e){ return null; }
+}
+function lgGuardar(s){
+  try{ localStorage.setItem(STORE_SESSAO, JSON.stringify(s)); }catch(e){}
+}
+function lgLimpar(){
+  try{ localStorage.removeItem(STORE_SESSAO); }catch(e){}
+}
+
+function lgEl(id){ return document.getElementById(id); }
+function lgMsg(tipo, texto){
+  var b = lgEl('lgMsg');
+  b.className = 'lg-msg on ' + tipo;
+  b.textContent = texto;
+}
+
+function lgMostrar(mostrar){
+  var ov = lgEl('lgOverlay');
+  if(!ov) return;
+  ov.classList.toggle('on', !!mostrar);
+}
+
+function lgModo(m){
+  lgModoAtual = m;
+  var tabs = lgEl('lgTabs').querySelectorAll('[data-modo]');
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('on', tabs[i].getAttribute('data-modo') === m);
+  lgEl('lgBlocoEmail').style.display = (m === 'criar') ? '' : 'none';
+  lgEl('lgAcao').textContent = (m === 'criar') ? 'Criar conta' : 'Entrar';
+  lgEl('lgSenha').setAttribute('autocomplete', (m === 'criar') ? 'new-password' : 'current-password');
+  lgEl('lgMsg').className = 'lg-msg';
+  lgEl('lgSub').textContent = (m === 'criar')
+    ? 'Crie sua conta com usuário, e-mail e senha.'
+    : 'Entre para salvar seus personagens na conta.';
+}
+var lgModoAtual = 'entrar';
+
+// chama a API
+async function lgPedir(rota, corpo, comSessao){
+  var cab = { 'Content-Type': 'application/json' };
+  if(comSessao){
+    var s = lgSessao();
+    if(s && s.passe) cab['Authorization'] = 'Bearer ' + s.passe;
+  }
+  var r = await fetch(LG_API + rota, {
+    method: 'POST',
+    headers: cab,
+    body: JSON.stringify(corpo || {})
+  });
+  var dados = null;
+  try{ dados = await r.json(); }catch(e){ dados = {}; }
+  return { status: r.status, dados: dados };
+}
+
+async function lgExecutar(){
+  var usuario = (lgEl('lgUsuario').value || '').trim().toLowerCase();
+  var email = (lgEl('lgEmail').value || '').trim().toLowerCase();
+  var senha = lgEl('lgSenha').value || '';
+  var btn = lgEl('lgAcao');
+
+  if(lgModoAtual === 'criar'){
+    if(!usuario){ lgMsg('bad', 'Escolha um usuário.'); return; }
+    if(!email){ lgMsg('bad', 'Informe seu e-mail.'); return; }
+    if(senha.length < 6){ lgMsg('bad', 'A senha precisa ter pelo menos 6 caracteres.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Criando...';
+    try{
+      var r = await lgPedir('/criar', { usuario: usuario, email: email, senha: senha });
+      if(r.status === 201){
+        lgMsg('ok', 'Conta criada! Entrando...');
+        var e = await lgPedir('/entrar', { usuario: usuario, senha: senha });
+        if(e.status === 200){
+          lgGuardar({ usuario: e.dados.usuario, email: e.dados.email, passe: e.dados.passe, desde: new Date().toISOString() });
+          lgEntrou();
+          return;
+        }
+        lgMsg('info', 'Conta criada. Agora entre com usuário e senha.');
+        lgModo('entrar');
+      } else {
+        lgMsg('bad', r.dados.erro || 'Não foi possível criar a conta.');
+      }
+    } catch(err){
+      lgMsg('bad', 'Não consegui falar com o servidor. Verifique sua internet.');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Criar conta';
+    return;
+  }
+
+  if(!usuario || !senha){ lgMsg('bad', 'Informe usuário e senha.'); return; }
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  try{
+    var r2 = await lgPedir('/entrar', { usuario: usuario, senha: senha });
+    if(r2.status === 200){
+      lgGuardar({ usuario: r2.dados.usuario, email: r2.dados.email, passe: r2.dados.passe, desde: new Date().toISOString() });
+      lgEntrou();
+      return;
+    }
+    lgMsg('bad', r2.dados.erro || 'Usuário ou senha incorretos.');
+  } catch(err2){
+    lgMsg('bad', 'Não consegui falar com o servidor. Verifique sua internet.');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
+}
+
+function lgEntrou(){
+  var s = lgSessao();
+  if(!s) return;
+  lgMostrar(false);
+  lgBarra();
+  lgEl('lgSenha').value = '';
+  try{ pfRender(); }catch(e){}
+  toast('Bem-vindo, ' + s.usuario + '.');
+}
+
+function lgSair(){
+  if(!confirm('Sair da conta? Seu progresso continua salvo neste aparelho.')) return;
+  lgLimpar();
+  lgBarra();
+  lgModo('entrar');
+  lgMostrar(true);
+  toast('Você saiu da conta.');
+}
+
+// barra com o usuario no topo
+function lgBarra(){
+  var s = lgSessao();
+  var alvo = document.getElementById('lgUserBar');
+  if(!alvo){
+    alvo = document.createElement('div');
+    alvo.id = 'lgUserBar';
+    alvo.className = 'pill';
+    alvo.style.marginLeft = 'auto';
+    var cab = document.querySelector('.topbar');
+    if(cab) cab.appendChild(alvo);
+  }
+  if(!s){
+    alvo.innerHTML = '<button class="lg-out" id="lgBtnEntrar" style="margin:0">Entrar</button>';
+    var b1 = document.getElementById('lgBtnEntrar');
+    if(b1) b1.onclick = function(){ lgModo('entrar'); lgMostrar(true); };
+    return;
+  }
+  alvo.innerHTML = '<div class="lg-user"><div><div class="nm">' + esc(s.usuario) + '</div>'
+    + '<div class="em">' + esc(s.email || '') + '</div></div>'
+    + '<button class="lg-out" id="lgBtnSair">Sair</button></div>';
+  var b2 = document.getElementById('lgBtnSair');
+  if(b2) b2.onclick = lgSair;
+}
+
+function lgInit(){
+  var tabs = lgEl('lgTabs').querySelectorAll('[data-modo]');
+  for(var i=0;i<tabs.length;i++){
+    tabs[i].onclick = (function(m){ return function(){ lgModo(m); }; })(tabs[i].getAttribute('data-modo'));
+  }
+  var acao = lgEl('lgAcao');
+  if(acao) acao.onclick = lgExecutar;
+
+  ['lgUsuario','lgEmail','lgSenha'].forEach(function(id){
+    var c = lgEl(id);
+    if(c) c.onkeydown = function(e){ if(e.key === 'Enter') lgExecutar(); };
+  });
+
+  // se ja tem sessao, entra direto; se nao, abre a tela
+  var s = lgSessao();
+  lgBarra();
+  if(!s){
+    lgModo('entrar');
+    lgMostrar(true);
+  }
+}
+
 try{ pfInit(); }catch(e){}
+try{ lgInit(); }catch(e){}
 </script>
 </body>
 </html>
