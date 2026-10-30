@@ -5814,20 +5814,20 @@ async function syBaixar(){
 }
 
 // --- envio ---------------------------------------------------------
-async function syEnviarAgora(silencioso){
+async function syEnviarAgora(){
   var locais = syContarLocais();
-  if(!silencioso){
-    if(!confirm('Enviar ' + locais.perfis + ' personagem(ns) e ' + locais.itens +
-      ' item(ns) deste aparelho para a conta?\n\nNada e apagado daqui. Apenas uma copia vai para o servidor.')) return false;
-  }
-  syStatus('', 'Enviando...');
-  var r = await syEnviar(syColetar());
+  var dados = syColetar();
+  var conta = syContar(dados);
+  syStatus('', 'Enviando ' + conta.perfis + ' personagem(ns)...');
+  var r = await syEnviar(dados);
   if(r.ok){
     try{ localStorage.setItem(SY_EM, new Date().toISOString()); }catch(e){}
-    syStatus('ok', 'Salvo na conta', 3000);
+    syStatus('ok', 'Salvo na conta: ' + conta.perfis + ' personagem(ns), ' + conta.itens + ' itens', 6000);
+    syMarcarOff(true);
     return true;
   }
-  syStatus('bad', 'Nao consegui salvar: ' + r.erro, 6000);
+  syStatus('bad', 'Nao salvou: ' + r.erro, 12000);
+  alert('O envio falhou.\n\n' + r.erro);
   return false;
 }
 
@@ -5860,7 +5860,7 @@ function syPainel(nuvem){
 
   document.getElementById('syEnviarSo').onclick = async function(){
     fechar();
-    await syEnviarAgora(false);
+    await syEnviarAgora();
   };
 
   document.getElementById('syJuntar').onclick = async function(){
@@ -5909,13 +5909,12 @@ async function syPrimeiraVez(){
       return;
     }
     if(!b.dados){
-      // conta nova
+      // conta vazia: envia o que existe aqui, sem confirmacao bloqueante
       var locais = syContarLocais();
       if(locais.perfis > 0){
-        if(confirm('Sua conta ainda esta vazia.\n\nEnviar os ' + locais.perfis +
-          ' personagem(ns) e ' + locais.itens + ' item(ns) deste aparelho para ela?\n\nNada e apagado daqui.')){
-          await syEnviarAgora(null);
-        }
+        await syEnviarAgora();
+      } else {
+        syStatus('ok', 'Conta pronta', 2500);
       }
       return;
     }
@@ -5962,9 +5961,18 @@ function syBotaoBarra(){
   b.textContent = 'Sincronizar';
   b.onclick = function(){
     b.disabled = true; b.textContent = '...';
-    syPrimeiraVez().then(function(){ b.disabled = false; b.textContent = 'Sincronizar'; });
+    syEnviarAgora().then(function(){ b.disabled = false; b.textContent = 'Sincronizar'; });
   };
   alvo.appendChild(b);
+
+  var d = document.createElement('button');
+  d.id = 'syDiag';
+  d.className = 'lg-out';
+  d.style.margin = '0 0 0 6px';
+  d.textContent = '?';
+  d.title = 'Diagnostico da sincronizacao';
+  d.onclick = function(){ syDiagnostico(); };
+  alvo.appendChild(d);
 }
 
 function syRecarregarTelas(){
@@ -6003,6 +6011,31 @@ document.addEventListener('click', function(e){
   if(t.id === 'syDesfazer') syDesfazer();
   if(t.id === 'syOkBackup'){ document.getElementById('syBackup').className = ''; }
 });
+
+// --- diagnostico na tela --------------------------------------------
+async function syDiagnostico(){
+  var conta = syContar(syColetar());
+  var linhas = [];
+  linhas.push('PERSONAGENS AQUI: ' + conta.perfis);
+  linhas.push('ITENS AQUI: ' + conta.itens);
+
+  var s = lgSessao();
+  linhas.push('CONTA: ' + (s ? s.usuario : 'sem sessao'));
+  linhas.push('PASSE: ' + (s && s.passe ? 'presente (' + s.passe.length + ' car.)' : 'AUSENTE'));
+  linhas.push('SINCRONIZACAO: ' + (syOff() ? 'desligada' : 'ligada'));
+
+  try{
+    var b = await syBaixar();
+    if(b.ok){
+      var naConta = syContar(b.dados);
+      linhas.push('NO SERVIDOR: ' + (b.dados ? (naConta.perfis + ' personagem(ns), ' + naConta.itens + ' itens') : 'vazio'));
+    } else {
+      linhas.push('LEITURA FALHOU: ' + b.erro);
+    }
+  }catch(e){ linhas.push('LEITURA FALHOU: ' + e.message); }
+
+  alert(linhas.join('\n'));
+}
 
 // --- boot -----------------------------------------------------------
 try{
