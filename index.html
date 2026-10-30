@@ -798,7 +798,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .lg-out{border:1px solid rgba(251,113,133,.45);background:rgba(251,113,133,.09);color:#fecdd3;border-radius:10px;
   padding:7px 11px;font-size:11px;font-weight:900;cursor:pointer;margin-left:auto}
 
-/* ================= SINCRONIZACAO (v22) ================= */
+/* ================= SINCRONIZACAO SEGURA (v23) ================= */
 #syBarra{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9000;
   display:none;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;
   background:rgba(15,23,42,.96);border:1px solid rgba(148,163,184,.35);
@@ -808,18 +808,32 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 #syBarra.ok .dot{background:#4ade80;animation:none}
 #syBarra.bad .dot{background:#fb7185;animation:none}
 @keyframes syPulse{0%,100%{opacity:1}50%{opacity:.3}}
-#syAviso{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);z-index:9001;
-  display:none;max-width:min(92vw,520px);padding:16px 18px;border-radius:16px;
-  background:#0f172a;border:1px solid rgba(148,163,184,.35);color:#e2e8f0;
-  box-shadow:0 18px 50px rgba(0,0,0,.55);font-size:14px;line-height:1.5}
+#syAviso{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9002;
+  display:none;max-width:min(94vw,560px);width:100%;padding:20px 22px;border-radius:18px;
+  background:#0f172a;border:1px solid rgba(148,163,184,.4);color:#e2e8f0;
+  box-shadow:0 24px 70px rgba(0,0,0,.7);font-size:14px;line-height:1.55}
 #syAviso.on{display:block}
-#syAviso .tt{font-weight:700;margin-bottom:6px;font-size:15px}
-#syAviso .sb{color:#94a3b8;font-size:13px;margin-bottom:14px}
-#syAviso .btns{display:flex;gap:8px;flex-wrap:wrap}
-#syAviso button{cursor:pointer;border-radius:10px;border:1px solid rgba(148,163,184,.35);
-  background:#1e293b;color:#e2e8f0;padding:9px 14px;font-size:13px;font-weight:600}
+#syAviso .tt{font-weight:800;margin-bottom:8px;font-size:17px}
+#syAviso .sb{color:#94a3b8;font-size:13.5px;margin-bottom:16px}
+#syAviso .linha{display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid rgba(148,163,184,.15);font-size:13.5px}
+#syAviso .linha b{color:#e2e8f0}
+#syAviso .btns{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+#syAviso button{cursor:pointer;border-radius:11px;border:1px solid rgba(148,163,184,.35);
+  background:#1e293b;color:#e2e8f0;padding:12px 15px;font-size:13.5px;font-weight:700;
+  text-align:left;line-height:1.35}
+#syAviso button:hover{background:#273449}
 #syAviso button.prim{background:#22c55e;border-color:#22c55e;color:#052e16}
+#syAviso button.prim:hover{background:#16a34a}
+#syAviso button small{display:block;font-weight:500;opacity:.75;font-size:12px;margin-top:3px}
 #syAviso button:disabled{opacity:.5;cursor:default}
+#syBackup{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);z-index:9001;
+  display:none;align-items:center;gap:12px;padding:11px 16px;border-radius:14px;
+  background:#1e293b;border:1px solid rgba(251,191,36,.5);color:#fde68a;
+  font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+#syBackup.on{display:flex}
+#syBackup button{cursor:pointer;border-radius:9px;border:1px solid rgba(251,191,36,.6);
+  background:transparent;color:#fde68a;padding:7px 12px;font-size:12.5px;font-weight:700}
 </style>
 </head>
 <body>
@@ -5576,24 +5590,27 @@ function lgInit(){
 try{ pfInit(); }catch(e){}
 try{ lgInit(); }catch(e){}
 
-/* ================= SINCRONIZACAO (v22) ================= */
+/* ================= SINCRONIZACAO SEGURA (v23) =================
 
-// ------------------------------------------------------------------
-// Chaves que guardam o progresso. O nome do personagem e a chave dos
-// dados: por isso, ao baixar da nuvem, cada personagem recebe um nome
-// local que nao colide com o que ja existe neste aparelho.
-// ------------------------------------------------------------------
-var SY_CHAVES_FIXAS = [STORE_PERFIL, STORE_COD, STORE_SESSAO];
-var SY_MARCA_OFF = 'projectGachaSyncOff.v1';
+   REGRA QUE NAO SE QUEBRA: os dados deste aparelho nunca sao
+   reduzidos por causa da nuvem. O que vem de la e somado ao que
+   ja existe aqui, e sempre depois de uma copia de seguranca.
+
+   ================================================================ */
+
+var SY_OFF = 'projectGachaSyncOff.v1';
+var SY_BACKUP = 'projectGachaBackup.v1';
+var SY_EM = 'projectGachaSyncEm.v1';
+var SY_NAO_TOCA = [STORE_PERFIL, STORE_COD, STORE_SESSAO, SY_OFF, SY_BACKUP, SY_EM];
 
 function syOff(){
-  try{ return localStorage.getItem(SY_MARCA_OFF) === 'sim'; }catch(e){ return false; }
+  try{ return localStorage.getItem(SY_OFF) === 'sim'; }catch(e){ return false; }
 }
 function syMarcarOff(v){
-  try{ if(v) localStorage.setItem(SY_MARCA_OFF,'sim'); else localStorage.removeItem(SY_MARCA_OFF); }catch(e){}
+  try{ if(v) localStorage.setItem(SY_OFF,'sim'); else localStorage.removeItem(SY_OFF); }catch(e){}
 }
 
-// --- faixa de status ---------------------------------------------
+// --- faixa ---------------------------------------------------------
 var syTimer = null;
 function syStatus(tipo, texto, someEmMs){
   var b = document.getElementById('syBarra');
@@ -5603,26 +5620,60 @@ function syStatus(tipo, texto, someEmMs){
   b.className = 'on' + (tipo ? ' ' + tipo : '');
   t.textContent = texto;
   if(syTimer){ clearTimeout(syTimer); syTimer = null; }
-  if(someEmMs){
-    syTimer = setTimeout(function(){ b.className = ''; }, someEmMs);
+  if(someEmMs) syTimer = setTimeout(function(){ b.className = ''; }, someEmMs);
+}
+
+// --- copia de seguranca --------------------------------------------
+function syBackupFazer(){
+  try{
+    var b = { quando: new Date().toISOString(), tudo: {} };
+    for(var i=0;i<localStorage.length;i++){
+      var k = localStorage.key(i);
+      if(!k) continue;
+      if(k === SY_BACKUP) continue;
+      b.tudo[k] = localStorage.getItem(k);
+    }
+    localStorage.setItem(SY_BACKUP, JSON.stringify(b));
+    return true;
+  }catch(e){ return false; }
+}
+function syBackupExiste(){
+  try{ return !!localStorage.getItem(SY_BACKUP); }catch(e){ return false; }
+}
+function syBackupMostrar(){
+  var el = document.getElementById('syBackup');
+  if(el) el.className = syBackupExiste() ? 'on' : '';
+}
+function syDesfazer(){
+  try{
+    var bruto = localStorage.getItem(SY_BACKUP);
+    if(!bruto) return;
+    var b = JSON.parse(bruto);
+    // apaga as chaves atuais que o backup nao conhece? nao: so restaura as do backup
+    for(var k in (b.tudo || {})){
+      localStorage.setItem(k, b.tudo[k]);
+    }
+    localStorage.removeItem(SY_BACKUP);
+    document.getElementById('syBackup').className = '';
+    toast('Dados restaurados.');
+    syRecarregarTelas();
+  }catch(e){
+    toast('Nao consegui restaurar.');
   }
 }
 
-// --- coleta de tudo que precisa subir -----------------------------
+// --- coleta --------------------------------------------------------
+function syListaNomes(){
+  var nomes = {};
+  try{ var p = loadColls(); for(var k in p) nomes[k] = 1; }catch(e){}
+  try{ var v = loadJSON(STORE_COLL, null); if(v && typeof v === 'object') for(var k2 in v) nomes[k2] = 1; }catch(e){}
+  nomes[activeColl()] = 1;
+  return nomes;
+}
+
 function syColetar(){
   var dados = { perfis: loadColls(), inv: {}, lvl: null, elo: null, reb: null, tr: null, daily: null, cod: null, meta: {} };
-  // inventarios: varre o STORE_COLL (lista crua de personagens, se existir) e os perfis
-  var nomes = {};
-  try{
-    var perfis = loadColls();
-    for(var k in perfis) nomes[k] = 1;
-  }catch(e){}
-  try{
-    var velhas = loadJSON(STORE_COLL, null);
-    if(velhas && typeof velhas === 'object') for(var k2 in velhas) nomes[k2] = 1;
-  }catch(e){}
-  nomes[activeColl()] = 1;
-
+  var nomes = syListaNomes();
   for(var nome in nomes){
     for(var i=0;i<SYS_ORDER.length;i++){
       var s = SYS_ORDER[i];
@@ -5638,104 +5689,102 @@ function syColetar(){
   try{ dados.tr  = loadJSON(STORE_TR, null); }catch(e){}
   try{ dados.daily = loadJSON(STORE_DAILY, null); }catch(e){}
   try{ dados.cod = loadJSON(STORE_COD, null); }catch(e){}
-  dados.meta = { versao: 22, ativo: activeColl(), em: new Date().toISOString() };
+  dados.meta = { versao: 23, ativo: activeColl(), em: new Date().toISOString() };
   return dados;
 }
 
-// --- aplica o que veio da nuvem ------------------------------------
-// devolve o mapa nomeRemoto -> nomeLocal usado
-function syAplicar(dados, usarRemoto){
-  if(!dados || typeof dados !== 'object') return {};
+function syContar(dados){
+  if(!dados) return { perfis: 0, itens: 0 };
+  var np = 0, ni = 0;
+  for(var k in (dados.perfis || {})) np++;
+  for(var c in (dados.inv || {})) ni += ((dados.inv[c] || []).length);
+  return { perfis: np, itens: ni };
+}
+function syContarLocais(){
+  return syContar(syColetar());
+}
 
-  var mapa = {};   // nome no servidor -> nome neste aparelho
+// --- aplica o que veio da nuvem: SOMENTE SOMA ----------------------
+// nunca remove personagem, nunca reduz inventario
+function syFundir(dados){
+  if(!dados || typeof dados !== 'object') return { novos: 0, itens: 0 };
+
   var perfisAtuais = loadColls();
+  var mapa = {};          // nome remoto -> nome local
+  var novos = 0;
 
-  // 1. personagens
-  var perfisRemotos = dados.perfis || {};
-  var lista = [];
-  for(var nome in perfisRemotos) lista.push(nome);
-
-  if(usarRemoto){
-    // o servidor manda: mantem so os personagens de la, renomeando os que colidirem
-    var novos = {};
-    for(var i=0;i<lista.length;i++){
-      var remoto = lista[i];
-      var p = Object.assign({}, perfisRemotos[remoto]);
-      var local = remoto;
-      var n = 2;
-      while(perfisAtuais[local] && local !== remoto){ local = remoto + ' (' + (n++) + ')'; }
-      if(perfisAtuais[local] && !mapa[remoto]){
-        // ja existe um personagem com esse nome aqui, criado depois do ultimo envio
-      }
-      mapa[remoto] = local;
-      p.id = local;
+  // 1. personagens que vieram
+  var remotos = dados.perfis || {};
+  for(var remoto in remotos){
+    if(perfisAtuais[remoto]){
+      mapa[remoto] = remoto;            // ja existe aqui: mantem o local como esta
+    } else {
+      var p = Object.assign({}, remotos[remoto]);
+      p.id = remoto;
       p.name = p.name || remoto;
-      novos[local] = p;
+      perfisAtuais[remoto] = p;
+      mapa[remoto] = remoto;
+      novos++;
     }
-    // personagens que so existem aqui e nao estavam na nuvem: mantem para nao apagar nada
-    for(var localNome in perfisAtuais){
-      if(!novos[localNome]) novos[localNome] = perfisAtuais[localNome];
-    }
-    saveColls(novos);
-  } else {
-    for(var j=0;j<lista.length;j++) mapa[lista[j]] = lista[j];
   }
+  saveColls(perfisAtuais);   // <- lista com o que ja havia + o que chegou
 
-  // 2. inventarios
+  // 2. inventarios: so acrescenta item que ainda nao existe
+  var itensSomados = 0;
   for(var chave in (dados.inv || {})){
     var partes = chave.split('|');
     var sistema = partes[0], nomeRemoto = partes.slice(1).join('|');
     var destino = mapa[nomeRemoto] || nomeRemoto;
-    if(usarRemoto){
-      saveInv(sistema, destino, dados.inv[chave] || []);
-    } else {
-      // enviando: se o personagem local tiver mais itens, mantem o local
-      var atual = loadInv(sistema, destino);
-      if(!atual || atual.length < (dados.inv[chave] || []).length){
-        saveInv(sistema, destino, dados.inv[chave] || []);
-      }
+    if(!perfisAtuais[destino] && destino === nomeRemoto) continue;   // personagem de outra conta
+    var atuais = loadInv(sistema, destino);
+    var vistos = {};
+    for(var i=0;i<atuais.length;i++) if(atuais[i] && atuais[i].uid) vistos[atuais[i].uid] = 1;
+    var vieram = dados.inv[chave] || [];
+    for(var j=0;j<vieram.length;j++){
+      var it = vieram[j];
+      var marca = it && it.uid;
+      if(marca && vistos[marca]) continue;
+      atuais.push(it);
+      if(marca) vistos[marca] = 1;
+      itensSomados++;
     }
+    if(atuais.length) saveInv(sistema, destino, atuais);
   }
 
-  // 3. os mapas por personagem (nivel, elo, renascimento, torre)
-  function remapear(chaveStore, veioRemoto, éSubstituir){
-    if(!veioRemoto || typeof veioRemoto !== 'object') return;
+  // 3. mapas por personagem: so preenche o que falta
+  function somarMapa(chaveStore, veio){
+    if(!veio || typeof veio !== 'object') return;
     var atual = loadJSON(chaveStore, {}) || {};
-    var saida = éSubstituir ? {} : atual;
-    for(var nomeR in veioRemoto){
-      var destino2 = mapa[nomeR] || nomeR;
-      if(éSubstituir || saida[destino2] === undefined) saida[destino2] = veioRemoto[nomeR];
+    for(var nomeR in veio){
+      var dest = mapa[nomeR] || nomeR;
+      if(!perfisAtuais[dest]) continue;
+      if(atual[dest] === undefined) atual[dest] = veio[nomeR];
     }
-    saveJSON(chaveStore, saida);
+    saveJSON(chaveStore, atual);
   }
-  remapear(STORE_LVL, dados.lvl, usarRemoto);
-  remapear(STORE_ELO, dados.elo, usarRemoto);
-  remapear(STORE_REB, dados.reb, usarRemoto);
-  remapear(STORE_TR,  dados.tr,  usarRemoto);
+  somarMapa(STORE_LVL, dados.lvl);
+  somarMapa(STORE_ELO, dados.elo);
+  somarMapa(STORE_REB, dados.reb);
+  somarMapa(STORE_TR,  dados.tr);
 
-  // 4. diario e codigos (globais, nao por personagem)
-  if(usarRemoto){
-    if(dados.daily) saveJSON(STORE_DAILY, dados.daily);
-    if(dados.cod)   saveJSON(STORE_COD,   dados.cod);
-    if(dados.meta && dados.meta.ativo && loadColls()[dados.meta.ativo]){
-      try{ localStorage.setItem(STORE_ACTIVE, dados.meta.ativo); }catch(e){}
-    }
-  } else {
-    if(dados.daily && !loadJSON(STORE_DAILY, null)) saveJSON(STORE_DAILY, dados.daily);
-    if(dados.cod && !loadJSON(STORE_COD, null))     saveJSON(STORE_COD, dados.cod);
-  }
+  // 4. diario e codigos: so preenchem se aqui estiver vazio
+  if(dados.daily && !loadJSON(STORE_DAILY, null)) saveJSON(STORE_DAILY, dados.daily);
+  if(dados.cod && !loadJSON(STORE_COD, null)) saveJSON(STORE_COD, dados.cod);
 
-  return mapa;
+  return { novos: novos, itens: itensSomados };
 }
 
-// --- conversa com o servidor ---------------------------------------
+// --- servidor ------------------------------------------------------
 async function syEnviar(dados){
-  var r = await lgPedir('/perfil', { dados: dados }, true);
-  if(r.status === 200) return { ok: true };
-  if(r.status === 413) return { ok: false, erro: 'O progresso passou do limite de 350 KB.' };
-  return { ok: false, erro: (r.dados && r.dados.erro) || ('Erro ' + r.status) };
+  try{
+    var r = await lgPedir('/perfil', { dados: dados }, true);
+    if(r.status === 200) return { ok: true };
+    if(r.status === 413) return { ok: false, erro: 'O progresso passou do limite de 350 KB.' };
+    return { ok: false, erro: (r.dados && r.dados.erro) || ('Erro ' + r.status) };
+  }catch(e){
+    return { ok: false, erro: 'Sem conexao com o servidor.' };
+  }
 }
-
 async function syBaixar(){
   var s = lgSessao();
   if(!s || !s.passe) return { ok: false, erro: 'sem sessao' };
@@ -5744,176 +5793,166 @@ async function syBaixar(){
     var d = null;
     try{ d = await r.json(); }catch(e){ d = {}; }
     if(r.status !== 200) return { ok: false, erro: (d && d.erro) || ('Erro ' + r.status) };
-    return { ok: true, dados: d.dados, novo: !!d.novo };
+    return { ok: true, dados: d.dados || null };
   }catch(e){
     return { ok: false, erro: 'Sem conexao com o servidor.' };
   }
 }
 
-// --- quantos personagens existem aqui -------------------------------
-function syQuantosLocais(){
-  var n = 0;
-  try{ var p = loadColls(); for(var k in p) n++; }catch(e){}
-  return n;
+// --- envio ---------------------------------------------------------
+async function syEnviarAgora(silencioso){
+  var locais = syContarLocais();
+  if(!silencioso){
+    if(!confirm('Enviar ' + locais.perfis + ' personagem(ns) e ' + locais.itens +
+      ' item(ns) deste aparelho para a conta?\n\nNada e apagado daqui. Apenas uma copia vai para o servidor.')) return false;
+  }
+  syStatus('', 'Enviando...');
+  var r = await syEnviar(syColetar());
+  if(r.ok){
+    try{ localStorage.setItem(SY_EM, new Date().toISOString()); }catch(e){}
+    syStatus('ok', 'Salvo na conta', 3000);
+    return true;
+  }
+  syStatus('bad', 'Nao consegui salvar: ' + r.erro, 6000);
+  return false;
 }
 
-// --- primeira sincronizacao depois do login -------------------------
-async function syPrimeiraVez(){
-  var s = lgSessao();
-  if(!s) return;
-  if(syOff()){
-    syStatus('', '');
-    return;
-  }
-  syStatus('', 'Verificando sua conta...');
-  var baixado = await syBaixar();
-
-  if(!baixado.ok){
-    syStatus('bad', 'Nao consegui sincronizar agora', 5000);
-    return;
-  }
-
-  // conta nova (sem nada salvo no servidor)
-  if(!baixado.dados){
-    if(syQuantosLocais() > 0){
-      var env = await syEnviar(syColetar());
-      if(env.ok){
-        syMarcarOff(true);
-        syStatus('ok', 'Progresso enviado para a conta', 4000);
-        syLembrar();
-      } else {
-        syStatus('bad', 'Falha ao enviar: ' + env.erro, 6000);
-      }
-    } else {
-      syStatus('ok', 'Conta pronta', 2500);
-      syLembrar();
-    }
-    return;
-  }
-
-  // a conta ja tem dados: decide com quem ficar
-  var locais = syQuantosLocais();
-  if(locais === 0){
-    syAplicar(baixado.dados, true);
-    syStatus('ok', 'Personagens carregados da conta', 4000);
-    syMarcarOff(true);
-    syLembrar();
-    return;
-  }
-  syPerguntar(baixado.dados);
-}
-
-// aviso perguntando o que fazer quando existem os dois lados
-function syPerguntar(dadosNuvem){
-  var quantos = 0;
-  for(var k in (dadosNuvem.perfis || {})) quantos++;
+// --- tela de escolha -----------------------------------------------
+function syPainel(nuvem){
+  var locais = syContarLocais();
+  var daNuvem = syContar(nuvem);
   var av = document.getElementById('syAviso');
-  document.getElementById('syAvisoTitulo').textContent = 'Personagens nos dois lados';
+
+  document.getElementById('syAvisoTitulo').textContent = 'Sincronizar com a conta';
   document.getElementById('syAvisoSub').textContent =
-    'Neste aparelho ha ' + syQuantosLocais() + ' personagem(ns) e na sua conta ha ' + quantos +
-    '. Escolha com quem ficar. Nada e apagado do outro lado sem voce mandar.';
+    'Nada e apagado sem a sua escolha. A opcao marcada em verde e a mais segura.';
+
+  document.getElementById('syAvisoInfo').innerHTML =
+    '<div class="linha"><span>Neste aparelho</span><b>' + locais.perfis + ' personagem(ns) · ' + locais.itens + ' itens</b></div>' +
+    '<div class="linha"><span>Na sua conta</span><b>' + daNuvem.perfis + ' personagem(ns) · ' + daNuvem.itens + ' itens</b></div>';
+
   var b = document.getElementById('syAvisoBotoes');
   b.innerHTML =
-    '<button class="prim" id="syUsarNuvem">Usar os da conta</button>' +
-    '<button id="syUsarLocal">Usar os deste aparelho</button>' +
-    '<button id="syJuntar">Juntar os dois</button>';
-  av.className = 'on';
+    '<button class="prim" id="syEnviarSo">Enviar deste aparelho para a conta' +
+      '<small>Nada muda aqui. A conta passa a ter o que voce ja tem.</small></button>' +
+    '<button id="syJuntar">Juntar os dois' +
+      '<small>O que existe na conta entra aqui, somando. Nada e removido.</small></button>' +
+    '<button id="syBaixarSo">Baixar da conta' +
+      '<small>So use se este aparelho estiver vazio. Pode substituir o que ha aqui.</small></button>' +
+    '<button id="syDepois" style="border-color:rgba(148,163,184,.25);color:#94a3b8">Agora nao</button>';
 
+  av.className = 'on';
   function fechar(){ av.className = ''; }
 
-  document.getElementById('syUsarNuvem').onclick = async function(){
+  document.getElementById('syEnviarSo').onclick = async function(){
     fechar();
-    syStatus('', 'Baixando da conta...');
-    syAplicar(dadosNuvem, true);
-    try{ syRecarregarTelas(); }catch(e){}
-    syMarcarOff(true);
-    syStatus('ok', 'Agora seus personagens sao os da conta', 4500);
-    syLembrar();
-  };
-
-  document.getElementById('syUsarLocal').onclick = async function(){
-    fechar();
-    syStatus('', 'Enviando deste aparelho...');
-    var env = await syEnviar(syColetar());
-    if(env.ok){ syMarcarOff(true); syStatus('ok', 'Conta atualizada com estes personagens', 4500); syLembrar(); }
-    else syStatus('bad', 'Falha: ' + env.erro, 6000);
+    await syEnviarAgora(false);
   };
 
   document.getElementById('syJuntar').onclick = async function(){
     fechar();
-    syStatus('', 'Juntando os dois lados...');
-    // traz o que veio da conta, criando nomes novos quando colidir
-    var mapa = syAplicar(dadosNuvem, false);
-    var renomeados = 0;
-    for(var r in mapa){ if(mapa[r] !== r) renomeados++; }
-    try{ syRecarregarTelas(); }catch(e){}
-    var env2 = await syEnviar(syColetar());
-    if(env2.ok){
-      syMarcarOff(true);
-      syStatus('ok', 'Tudo junto: ' + syQuantosLocais() + ' personagens' + (renomeados ? ' (' + renomeados + ' renomeados)' : ''), 5000);
-      syLembrar();
+    if(!confirm('Juntar os dois lados?\n\nOs ' + daNuvem.perfis + ' personagem(ns) da conta vao somar aos ' +
+      locais.perfis + ' daqui. Nada e removido.\n\nUma copia de seguranca sera feita antes.')) return;
+
+    if(!syBackupFazer()){ toast('Nao consegui fazer a copia de seguranca.'); return; }
+    syBackupMostrar();
+    syStatus('', 'Juntando...');
+    var r = syFundir(nuvem);
+    syRecarregarTelas();
+    var env = await syEnviar(syColetar());
+    if(env.ok){
+      syStatus('ok', 'Somados ' + r.novos + ' personagem(ns) e ' + r.itens + ' item(ns)', 5000);
     } else {
-      syStatus('bad', 'Falha ao enviar: ' + env2.erro, 6000);
+      syStatus('bad', 'Juntou aqui, mas nao enviou: ' + env.erro, 6000);
     }
   };
+
+  document.getElementById('syBaixarSo').onclick = async function(){
+    fechar();
+    if(!confirm('Baixar da conta?\n\nATENCAO: isto baixa os ' + daNuvem.perfis +
+      ' personagem(ns) da conta. Os ' + locais.perfis + ' deste aparelho continuam aqui, somados.')) return;
+
+    if(!syBackupFazer()){ toast('Nao consegui fazer a copia de seguranca.'); return; }
+    syBackupMostrar();
+    syStatus('', 'Baixando...');
+    var r = syFundir(nuvem);
+    syRecarregarTelas();
+    syStatus('ok', 'Baixados ' + r.novos + ' personagem(ns), ' + r.itens + ' itens', 5000);
+  };
+
+  document.getElementById('syDepois').onclick = fechar;
 }
 
-// lembra o nome do personagem ativo para reenviar depois
-function syLembrar(){
-  try{ localStorage.setItem('projectGachaSyncEm.v1', new Date().toISOString()); }catch(e){}
+// --- primeira conversa ao entrar -----------------------------------
+async function syPrimeiraVez(){
+  if(!lgSessao()) return;
+  if(syOff()) return;
+  try{
+    var b = await syBaixar();
+    if(!b.ok){
+      // servidor fora: nao faz nada, nao toca nos dados
+      syStatus('bad', 'Servidor indisponivel', 4000);
+      return;
+    }
+    if(!b.dados){
+      // conta nova
+      var locais = syContarLocais();
+      if(locais.perfis > 0){
+        if(confirm('Sua conta ainda esta vazia.\n\nEnviar os ' + locais.perfis +
+          ' personagem(ns) e ' + locais.itens + ' item(ns) deste aparelho para ela?\n\nNada e apagado daqui.')){
+          await syEnviarAgora(null);
+        }
+      }
+      return;
+    }
+    syPainel(b.dados);
+  }catch(e){
+    syStatus('bad', 'Falha ao sincronizar', 4000);
+  }
 }
 
-// --- reenvio automatico --------------------------------------------
-var syPendente = null;
-var syUltimoEnvio = 0;
+// --- envio automatico nas mudancas ---------------------------------
+var syPendente = null, syUltimo = 0;
 
-function syAgendar(segundos){
+function syAgendar(){
   try{
     if(!lgSessao() || syOff()) return;
-    syStatus('', 'Alteracoes nao enviadas...');
     if(syPendente) clearTimeout(syPendente);
-    syPendente = setTimeout(function(){ syPendente = null; syEmpurrar(); }, (segundos || 6) * 1000);
+    syPendente = setTimeout(function(){ syPendente = null; syEmpurrar(); }, 7000);
   }catch(e){}
 }
 
 async function syEmpurrar(forcar){
   if(!lgSessao() || syOff()) return;
   var agora = Date.now();
-  if(!forcar && agora - syUltimoEnvio < 4000) return;
-  syUltimoEnvio = agora;
-  syStatus('', 'Enviando...');
+  if(!forcar && agora - syUltimo < 5000) return;
+  syUltimo = agora;
+  syStatus('', 'Salvando...');
   var r = await syEnviar(syColetar());
   if(r.ok){
-    syStatus('ok', 'Salvo na sua conta', 2500);
-    try{ localStorage.setItem('projectGachaSyncEm.v1', new Date().toISOString()); }catch(e){}
+    try{ localStorage.setItem(SY_EM, new Date().toISOString()); }catch(e){}
+    syStatus('ok', 'Salvo na conta', 2200);
   } else {
-    syStatus('bad', 'Nao consegui salvar: ' + r.erro, 6000);
+    syStatus('bad', 'Nao salvou: ' + r.erro, 5000);
   }
 }
 
-// --- botao de sincronizar na barra do usuario -----------------------
+// --- botao na barra -------------------------------------------------
 function syBotaoBarra(){
   var alvo = document.getElementById('lgUserBar');
-  if(!alvo) return;
-  if(document.getElementById('syBtn')) return;
-  var s = lgSessao();
-  if(!s) return;
+  if(!alvo || !lgSessao() || document.getElementById('syBtn')) return;
   var b = document.createElement('button');
   b.id = 'syBtn';
   b.className = 'lg-out';
   b.style.margin = '0 0 0 8px';
   b.textContent = 'Sincronizar';
-  b.onclick = async function(){
-    b.disabled = true;
-    b.textContent = 'Enviando...';
-    await syEmpurrar(true);
-    b.disabled = false;
-    b.textContent = 'Sincronizar';
+  b.onclick = function(){
+    b.disabled = true; b.textContent = '...';
+    syPrimeiraVez().then(function(){ b.disabled = false; b.textContent = 'Sincronizar'; });
   };
   alvo.appendChild(b);
 }
 
-// --- recarrega as telas depois de trocar os dados -------------------
 function syRecarregarTelas(){
   try{
     coll = activeColl();
@@ -5923,64 +5962,52 @@ function syRecarregarTelas(){
   try{ if(typeof pfRender === 'function') pfRender(); }catch(e){}
 }
 
-// --- gancho no botao de sair: envia antes de sair -------------------
-var syLgSairOriginal = lgSair;
-lgSair = async function(){
-  if(lgSessao() && !syOff()){
-    await syEmpurrar(true);
-  }
-  syLgSairOriginal();
-  syMarcarOff(false);
-};
-
-// --- gancho no login: sincroniza ao entrar --------------------------
-var syLgEntrouOriginal = lgEntrou;
+// --- ganchos --------------------------------------------------------
+var syEntrou = lgEntrou;
 lgEntrou = function(){
-  syLgEntrouOriginal();
+  syEntrou();
   syBotaoBarra();
-  syAgendar(1);
+  syPrimeiraVez();
 };
 
-// --- gancho nas gravacoes do jogo -----------------------------------
-// qualquer saveJSON passa a agendar um envio
-var sySaveJSONOriginal = saveJSON;
-saveJSON = function(k, v){
-  sySaveJSONOriginal(k, v);
-  if(syChavesDeJogo(k)) syAgendar(6);
+var sySair = lgSair;
+lgSair = async function(){
+  if(lgSessao() && !syOff()) await syEmpurrar(true);
+  sySair();
 };
-function syChavesDeJogo(k){
-  if(!k) return false;
-  if(SY_CHAVES_FIXAS.indexOf(k) >= 0) return false;   // perfil, codigos e sessao nao disparam
-  return k.indexOf('gacha') === 0 || k.indexOf('projectGacha') === 0 || k.indexOf('gachaInv') === 0;
-}
+
+var sySave = saveJSON;
+saveJSON = function(k, v){
+  sySave(k, v);
+  if(k && SY_NAO_TOCA.indexOf(k) < 0 && (k.indexOf('gacha') === 0 || k.indexOf('projectGacha') === 0)) syAgendar();
+};
+
+// --- desfazer -------------------------------------------------------
+document.addEventListener('click', function(e){
+  var t = e.target;
+  if(!t) return;
+  if(t.id === 'syDesfazer') syDesfazer();
+  if(t.id === 'syOkBackup'){ document.getElementById('syBackup').className = ''; }
+});
 
 // --- boot -----------------------------------------------------------
 try{
-  if(lgSessao()){
-    syBotaoBarra();
-    syPrimeiraVez();
-  }
+  if(lgSessao()){ syBotaoBarra(); syBackupMostrar(); }
 }catch(e){}
-
-window.addEventListener('beforeunload', function(){
-  try{
-    if(lgSessao() && !syOff() && navigator.sendBeacon){
-      var s = lgSessao();
-      var corpo = JSON.stringify({ dados: syColetar() });
-      var blob = new Blob([corpo], { type: 'application/json' });
-      // sendBeacon nao manda cabecalho: usa a rota com passe no corpo
-      navigator.sendBeacon(LG_API + '/perfil?passe=' + encodeURIComponent(s.passe), blob);
-    }
-  }catch(e){}
-});
 </script>
 </script>
 
-<!-- ============ SINCRONIZACAO (v22) ============ -->
+<!-- ============ SINCRONIZACAO SEGURA (v23) ============ -->
 <div id="syBarra"><span class="dot"></span><span id="syTexto">Sincronizando...</span></div>
+<div id="syBackup">
+  <span>Foi feita uma copia de seguranca antes de mexer nos dados.</span>
+  <button id="syDesfazer">Desfazer</button>
+  <button id="syOkBackup" style="border-color:rgba(148,163,184,.4);color:#cbd5e1">Dispensar</button>
+</div>
 <div id="syAviso">
-  <div class="tt" id="syAvisoTitulo">Encontramos personagens neste aparelho</div>
+  <div class="tt" id="syAvisoTitulo"></div>
   <div class="sb" id="syAvisoSub"></div>
+  <div id="syAvisoInfo"></div>
   <div class="btns" id="syAvisoBotoes"></div>
 </div>
 </body>
