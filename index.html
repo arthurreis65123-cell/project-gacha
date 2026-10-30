@@ -1486,6 +1486,20 @@ var query = '';
 var selection = {};
 
 function SYS(){ return SYSTEMS[current]; }
+// ordem de raridade do sistema atual. Existia como sysClasses() no
+// gacha antigo e sumiu nas reeditacoes, deixando showBatchResult quebrado.
+function orderRanks(){
+  try{
+    var lista = classesOf(current) || [];
+    var saida = [];
+    for(var i=0;i<lista.length;i++){
+      var c = lista[i];
+      if(c && c.rank !== undefined) saida.push(c.rank);
+    }
+    return saida;
+  }catch(e){ return []; }
+}
+
 function classesOf(k){
   if(k === 'weapons') return [];
   var s = SYSTEMS[k];
@@ -2378,14 +2392,14 @@ function showBatchResult(){
     return;
   }
   var best = batchGot[0], i;
-  var order2 = orderRanks();
+  var order2 = (typeof orderRanks === 'function') ? (orderRanks() || []) : [];
   var weight = {};
   for(i=0;i<order2.length;i++) weight[order2[i]] = i;
   for(i=0;i<batchGot.length;i++){
     var w = weight[batchGot[i].rank];
     var wb = weight[best.rank];
-    if(w === undefined) w = 100 + i;
-    if(wb === undefined) wb = 100;
+    if(w === undefined) w = -1;
+    if(wb === undefined) wb = -1;
     if(w > wb) best = batchGot[i];
   }
   var color = best.color || '#94a3c5';
