@@ -295,25 +295,67 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .chip2{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:7px 12px;font-size:11px;font-weight:900;cursor:pointer}
 .chip2.active{color:var(--text);border-color:var(--accent);background:var(--panel)}
 .lbl{font-size:10px;letter-spacing:1.6px;font-weight:950;text-transform:uppercase;color:var(--muted);margin:0 0 8px 2px}
+/* ===== aba Gacha: gachas a esquerda, tabelas a direita ===== */
+.gacha-painel{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+.gacha-col-a{min-width:0}
+.gacha-col-b{min-width:0;display:none}
+.gacha-col-b.on{display:block}
+.gacha-col-b .card2{margin-bottom:14px}
+.gacha-col-b .hd h3{font-size:13.5px}
+.gacha-col-b .rates2{padding:12px 14px}
+@media(min-width:1080px){
+  .gacha-painel{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .gacha-col-b{display:block}
+  .gacha-painel.sem-tabelas{grid-template-columns:1fr}
+  .gacha-painel.sem-tabelas .gacha-col-b{display:none}
+}
+
 @media(min-width:820px){
-  .sh-wrap{grid-template-columns:240px minmax(0,1fr)}
+  .sh-wrap{grid-template-columns:68px minmax(0,1fr);transition:grid-template-columns .22s ease}
+  /* barra lateral retratil: so icones, abre ao passar o cursor */
   .nav{
     position:sticky;top:0;left:auto;right:auto;bottom:auto;
-    height:100vh;width:240px;
+    height:100vh;width:68px;
     display:flex;flex-direction:column;flex-wrap:nowrap;
     align-content:flex-start;justify-content:flex-start;
-    gap:4px;padding:16px 12px;
+    gap:4px;padding:16px 10px;
     border-top:0;border-right:1px solid var(--line);
-    overflow-y:auto;
+    overflow:hidden;
+    transition:width .22s ease,padding .22s ease;
+    z-index:30;
   }
+  .sh-wrap:has(.nav:hover){grid-template-columns:230px minmax(0,1fr)}
+  .nav:hover{width:230px;padding:16px 12px;overflow-y:auto;box-shadow:18px 0 40px rgba(0,0,0,.45)}
   .nav button{
     display:flex;flex-direction:row;flex:0 0 auto;
     width:100%;justify-content:flex-start;align-items:center;
-    gap:11px;border-radius:12px;padding:12px 14px;
+    gap:13px;border-radius:12px;padding:12px 15px;
     font-size:12.5px;text-align:left;white-space:nowrap;
+    overflow:hidden;
   }
-  .nav button i{font-size:17px}
+  .nav button i{
+    font-size:19px;flex:0 0 22px;width:22px;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  /* o texto so aparece quando a barra abre */
+  .nav button .lbl2{
+    opacity:0;transform:translateX(-6px);
+    transition:opacity .16s ease,transform .16s ease;
+    pointer-events:none;
+  }
+  .nav:hover button .lbl2{opacity:1;transform:none}
   .nav button.active{background:var(--panel2)}
+  /* botao fixar: mantem a barra aberta sem precisar do cursor */
+  .nav .pin{
+    margin-top:auto;border:1px dashed rgba(148,163,184,.35);
+    color:var(--muted);font-size:11px;font-weight:900;
+    display:flex;align-items:center;gap:13px;padding:10px 15px;border-radius:12px;
+    background:none;cursor:pointer;
+  }
+  .nav .pin i{font-size:15px;flex:0 0 22px;width:22px;text-align:center}
+  .sh-wrap.fixado{grid-template-columns:230px minmax(0,1fr)}
+  .sh-wrap.fixado .nav{width:230px;padding:16px 12px;overflow-y:auto}
+  .sh-wrap.fixado .nav button .lbl2{opacity:1;transform:none}
 
   .stage{padding:22px 26px 40px}
   .stats2{grid-template-columns:repeat(4,1fr)}
@@ -875,17 +917,17 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 
 <div class="sh-wrap">
   <nav class="nav" id="nav">
-    <button class="active" data-view="v-gacha"><i>✦</i>Gacha</button>
-    <button data-view="v-coll"><i>▦</i>Personagens</button>
-    <button data-view="v-cmp"><i>⚖</i>Comparar</button>
-    <button data-view="v-pvp"><i>⚔</i>PvP</button>
-    <button data-view="v-nivel"><i>▲</i>Nível</button>
-    <button data-view="v-torre"><i>🗼</i>Torre</button>
-    <button data-view="v-diario"><i>🎁</i>Diário</button>
-    <button data-view="v-codigos"><i>🎟</i>Códigos</button>
-    <button data-view="v-set"><i>⚙</i>Ajustes</button>
-    <button data-view="v-perfil"><i>👤</i>Perfil</button>
-    
+    <button class="active" data-view="v-gacha"><i>✦</i><span class="lbl2">Gacha</span></button>
+    <button data-view="v-coll"><i>▦</i><span class="lbl2">Personagens</span></button>
+    <button data-view="v-cmp"><i>⚖</i><span class="lbl2">Comparar</span></button>
+    <button data-view="v-pvp"><i>⚔</i><span class="lbl2">PvP</span></button>
+    <button data-view="v-nivel"><i>▲</i><span class="lbl2">Nível</span></button>
+    <button data-view="v-torre"><i>🗼</i><span class="lbl2">Torre</span></button>
+    <button data-view="v-diario"><i>🎁</i><span class="lbl2">Diário</span></button>
+    <button data-view="v-codigos"><i>🎟</i><span class="lbl2">Códigos</span></button>
+    <button data-view="v-set"><i>⚙</i><span class="lbl2">Ajustes</span></button>
+    <button data-view="v-perfil"><i>👤</i><span class="lbl2">Perfil</span></button>
+    <button class="pin" id="navPin" type="button"><i>📌</i><span class="lbl2">Fixar barra</span></button>
   </nav>
 
   <div class="maincol">
@@ -898,6 +940,8 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 
       <!-- ============ ABA: GACHA ============ -->
       <section class="view active" id="v-gacha">
+       <div class="gacha-painel">
+        <div class="gacha-col-a">
         <div class="card2">
           <div class="hd"><h3>Escolher gacha</h3><span id="sysCount">15 sistemas</span></div>
           <div class="bd"><div class="sysgrid" id="sysList"></div></div>
@@ -925,10 +969,20 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
           </div>
         </div>
 
-        <div class="card2" id="ratesPanel">
-          <div class="hd"><h3 id="rateTitle">Probabilidade por classe</h3><span id="totalRate">Total: 0%</span></div>
-          <section id="rates" class="rates2" style="padding:13px 15px"></section>
+        </div><!-- /coluna A -->
+
+        <div class="gacha-col-b">
+          <div class="card2" id="ratesPanel">
+            <div class="hd"><h3 id="rateTitle">Probabilidade por classe</h3><span id="totalRate">Total: 0%</span></div>
+            <section id="rates" class="rates2" style="padding:13px 15px"></section>
+          </div>
+
+          <div class="card2">
+            <div class="hd"><h3 id="tabelaTitulo">Tabela do sistema</h3><span id="tabelaSub">classes e itens</span></div>
+            <div class="bd" id="tabelaSistema"></div>
+          </div>
         </div>
+       </div>
       </section>
 
       <!-- ============ ABA: COLEÇÃO ============ -->
@@ -1600,10 +1654,74 @@ function renderSys(){
       +  '<div class="ct">'+cc+' na coleção</div></div>';
   }
   box.innerHTML = out;
+  try{ renderTabela(); }catch(e){}
   var rows = box.querySelectorAll('[data-k]');
   for(var r=0;r<rows.length;r++){
     rows[r].onclick = (function(key){ return function(){ choose(key); }; })(rows[r].getAttribute('data-k'));
   }
+}
+
+// Tabela do sistema: lista as classes de raridade com chance e quantidade.
+function renderTabela(){
+  var box = el('tabelaSistema');
+  if(!box) return;
+  var m = SYSTEMS[current];
+  if(!m){ box.innerHTML = ''; return; }
+
+  var tt = el('tabelaTitulo'), sub = el('tabelaSub');
+  if(tt) tt.textContent = 'Tabela: ' + m.label;
+  if(sub) sub.textContent = totalOf(current) + ' itens';
+
+  var classes = (typeof classesOf === 'function') ? (classesOf(current) || []) : (m.classes || []);
+  if(!classes.length){
+    box.innerHTML = '<div class="sub" style="color:var(--muted);font-size:12px">Este sistema não tem classes de raridade.</div>';
+    return;
+  }
+
+  // total de probabilidade, para normalizar quando vier em porcentagem
+  var soma = 0;
+  for(var i=0;i<classes.length;i++){
+    var pr = classes[i].prob !== undefined ? Number(classes[i].prob) : 0;
+    if(!isNaN(pr)) soma += pr;
+  }
+
+  var h2 = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    + '<thead><tr style="color:var(--muted);font-size:10px;letter-spacing:1.4px;text-transform:uppercase">'
+    + '<th style="text-align:left;padding:6px 4px">Classe</th>'
+    + '<th style="text-align:right;padding:6px 4px">Chance</th>'
+    + '<th style="text-align:right;padding:6px 4px">Itens</th>'
+    + '<th style="text-align:right;padding:6px 4px">Na coleção</th>'
+    + '</tr></thead><tbody>';
+
+  for(var j=0;j<classes.length;j++){
+    var c = classes[j] || {};
+    var nome = c.name || c.rank || ('Classe ' + (j+1));
+    var cor = c.color || 'var(--muted)';
+    var pr2 = (c.prob !== undefined) ? Number(c.prob) : null;
+    var chance = (pr2 === null || isNaN(pr2)) ? '-' : (pr2.toFixed(2).replace('.00','') + '%');
+    var qtd = 0;
+    try{
+      var bag = (m.items && c.rank !== undefined) ? (m.items[c.rank] || m.items[nome] || []) : [];
+      qtd = bag.length || 0;
+    }catch(e){ qtd = 0; }
+    var tem = 0;
+    try{
+      var lista = loadInv(current, coll) || [];
+      for(var z=0;z<lista.length;z++){
+        if(lista[z] && (lista[z].rank === c.rank || lista[z].cls === nome)) tem++;
+      }
+    }catch(e){ tem = 0; }
+
+    h2 += '<tr style="border-top:1px solid rgba(148,163,184,.14)">'
+      + '<td style="padding:7px 4px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+cor+';margin-right:7px"></span>'
+      + '<b style="color:'+cor+'">'+esc(String(c.rank||''))+'</b> <span style="color:var(--muted)">'+esc(nome)+'</span></td>'
+      + '<td style="text-align:right;padding:7px 4px;font-weight:900">'+chance+'</td>'
+      + '<td style="text-align:right;padding:7px 4px;color:var(--muted)">'+qtd+'</td>'
+      + '<td style="text-align:right;padding:7px 4px;color:var(--muted)">'+tem+'</td>'
+      + '</tr>';
+  }
+  h2 += '</tbody></table>';
+  box.innerHTML = h2;
 }
 
 function choose(k){
@@ -1621,6 +1739,7 @@ function choose(k){
   el('uniqueLabel').textContent = m.plural.charAt(0).toUpperCase()+m.plural.slice(1)+' únicos';
   el('totalLabel').textContent = m.plural.charAt(0).toUpperCase()+m.plural.slice(1)+' no sistema';
   el('search').placeholder = 'Buscar '+m.singular+'...';
+  try{ renderTabela(); }catch(e){}
   if(el('portalKind2')) el('portalKind2').textContent = m.label;
   if(el('collSub')) el('collSub').textContent = coll + ' · ' + m.label;
   if(el('sysCount')) el('sysCount').textContent = SYS_ORDER.length + ' sistemas';
@@ -2885,13 +3004,31 @@ var STORE_VIEW2 = 'projectGachaView.v2';
 function showView(id){
   var views = document.querySelectorAll('.view');
   for(var i=0;i<views.length;i++) views[i].classList.toggle('active', views[i].id === id);
-  var btns = document.querySelectorAll('.nav button');
+  var btns = document.querySelectorAll('.nav button[data-view]');
   for(var j=0;j<btns.length;j++) btns[j].classList.toggle('active', btns[j].getAttribute('data-view') === id);
   try{ localStorage.setItem(STORE_VIEW2, id); }catch(e){}
   window.scrollTo(0,0);
 }
 (function(){
-  var btns = document.querySelectorAll('.nav button');
+  // botao fixar: mantem a barra aberta sem depender do cursor
+  var pin = document.getElementById('navPin');
+  if(pin){
+    pin.onclick = function(){
+      var wrap = document.querySelector('.sh-wrap');
+      var fixado = wrap.classList.toggle('fixado');
+      var t = pin.querySelector('.lbl2');
+      if(t) t.textContent = fixado ? 'Desafixar' : 'Fixar barra';
+      try{ localStorage.setItem('gachaNavFixado.v1', fixado ? 'sim' : 'nao'); }catch(e){}
+    };
+    try{
+      if(localStorage.getItem('gachaNavFixado.v1') === 'sim'){
+        document.querySelector('.sh-wrap').classList.add('fixado');
+        var t2 = pin.querySelector('.lbl2');
+        if(t2) t2.textContent = 'Desafixar';
+      }
+    }catch(e){}
+  }
+  var btns = document.querySelectorAll('.nav button[data-view]');
   for(var i=0;i<btns.length;i++){
     btns[i].onclick = (function(v){ return function(){ showView(v); }; })(btns[i].getAttribute('data-view'));
   }
