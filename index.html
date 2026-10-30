@@ -260,6 +260,16 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .topbar h1{font-size:17px;margin:0;letter-spacing:-.02em}
 .topbar .eyebrow{display:none}
 .topbar .pill{padding:7px 10px;font-size:11px}
+/* contadores de moeda (v27) */
+.pill moeda, .tx-pill{display:inline-flex}
+.pill.moedas{gap:11px;align-items:center;padding:6px 11px}
+.pill.moedas .m{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:900;white-space:nowrap}
+.pill.moedas .m .ic{font-size:13px;line-height:1}
+.pill.moedas .m.gc{color:#fbbf24}
+.pill.moedas .m.dm{color:#67e8f9}
+.pill.moedas .m .ganho{font-size:10.5px;font-weight:900;opacity:0;transition:opacity .2s ease}
+.pill.moedas .m .ganho.on{opacity:1}
+.pill.moedas .sep{width:1px;height:14px;background:var(--line)}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:25;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;border-top:1px solid var(--line);background:rgba(8,11,24,.96);backdrop-filter:blur(12px);padding-bottom:env(safe-area-inset-bottom)}
 .nav button{display:grid;gap:3px;justify-items:center;align-items:center;border:0;background:none;color:var(--muted);padding:10px 2px 12px;font-size:9.5px;font-weight:900;letter-spacing:.2px;cursor:pointer;min-width:0;overflow:hidden}
 .nav button i{font-size:18px;font-style:normal;line-height:1}
@@ -948,6 +958,11 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
     <div class="topbar">
       <div class="brand"><div class="brand-logo" id="brandLogo"></div><div><h1>PROJECT GACHA</h1></div></div>
       <div class="pill">✧ <span id="count">0</span> itens</div>
+      <div class="pill moedas" id="moedasBar">
+        <span class="m gc"><span class="ic">🪙</span><span id="mGC">0</span><span class="ganho" id="mGCg"></span></span>
+        <span class="sep"></span>
+        <span class="m dm"><span class="ic">💎</span><span id="mDM">0</span><span class="ganho" id="mDMg"></span></span>
+      </div>
     </div>
 
     <div class="stage">
@@ -5587,6 +5602,83 @@ applyTheme(savedTheme);
 choose(current);
 
 
+/* ================= MOEDAS (v27) ================= */
+// G-Coins e Diamantes sao da CONTA (um saldo por perfil), e nao de
+// cada personagem. Ficam na chave projectGachaMoedas.v1 e sobem na
+// sincronizacao como um pedaco proprio (p_moedas).
+var STORE_MOEDAS = 'projectGachaMoedas.v1';
+
+function moedas(){
+  var m = loadJSON(STORE_MOEDAS, null);
+  if(!m || typeof m !== 'object'){
+    m = { gc: 0, dm: 0, hist: [] };
+  }
+  if(typeof m.gc !== 'number' || isNaN(m.gc)) m.gc = 0;
+  if(typeof m.dm !== 'number' || isNaN(m.dm)) m.dm = 0;
+  if(!m.hist || !m.hist.length) m.hist = [];
+  return m;
+}
+function moedasSalvar(m){
+  try{ localStorage.setItem(STORE_MOEDAS, JSON.stringify(m)); }catch(e){}
+}
+function moedasNivel(){ return { gc: Math.floor(arguments.length ? 1 : 1) }; }
+
+// valor formatado: 12450 -> 12.450
+function moedaFmt(n){
+  n = Math.floor(Number(n) || 0);
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function moedasRender(ganhoGC, ganhoDM){
+  var m = moedas();
+  var a = document.getElementById('mGC'), b = document.getElementById('mDM');
+  if(a) a.textContent = moedaFmt(m.gc);
+  if(b) b.textContent = moedaFmt(m.dm);
+
+  function mostraGanho(id, valor){
+    var e = document.getElementById(id);
+    if(!e) return;
+    if(!valor){ e.className = 'ganho'; return; }
+    e.textContent = '+' + moedaFmt(valor);
+    e.className = 'ganho on';
+    setTimeout(function(){ e.className = 'ganho'; }, 2600);
+  }
+  mostraGanho('mGCg', ganhoGC);
+  mostraGanho('mDMg', ganhoDM);
+}
+
+// dar moedas. origem fica registrada para voce acompanhar de onde veio.
+function darMoedas(gc, dm, origem){
+  gc = Math.floor(Number(gc) || 0);
+  dm = Math.floor(Number(dm) || 0);
+  if(!gc && !dm) return false;
+  var m = moedas();
+  m.gc += gc;
+  m.dm += dm;
+  m.hist.unshift({ gc: gc, dm: dm, de: String(origem || 'jogo'), em: new Date().toISOString() });
+  if(m.hist.length > 60) m.hist.length = 60;
+  moedasSalvar(m);
+  moedasRender(gc, dm);
+  try{ syAgendar(); }catch(e){}
+  return true;
+}
+
+// gastar moedas. devolve false se nao houver saldo.
+function gastarMoedas(gc, dm, origem){
+  gc = Math.floor(Number(gc) || 0);
+  dm = Math.floor(Number(dm) || 0);
+  var m = moedas();
+  if(m.gc < gc || m.dm < dm) return false;
+  m.gc -= gc;
+  m.dm -= dm;
+  m.hist.unshift({ gc: -gc, dm: -dm, de: String(origem || 'gasto'), em: new Date().toISOString() });
+  if(m.hist.length > 60) m.hist.length = 60;
+  moedasSalvar(m);
+  moedasRender();
+  try{ syAgendar(); }catch(e){}
+  return true;
+}
+
 /* ================= LOGIN (v21) ================= */
 var LG_API = 'https://project-gacha-api-fdcqbpevcsareqaj.brazilsouth-01.azurewebsites.net/api';
 var STORE_SESSAO = 'projectGachaSessao.v1';
@@ -5775,6 +5867,7 @@ function lgInit(){
 
 try{ pfInit(); }catch(e){}
 try{ lgInit(); }catch(e){}
+try{ moedasRender(); }catch(e){}
 
 /* ================= SINCRONIZACAO SEGURA (v23) =================
 
@@ -5787,7 +5880,7 @@ try{ lgInit(); }catch(e){}
 var SY_OFF = 'projectGachaSyncOff.v1';
 var SY_BACKUP = 'projectGachaBackup.v1';
 var SY_EM = 'projectGachaSyncEm.v1';
-var SY_NAO_TOCA = [STORE_PERFIL, STORE_COD, STORE_SESSAO, SY_OFF, SY_BACKUP, SY_EM];
+var SY_NAO_TOCA = [STORE_PERFIL, STORE_COD, STORE_SESSAO, STORE_MOEDAS, SY_OFF, SY_BACKUP, SY_EM];
 
 function syOff(){
   try{ return localStorage.getItem(SY_OFF) === 'sim'; }catch(e){ return false; }
@@ -5875,6 +5968,7 @@ function syColetar(){
   try{ dados.tr  = loadJSON(STORE_TR, null); }catch(e){}
   try{ dados.daily = loadJSON(STORE_DAILY, null); }catch(e){}
   try{ dados.cod = loadJSON(STORE_COD, null); }catch(e){}
+  try{ dados.moedas = moedas(); }catch(e){}
   dados.meta = { versao: 23, ativo: activeColl(), em: new Date().toISOString() };
   return dados;
 }
@@ -5953,9 +6047,27 @@ function syFundir(dados){
   somarMapa(STORE_REB, dados.reb);
   somarMapa(STORE_TR,  dados.tr);
 
-  // 4. diario e codigos: so preenchem se aqui estiver vazio
+  // 4. diario, codigos e moedas: so preenchem se aqui estiver vazio
   if(dados.daily && !loadJSON(STORE_DAILY, null)) saveJSON(STORE_DAILY, dados.daily);
   if(dados.cod && !loadJSON(STORE_COD, null)) saveJSON(STORE_COD, dados.cod);
+  if(dados.moedas && typeof dados.moedas === 'object'){
+    var mM = moedas();
+    if(!mM.gc && !mM.dm){
+      moedasSalvar({ gc: Number(dados.moedas.gc)||0, dm: Number(dados.moedas.dm)||0, hist: dados.moedas.hist || [] });
+      moedasRender();
+    }
+  }
+
+  // moedas: fica com o maior saldo dos dois lados, nunca reduz o que existe aqui
+  if(dados.moedas && typeof dados.moedas === 'object'){
+    var locaisM = moedas();
+    var gc = Math.max(Number(locaisM.gc) || 0, Number(dados.moedas.gc) || 0);
+    var dm = Math.max(Number(locaisM.dm) || 0, Number(dados.moedas.dm) || 0);
+    var hist = (locaisM.hist || []).concat(dados.moedas.hist || []);
+    hist.sort(function(a,b){ return String(b.em||'').localeCompare(String(a.em||'')); });
+    moedasSalvar({ gc: gc, dm: dm, hist: hist.slice(0,60) });
+    moedasRender();
+  }
 
   return { novos: novos, itens: itensSomados };
 }
