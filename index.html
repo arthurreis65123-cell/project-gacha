@@ -5792,11 +5792,21 @@ function syFundir(dados){
 async function syEnviar(dados){
   try{
     var r = await lgPedir('/perfil', { dados: dados }, true);
-    if(r.status === 200) return { ok: true };
-    if(r.status === 413) return { ok: false, erro: 'O progresso passou do limite de 350 KB.' };
-    return { ok: false, erro: (r.dados && r.dados.erro) || ('Erro ' + r.status) };
+    if(r.status === 200) return { ok: true, resposta: r.dados };
+    var partes = [];
+    if(r.dados){
+      if(r.dados.erro) partes.push(r.dados.erro);
+      if(r.dados.detalhe) partes.push('detalhe: ' + r.dados.detalhe);
+      if(r.dados.falhas){
+        var f = r.dados.falhas;
+        partes.push('falhas: ' + (f.join ? f.join(' | ') : f));
+      }
+      if(r.dados.gravados !== undefined) partes.push('gravados: ' + r.dados.gravados);
+    }
+    if(!partes.length) partes.push('Erro ' + r.status + ' (sem detalhe na resposta)');
+    return { ok: false, erro: partes.join('\n'), tudo: r.dados };
   }catch(e){
-    return { ok: false, erro: 'Sem conexao com o servidor.' };
+    return { ok: false, erro: 'Sem conexao com o servidor. (' + (e.message || e) + ')' };
   }
 }
 async function syBaixar(){
@@ -5826,8 +5836,8 @@ async function syEnviarAgora(){
     syMarcarOff(true);
     return true;
   }
-  syStatus('bad', 'Nao salvou: ' + r.erro, 12000);
-  alert('O envio falhou.\n\n' + r.erro);
+  syStatus('bad', 'Nao salvou - veja o aviso', 12000);
+  alert('O ENVIO FALHOU.\n\n' + r.erro);
   return false;
 }
 
@@ -6028,11 +6038,22 @@ async function syDiagnostico(){
     var b = await syBaixar();
     if(b.ok){
       var naConta = syContar(b.dados);
-      linhas.push('NO SERVIDOR: ' + (b.dados ? (naConta.perfis + ' personagem(ns), ' + naConta.itens + ' itens') : 'vazio'));
+      linhas.push('LEITURA (GET): ok - ' + (b.dados ? (naConta.perfis + ' pers, ' + naConta.itens + ' itens') : 'vazio'));
     } else {
-      linhas.push('LEITURA FALHOU: ' + b.erro);
+      linhas.push('LEITURA (GET): FALHOU - ' + b.erro);
     }
-  }catch(e){ linhas.push('LEITURA FALHOU: ' + e.message); }
+  }catch(e){ linhas.push('LEITURA (GET): FALHOU - ' + e.message); }
+
+  try{
+    var r = await lgPedir('/perfil', { dados: { meta: { teste: 1, em: new Date().toISOString() } } }, true);
+    linhas.push('ESCRITA (POST): status ' + r.status);
+    if(r.dados){
+      if(r.dados.ok) linhas.push('  gravados: ' + (r.dados.gravados || 0));
+      if(r.dados.erro) linhas.push('  erro: ' + r.dados.erro);
+      if(r.dados.detalhe) linhas.push('  detalhe: ' + r.dados.detalhe);
+      if(r.dados.falhas) linhas.push('  falhas: ' + (r.dados.falhas.join ? r.dados.falhas.join(' | ') : r.dados.falhas));
+    }
+  }catch(e){ linhas.push('ESCRITA (POST): excecao - ' + e.message); }
 
   alert(linhas.join('\n'));
 }
