@@ -834,11 +834,25 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .lg-msg.ok{border:1px solid rgba(74,222,128,.45);background:rgba(74,222,128,.08);color:#bbf7d0}
 .lg-msg.info{border:1px solid var(--line);background:rgba(0,0,0,.2);color:var(--muted)}
 .lg-foot{padding:0 22px 20px;text-align:center;font-size:10.5px;color:var(--muted);line-height:1.6}
-.lg-user{display:flex;align-items:center;gap:9px}
-.lg-user .nm{font-size:12.5px;font-weight:900}
-.lg-user .em{font-size:10.5px;color:var(--muted)}
+.lg-user{display:flex;align-items:center;gap:10px;padding:5px 8px 5px 12px;border:1px solid var(--line);
+  border-radius:999px;background:rgba(17,23,42,.75)}
+.lg-user .av{width:26px;height:26px;border-radius:50%;flex:0 0 26px;display:grid;place-items:center;
+  font-size:13px;font-weight:950;color:#0b0d12;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.lg-user .nm{font-size:12.5px;font-weight:900;line-height:1.15}
+.lg-user .id2{font-size:10px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .lg-out{border:1px solid rgba(251,113,133,.45);background:rgba(251,113,133,.09);color:#fecdd3;border-radius:10px;
   padding:7px 11px;font-size:11px;font-weight:900;cursor:pointer;margin-left:auto}
+/* botoes de sistema dentro de Ajustes */
+.set-btn{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  border:1px solid var(--line);border-radius:14px;background:rgba(17,23,42,.7);
+  padding:13px 14px;margin-bottom:9px}
+.set-btn .t{font-size:13px;font-weight:900}
+.set-btn .d{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.set-btn button{border:1px solid var(--line);background:var(--panel2);color:var(--text);
+  border-radius:11px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+.set-btn button.perigo{border-color:rgba(251,113,133,.5);background:rgba(251,113,133,.1);color:#fecdd3}
+.set-btn button.ok{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:#bbf7d0}
+#sySt {font-size:11.5px;color:var(--muted);margin-top:2px}
 
 /* ================= SINCRONIZACAO SEGURA (v23) ================= */
 #syBarra{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9000;
@@ -1292,7 +1306,20 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       </section>
 
       <section class="view" id="v-set">
-        <div class="vtitle"><h2>Ajustes</h2><span>tema e identidade</span></div>
+        <div class="vtitle"><h2>Ajustes</h2><span>conta, tema e identidade</span></div>
+
+        <div class="card2" id="settingsConta">
+          <div class="hd"><h3>Conta</h3><span id="stContaSub">-</span></div>
+          <div class="bd" id="setContaBox"></div>
+        </div>
+
+        <div class="card2">
+          <div class="hd"><h3>Sincronização</h3><span>levar personagens entre aparelhos</span></div>
+          <div class="bd">
+            <div id="sySt">-</div>
+          </div>
+        </div>
+
         <div class="card2" id="settingsPanel">
           <div class="hd"><h3>Tema do aplicativo</h3><span>5 temas</span></div>
           <div class="bd"><div class="theme-grid" id="themeGrid"></div></div>
@@ -5692,6 +5719,14 @@ function lgSair(){
 }
 
 // barra com o usuario no topo
+// marca e ID curtos, derivados do usuario
+function lgIdCurto(u){
+  var s = String(u || '');
+  var h2 = 0;
+  for(var i=0;i<s.length;i++) h2 = (h2 * 31 + s.charCodeAt(i)) % 100000;
+  return 'PG-' + String(h2).padStart(5,'0');
+}
+
 function lgBarra(){
   var s = lgSessao();
   var alvo = document.getElementById('lgUserBar');
@@ -5709,11 +5744,11 @@ function lgBarra(){
     if(b1) b1.onclick = function(){ lgModo('entrar'); lgMostrar(true); };
     return;
   }
-  alvo.innerHTML = '<div class="lg-user"><div><div class="nm">' + esc(s.usuario) + '</div>'
-    + '<div class="em">' + esc(s.email || '') + '</div></div>'
-    + '<button class="lg-out" id="lgBtnSair">Sair</button></div>';
-  var b2 = document.getElementById('lgBtnSair');
-  if(b2) b2.onclick = lgSair;
+  var inicial = String(s.usuario || '?').charAt(0).toUpperCase();
+  alvo.innerHTML = '<div class="lg-user">'
+    + '<div class="av">' + esc(inicial) + '</div>'
+    + '<div><div class="nm">' + esc(s.usuario) + '</div>'
+    + '<div class="id2" id="lgId">ID ' + esc(lgIdCurto(s.usuario)) + '</div></div></div>';
 }
 
 function lgInit(){
@@ -6157,6 +6192,7 @@ var syEntrou = lgEntrou;
 lgEntrou = function(){
   syEntrou();
   syBotaoBarra();
+  try{ syPainelAjustes(); }catch(e){}
   syPrimeiraVez();
 };
 
@@ -6216,9 +6252,88 @@ async function syDiagnostico(){
   alert(linhas.join('\n'));
 }
 
+// --- Ajustes: painel de conta e sincronizacao -----------------------
+function syPainelAjustes(){
+  var caixa = document.getElementById('setContaBox');
+  var sub = document.getElementById('stContaSub');
+  if(!caixa) return;
+  var s = lgSessao();
+
+  if(!s){
+    if(sub) sub.textContent = 'sem conta';
+    caixa.innerHTML = '<div class="set-btn"><div><div class="t">Você não está numa conta</div>'
+      + '<div class="d">Entre para levar seus personagens entre aparelhos.</div></div>'
+      + '<button class="ok" id="stEntrar">Entrar</button></div>';
+    var e1 = document.getElementById('stEntrar');
+    if(e1) e1.onclick = function(){ lgModo('entrar'); lgMostrar(true); };
+  } else {
+    if(sub) sub.textContent = 'conectada';
+    var ini = String(s.usuario || '?').charAt(0).toUpperCase();
+    caixa.innerHTML =
+      '<div class="set-btn"><div><div class="t">' + esc(s.usuario) + '</div>'
+      + '<div class="d">' + esc(s.email || 'sem e-mail') + ' · ID ' + esc(lgIdCurto(s.usuario)) + '</div></div>'
+      + '<button class="perigo" id="stSair">Sair</button></div>';
+    var b2 = document.getElementById('stSair');
+    if(b2) b2.onclick = lgSair;
+  }
+
+  var st = document.getElementById('sySt');
+  var caixa2 = st ? st.parentNode : null;
+  if(caixa2){
+    // remove os botoes antigos, se houver
+    var antigos = caixa2.querySelectorAll('.set-btn, #syStLinha');
+    for(var i=0;i<antigos.length;i++) antigos[i].parentNode.removeChild(antigos[i]);
+
+    var linha = document.createElement('div');
+    linha.id = 'syStLinha';
+    if(!s){
+      linha.innerHTML = '<div class="d" style="font-size:11.5px;color:var(--muted)">Entre numa conta para sincronizar.</div>';
+    } else {
+      var conta = syContarLocais();
+      linha.innerHTML = '<div class="d" style="font-size:11.5px;color:var(--muted);margin-bottom:11px">'
+        + conta.perfis + ' personagem(ns) e ' + conta.itens + ' itens neste aparelho · '
+        + (syOff() ? 'sincronização desligada' : 'ligada') + '</div>'
+        + '<div class="set-btn"><div><div class="t">Sincronizar agora</div>'
+        + '<div class="d">Envia o progresso deste aparelho para a conta.</div></div>'
+        + '<button class="ok" id="stSync">Sincronizar</button></div>'
+        + '<div class="set-btn"><div><div class="t">Baixar da conta</div>'
+        + '<div class="d">Traz os personagens que estão na conta. Nada é removido daqui.</div></div>'
+        + '<button id="stBaixar">Baixar</button></div>'
+        + '<div class="set-btn"><div><div class="t">Diagnóstico</div>'
+        + '<div class="d">Mostra o que existe aqui e o que o servidor responde.</div></div>'
+        + '<button id="stDiag">Abrir</button></div>';
+    }
+    caixa2.appendChild(linha);
+
+    var bs = document.getElementById('stSync');
+    if(bs) bs.onclick = function(){ bs.disabled = true; bs.textContent = '...'; syEnviarAgora().then(function(){ bs.disabled = false; bs.textContent = 'Sincronizar'; syPainelAjustes(); }); };
+    var bb = document.getElementById('stBaixar');
+    if(bb) bb.onclick = async function(){
+      bb.disabled = true; bb.textContent = '...';
+      var r = await syBaixar();
+      if(r.ok && r.dados){ syFundir(r.dados); syRecarregarTelas(); syStatus('ok','Baixado da conta', 4000); }
+      else if(r.ok) syStatus('ok','A conta está vazia', 3000);
+      else syStatus('bad','Falhou: ' + r.erro, 5000);
+      bb.disabled = false; bb.textContent = 'Baixar';
+      syPainelAjustes();
+    };
+    var bd = document.getElementById('stDiag');
+    if(bd) bd.onclick = function(){ syDiagnostico(); };
+  }
+}
+
 // --- boot -----------------------------------------------------------
 try{
   if(lgSessao()){ syBotaoBarra(); syBackupMostrar(); }
+  try{ syPainelAjustes(); }catch(e){}
+  try{
+    var obs = new MutationObserver(function(){
+      var v = document.getElementById('v-set');
+      if(v && v.classList.contains('active')) syPainelAjustes();
+    });
+    var vs = document.getElementById('v-set');
+    if(vs) obs.observe(vs, { attributes: true, attributeFilter: ['class'] });
+  }catch(e){}
 }catch(e){}
 </script>
 </script>
