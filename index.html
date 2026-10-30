@@ -2427,7 +2427,13 @@ function reelDraw(){
 }
 
 el('reelClose').onclick = closeReel;
-el('reelGo').onclick = function(){ el('reel').classList.remove('open'); setTimeout(spin, 60); };
+el('reelGo').onclick = function(){
+  // girar de novo tambem consome moeda
+  var qtd = (typeof reelLastAmount === 'number' && reelLastAmount > 1) ? 5 : 1;
+  if(!gachaPode(qtd)){ gachaRecusar(qtd); return; }
+  gastarMoedas(GACHA_CUSTO * qtd, 0, 'invocar de novo x' + qtd);
+  el('reel').classList.remove('open'); setTimeout(spin, 60);
+};
 
 // troca o botao de invocar pela roleta
 
@@ -2605,8 +2611,31 @@ function spinSame(){
   if(reelLastAmount === 5) spinFive(); else spinSingle();
 }
 
-el('summonOne').onclick = function(){ batchGot = []; reelAmount = 1; reelLastAmount = 1; reelQueue = [reelDraw()]; spinQueued(true); };
-el('summonFive').onclick = function(){ batchGot = []; spinFive(); };
+// ===== custo da invocacao: 100 G-Coins por gacha (v27) =====
+var GACHA_CUSTO = 100;
+
+function gachaPode(qtd){
+  var m = moedas();
+  return Math.floor(m.gc / GACHA_CUSTO) >= qtd;
+}
+
+function gachaRecusar(qtd){
+  var m = moedas();
+  var falta = (qtd * GACHA_CUSTO) - m.gc;
+  toast('Sem G-Coins suficientes. Faltam ' + falta + ' moedas (' + (qtd * GACHA_CUSTO) + ' por invocacao).');
+  try{ moedasRender(); }catch(e){}
+}
+
+el('summonOne').onclick = function(){
+  if(!gachaPode(1)){ gachaRecusar(1); return; }
+  gastarMoedas(GACHA_CUSTO, 0, 'invocar x1');
+  batchGot = []; reelAmount = 1; reelLastAmount = 1; reelQueue = [reelDraw()]; spinQueued(true);
+};
+el('summonFive').onclick = function(){
+  if(!gachaPode(5)){ gachaRecusar(5); return; }
+  gastarMoedas(GACHA_CUSTO * 5, 0, 'invocar x5');
+  batchGot = []; spinFive();
+};
 
 
 document.addEventListener('keydown', function(e){
@@ -3638,6 +3667,14 @@ try{ if(typeof codRenderHist === 'function') codRenderHist(); }catch(e){}
         }
       }catch(e){}
 
+      // premio em G-Coins da luta (v27)
+      try{
+        var quemGanhou = (vencedor.id === coll);
+        var premioPvp = quemGanhou ? PVP_MOEDA_VITORIA : PVP_MOEDA_DERROTA;
+        darMoedas(premioPvp, 0, 'pvp ' + (quemGanhou ? 'vitoria' : 'derrota'));
+        push('MOEDAS: +' + premioPvp + ' G-Coins' + (quemGanhou ? ' pela vitória.' : ' por participar.'), 'fin');
+      }catch(e){}
+
       // registra no sistema de elos
       if(typeof eloRegistrar === 'function'){
         var res = eloRegistrar(
@@ -4279,6 +4316,11 @@ function indicePorNivel(cl, nivel){
 function sortearPresente(dia){
   var cfg = DIAS[dia - 1] || DIAS[0];
   var sorte = sorteAtual();
+
+  // premio em G-Coins do presente diario (v27)
+  try{
+    darMoedas(DIARIO_MOEDA, 0, 'diario dia ' + dia);
+  }catch(e){}
 
   // bonus de sorte empurra a raridade para cima
   var nivel = cfg.nivel;
@@ -5075,6 +5117,13 @@ function lutarTorre(){
     reg.recorde = Math.max(reg.recorde || 1, reg.andar);
     trSet(coll, reg);
 
+    // premio em G-Coins pela vitoria (v27)
+    try{
+      var premio = boss ? TORRE_MOEDA_BOSS : TORRE_MOEDA_ANDAR;
+      darMoedas(premio, 0, boss ? ('torre boss ' + andar) : ('torre andar ' + andar));
+      trLog('+' + premio + ' G-Coins.', 'win');
+    }catch(e){}
+
     if(andar >= TORRE_ANDARES) trLog('TORRE CONCLUÍDA! Você venceu os 500 andares.', 'win');
 
     if(coll === current) inv = loadInv(current, coll);
@@ -5622,6 +5671,13 @@ function moedasSalvar(m){
   try{ localStorage.setItem(STORE_MOEDAS, JSON.stringify(m)); }catch(e){}
 }
 function moedasNivel(){ return { gc: Math.floor(arguments.length ? 1 : 1) }; }
+
+// premios da economia (v27)
+var TORRE_MOEDA_ANDAR = 25;   // por andar vencido
+var TORRE_MOEDA_BOSS  = 150;  // por boss vencido
+var DIARIO_MOEDA      = 60;   // por presente diario
+var PVP_MOEDA_VITORIA = 40;   // por vitoria no PvP
+var PVP_MOEDA_DERROTA = 10;   // consolacao
 
 // valor formatado: 12450 -> 12.450
 function moedaFmt(n){
