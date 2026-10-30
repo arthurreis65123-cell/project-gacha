@@ -5824,7 +5824,29 @@ async function syBaixar(){
 }
 
 // --- envio ---------------------------------------------------------
+// fila: um envio por vez. Sem isso, um envio lento chega depois de um
+// novo e sobrescreve o dado melhor com o dado antigo.
+var syNaFila = null;
+var syRodando = false;
+
 async function syEnviarAgora(){
+  if(syRodando){
+    syNaFila = true;
+    return false;
+  }
+  syRodando = true;
+  try{
+    return await syEnviarDeVerdade();
+  } finally {
+    syRodando = false;
+    if(syNaFila){
+      syNaFila = null;
+      setTimeout(function(){ syEnviarAgora(); }, 800);
+    }
+  }
+}
+
+async function syEnviarDeVerdade(){
   var locais = syContarLocais();
   var dados = syColetar();
   var conta = syContar(dados);
@@ -5950,14 +5972,7 @@ async function syEmpurrar(forcar){
   var agora = Date.now();
   if(!forcar && agora - syUltimo < 5000) return;
   syUltimo = agora;
-  syStatus('', 'Salvando...');
-  var r = await syEnviar(syColetar());
-  if(r.ok){
-    try{ localStorage.setItem(SY_EM, new Date().toISOString()); }catch(e){}
-    syStatus('ok', 'Salvo na conta', 2200);
-  } else {
-    syStatus('bad', 'Nao salvou: ' + r.erro, 5000);
-  }
+  await syEnviarAgora();
 }
 
 // --- botao na barra -------------------------------------------------
@@ -5969,9 +5984,15 @@ function syBotaoBarra(){
   b.className = 'lg-out';
   b.style.margin = '0 0 0 8px';
   b.textContent = 'Sincronizar';
-  b.onclick = function(){
+  b.onclick = async function(){
     b.disabled = true; b.textContent = '...';
-    syEnviarAgora().then(function(){ b.disabled = false; b.textContent = 'Sincronizar'; });
+    if(syRodando){
+      alert('Ja existe um envio em andamento. Espere ele terminar.');
+      b.disabled = false; b.textContent = 'Sincronizar';
+      return;
+    }
+    await syEnviarAgora();
+    b.disabled = false; b.textContent = 'Sincronizar';
   };
   alvo.appendChild(b);
 
