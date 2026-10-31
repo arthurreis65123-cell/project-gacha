@@ -3474,13 +3474,9 @@ function runCompare(){
   el('cmpNote').textContent = 'Comparando ' + stats.length + ' coleções.';
 }
 
-el('cmpRun').onclick = runCompare;
-el('cmpClear').onclick = function(){
-  cmpSel = {};
-  el('cmpOut').innerHTML = '';
-  el('cmpNote').textContent = 'Escolha as coleções que deseja comparar.';
-  renderCmpPick();
-};
+/* Comparar: guardado para depois. Os botoes sairam do HTML quando a
+   Loja entrou no lugar. As funcoes seguem no arquivo, sem tela. */
+function cmpRunGuardado(){ runCompare(); }
 
 
 /* ================= ABAS (v13.5) ================= */
