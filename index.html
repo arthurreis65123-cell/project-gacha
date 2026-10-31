@@ -907,6 +907,89 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 #syBackup.on{display:flex}
 #syBackup button{cursor:pointer;border-radius:9px;border:1px solid rgba(251,191,36,.6);
   background:transparent;color:#fde68a;padding:7px 12px;font-size:12.5px;font-weight:700}
+
+/* ================= LOBBY (v31) ================= */
+#lobby{position:fixed;inset:0;z-index:8000;display:none;
+  background:radial-gradient(circle at 50% 42%,rgba(139,92,246,.22),transparent 46%),
+             radial-gradient(circle at 12% 88%,rgba(34,211,238,.14),transparent 38%),
+             linear-gradient(180deg,#0a0f22 0%,#070b18 55%,#04060e 100%);
+  overflow:hidden}
+#lobby.on{display:block}
+#lobby .lb-topo{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:12px 16px;z-index:3}
+#lobby .lb-marca{display:flex;align-items:center;gap:10px}
+#lobby .lb-marca .logo{width:40px;height:40px;border-radius:12px;flex:0 0 auto;
+  filter:drop-shadow(0 0 12px var(--glow))}
+#lobby .lb-marca h1{margin:0;font-size:16px;letter-spacing:-.02em}
+#lobby .lb-marca .eyebrow{font-size:9px;letter-spacing:2.4px;font-weight:900;color:var(--muted)}
+#lobby .lb-moedas{display:flex;gap:14px;align-items:center;border:1px solid var(--line);
+  border-radius:999px;background:rgba(17,23,42,.8);padding:8px 14px}
+#lobby .lb-moedas span{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:950}
+#lobby .lb-moedas .gc{color:#fbbf24}
+#lobby .lb-moedas .dm{color:#67e8f9}
+#lobby .lb-moedas i{font-style:normal;font-size:18px}
+
+/* palco central */
+#lobby .lb-palco{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;z-index:2;padding:0 18px;max-width:min(92vw,620px)}
+#lobby .lb-palco h2{margin:0;font-size:clamp(26px,7vw,52px);letter-spacing:-.04em;line-height:1.02}
+#lobby .lb-palco p{margin:12px 0 0;color:var(--muted);font-size:13.5px;line-height:1.6}
+#lobby .lb-ativo{margin-top:18px;display:inline-flex;align-items:center;gap:11px;
+  border:1px solid var(--line);border-radius:999px;background:rgba(17,23,42,.78);padding:9px 16px}
+#lobby .lb-ativo .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-size:14px;font-weight:950;color:#0b0d12;
+  background:linear-gradient(135deg,var(--accent),var(--accent2))}
+#lobby .lb-ativo .nm{font-size:13px;font-weight:900}
+#lobby .lb-ativo .sb{font-size:10.5px;color:var(--muted)}
+
+/* botoes em volta do palco */
+#lobby .lb-volta{position:absolute;inset:0;z-index:1}
+#lobby .lb-btn{position:absolute;width:132px;height:132px;border-radius:26px;cursor:pointer;
+  border:1px solid var(--line);background:linear-gradient(160deg,rgba(30,38,66,.94),rgba(14,19,36,.96));
+  color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:9px;transform:translate(-50%,-50%);padding:10px;text-align:center;
+  box-shadow:0 14px 34px rgba(0,0,0,.42);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+#lobby .lb-btn i{font-style:normal;font-size:32px;line-height:1;
+  filter:drop-shadow(0 0 10px var(--glow))}
+#lobby .lb-btn b{font-size:12.5px;font-weight:950;letter-spacing:.2px}
+#lobby .lb-btn small{font-size:9.5px;color:var(--muted);line-height:1.25}
+#lobby .lb-btn:hover,#lobby .lb-btn:focus-visible{transform:translate(-50%,-50%) scale(1.07);
+  border-color:var(--accent);box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 0 1px var(--accent) inset;
+  outline:none}
+#lobby .lb-btn:active{transform:translate(-50%,-50%) scale(.97)}
+#lobby .lb-btn .tag{position:absolute;top:9px;right:9px;font-size:9px;font-weight:950;
+  border-radius:999px;padding:3px 7px;background:var(--accent);color:#0b0d12}
+
+/* posicoes: 5 de cada lado, em leque */
+#lobby .p1{left:9%;top:15%}  #lobby .p2{left:6%;top:32%}  #lobby .p3{left:6%;top:50%}
+#lobby .p4{left:6%;top:68%}  #lobby .p5{left:9%;top:85%}
+#lobby .p6{left:91%;top:15%} #lobby .p7{left:94%;top:32%} #lobby .p8{left:94%;top:50%}
+#lobby .p9{left:94%;top:68%} #lobby .p10{left:91%;top:85%}
+
+/* rodape */
+#lobby .lb-pe{position:absolute;left:0;right:0;bottom:0;padding:14px 16px 18px;
+  display:flex;justify-content:center;gap:10px;z-index:3;flex-wrap:wrap}
+#lobby .lb-pe button{cursor:pointer;font-family:inherit;font-weight:900;font-size:12.5px;
+  border-radius:12px;padding:11px 16px;border:1px solid var(--line);
+  background:rgba(17,23,42,.86);color:var(--text)}
+#lobby .lb-pe button.pri{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;color:#fff}
+
+/* celular: botoes em grade, dois por linha */
+@media(max-width:820px){
+  #lobby .lb-volta{position:static}
+  #lobby{overflow:auto}
+  #lobby .lb-palco{position:static;transform:none;margin:74px auto 14px;top:auto;left:auto}
+  #lobby .lb-btn{position:static;transform:none;width:auto;height:auto;
+    flex-direction:row;justify-content:flex-start;gap:12px;padding:14px 16px;border-radius:18px;
+    text-align:left}
+  #lobby .lb-btn i{font-size:24px}
+  #lobby .lb-btn b{font-size:13px}
+  #lobby .lb-volta{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 96px}
+  #lobby .lb-btn:hover,#lobby .lb-btn:active{transform:none}
+  #lobby .lb-pe{position:fixed}
+}
 </style>
 </head>
 <body>
@@ -943,6 +1026,36 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
     <div class="lg-foot" id="lgFoot">
       Seu progresso continua salvo neste aparelho.<br>A conta serve para levar os personagens entre dispositivos.
     </div>
+  </div>
+</div>
+
+<!-- ================= LOBBY (v31) ================= -->
+<div id="lobby">
+  <div class="lb-topo">
+    <div class="lb-marca">
+      <div class="logo" id="lbLogo"></div>
+      <div>
+        <div class="eyebrow">PROJECT GACHA</div>
+        <h1>Salão de Invocação</h1>
+      </div>
+    </div>
+    <div class="lb-moedas">
+      <span class="gc"><i>🪙</i><span id="lbGC">0</span></span>
+      <span class="dm"><i>💎</i><span id="lbDM">0</span></span>
+    </div>
+  </div>
+
+  <div class="lb-palco">
+    <h2>Escolha seu caminho</h2>
+    <p>Toque num dos portais ao redor para entrar. Tudo que você faz fica salvo na sua conta.</p>
+    <div class="lb-ativo" id="lbAtivo"></div>
+  </div>
+
+  <div class="lb-volta" id="lbBotoes"></div>
+
+  <div class="lb-pe">
+    <button class="pri" id="lbJogar">Entrar no jogo</button>
+    <button id="lbAjustes">Ajustes</button>
   </div>
 </div>
 
@@ -6133,6 +6246,7 @@ function lgEntrou(){
   if(!s) return;
   lgMostrar(false);
   lgBarra();
+  try{ lbAbrir(); }catch(e){}
   lgEl('lgSenha').value = '';
   try{ pfRender(); }catch(e){}
   toast('Bem-vindo, ' + s.usuario + '.');
@@ -6202,8 +6316,118 @@ function lgInit(){
   }
 }
 
+/* ================= LOBBY (v31) ================= */
+// Tela inicial com botoes em volta: cada botao abre uma area do jogo.
+// O lobby aparece depois do login e some ao entrar numa area.
+
+var LOBBY_BOTOES = [
+  { v:'v-gacha',   i:'✦',  t:'Gacha',      s:'Invocar novos itens',        poso:'p1',  pri:1 },
+  { v:'v-coll',    i:'▦',  t:'Personagens', s:'Sua coleção por personagem', poso:'p2' },
+  { v:'v-nivel',   i:'▲',  t:'Nível',      s:'XP, níveis e artefatos',     poso:'p3' },
+  { v:'v-torre',   i:'🗼', t:'Torre',      s:'500 andares e chefes',       poso:'p4' },
+  { v:'v-diario',  i:'🎁', t:'Diário',     s:'Presente de cada dia',       poso:'p5' },
+  { v:'v-pvp',     i:'⚔',  t:'PvP',        s:'Lutar contra outra coleção', poso:'p6' },
+  { v:'v-cmp',     i:'⚖',  t:'Comparar',   s:'Medir duas coleções',        poso:'p7' },
+  { v:'v-codigos', i:'🎟', t:'Códigos',    s:'Resgatar códigos',           poso:'p8' },
+  { v:'v-perfil',  i:'👤', t:'Perfil',     s:'Seu personagem principal',   poso:'p9' },
+  { v:'v-set',     i:'⚙',  t:'Ajustes',    s:'Conta, tema e sincronização',poso:'p10' }
+];
+
+function lbAbrir(){
+  var lb = document.getElementById('lobby');
+  if(lb) lb.classList.add('on');
+  lbRender();
+}
+function lbFechar(){
+  var lb = document.getElementById('lobby');
+  if(lb) lb.classList.remove('on');
+}
+
+// desenha os botoes e o resumo do personagem ativo
+function lbRender(){
+  var box = document.getElementById('lbBotoes');
+  if(box && !box.children.length){
+    var out = '';
+    for(var i=0;i<LOBBY_BOTOES.length;i++){
+      var b = LOBBY_BOTOES[i];
+      out += '<button class="lb-btn ' + b.poso + '" data-lb="' + b.v + '">'
+          +  (b.pri ? '<span class="tag">JOGAR</span>' : '')
+          +  '<i>' + b.i + '</i><b>' + esc(b.t) + '</b><small>' + esc(b.s) + '</small></button>';
+    }
+    box.innerHTML = out;
+    var bs = box.querySelectorAll('[data-lb]');
+    for(var j=0;j<bs.length;j++){
+      bs[j].onclick = (function(v){ return function(){ lbIr(v); }; })(bs[j].getAttribute('data-lb'));
+    }
+  }
+
+  // marca e saldos
+  var m = (typeof moedas === 'function') ? moedas() : { gc:0, dm:0 };
+  var g = document.getElementById('lbGC'), d = document.getElementById('lbDM');
+  if(g) g.textContent = (typeof moedaFmt === 'function') ? moedaFmt(m.gc) : m.gc;
+  if(d) d.textContent = (typeof moedaFmt === 'function') ? moedaFmt(m.dm) : m.dm;
+
+  var logo = document.getElementById('lbLogo');
+  if(logo && typeof LOGO_SVG !== 'undefined' && !logo.innerHTML) logo.innerHTML = LOGO_SVG;
+
+  var at = document.getElementById('lbAtivo');
+  if(at){
+    try{
+      var p = (typeof persAtivo === 'function') ? persAtivo() : null;
+      var s = (typeof lgSessao === 'function') ? lgSessao() : null;
+      if(p){
+        at.innerHTML = '<div class="av">' + esc(p.avatar || '⚔️') + '</div>'
+          + '<div><div class="nm">' + esc(p.name || coll) + '</div>'
+          + '<div class="sb">' + (s ? ('conta ' + esc(s.usuario)) : 'sem conta')
+          + ' · ' + (typeof loadInv === 'function' ? loadInv(current, coll).length : 0) + ' itens</div></div>';
+      } else {
+        at.innerHTML = '<div class="sb">Sem personagem ativo</div>';
+      }
+    }catch(e){}
+  }
+}
+
+// entra numa area do jogo
+function lbIr(v){
+  lbFechar();
+  try{ showView(v); }catch(e){}
+  if(v === 'v-gacha'){ try{ renderStats(); renderList(); }catch(e){} }
+}
+
+// botoes do pe
+(function(){
+  var j = document.getElementById('lbJogar');
+  if(j) j.onclick = function(){ lbIr('v-gacha'); };
+  var a = document.getElementById('lbAjustes');
+  if(a) a.onclick = function(){ lbIr('v-set'); };
+})();
+
+// o botao da marca volta para o lobby
+(function(){
+  var marca = document.querySelector('.topbar .brand');
+  if(marca){
+    marca.style.cursor = 'pointer';
+    marca.title = 'Voltar ao salão';
+    marca.onclick = function(){ lbAbrir(); };
+  }
+})();
+
+// ESC dentro do jogo volta ao lobby
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  var lb = document.getElementById('lobby');
+  if(lb && lb.classList.contains('on')) return;
+  var aberto = document.querySelector('.view.active');
+  if(aberto) lbAbrir();
+});
+
 try{ pfInit(); }catch(e){}
 try{ lgInit(); }catch(e){}
+try{
+  // ja logado: abre o salao; sem conta, o login cuida de chamar depois
+  if(typeof lgSessao === 'function' && lgSessao()) lbAbrir();
+  else if(typeof lbRender === 'function') lbRender();
+}catch(e){}
 try{ moedasRender(); }catch(e){}
 
 /* ================= SINCRONIZACAO SEGURA (v23) =================
