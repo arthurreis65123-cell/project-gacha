@@ -449,6 +449,15 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .boneco-b{transform:scaleX(-1)}
 /* o lutador da esquerda olha para a direita, e vice-versa */
 .boneco-b canvas{transform:none}
+/* numero do dano subindo */
+.dano-pop{position:absolute;transform:translate(-50%,0);pointer-events:none;
+  font-size:20px;font-weight:1000;color:#FB7185;text-shadow:0 2px 8px rgba(0,0,0,.9);
+  animation:sobeDano .9s ease forwards;z-index:5}
+.dano-pop.crit{color:#FDE047;font-size:24px}
+@keyframes sobeDano{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}
+  25%{opacity:1;transform:translate(-50%,-4px) scale(1.1)}
+  100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
+
 /* avanco: cada um anda na direcao do oponente */
 .campo .fight .boneco-b{animation:avancaB .34s ease}
 .campo .fight .boneco-a{animation:avancaA .34s ease}
@@ -4027,18 +4036,44 @@ function startPvp(){
     return { v: Math.max(1, Math.round(reduzido)), crit: crit, errou:false };
   }
 
+  // mostra o dano: usa a CENA (canvas do boneco e HUD), nao mais os cartoes antigos
   function golpe(cor, valor, crit){
-    var f = el(cor);
-    f.classList.add('hit');
-    setTimeout(function(){ f.classList.remove('hit'); }, 340);
-    var fl = el('fl' + cor);
-    fl.classList.add('on');
-    setTimeout(function(){ fl.classList.remove('on'); }, 360);
-    var np = el('np' + cor);
-    np.textContent = '-' + valor + (crit ? ' CRIT' : '');
-    np.classList.remove('on');
-    void np.offsetWidth;
-    np.classList.add('on');
+    var lado = String(cor).toLowerCase();          // 'a' ou 'b'
+    var cv = el('px' + String(cor).toUpperCase());
+    var hud = document.querySelector('.hud-' + lado);
+
+    // tremida no boneco
+    if(cv){
+      cv.classList.remove('levou');
+      void cv.offsetWidth;
+      cv.classList.add('levou');
+      setTimeout(function(){ cv.classList.remove('levou'); }, 340);
+    }
+    // tremida no HUD
+    if(hud){
+      hud.classList.remove('hit');
+      void hud.offsetWidth;
+      hud.classList.add('hit');
+      setTimeout(function(){ hud.classList.remove('hit'); }, 340);
+    }
+
+    // numero do dano flutuando sobre o boneco
+    if(cv){
+      var pop = document.createElement('div');
+      pop.className = 'dano-pop' + (crit ? ' crit' : '');
+      pop.textContent = '-' + valor + (crit ? '!' : '');
+      var campo = el('pvpCampo');
+      if(campo){
+        var r = cv.getBoundingClientRect();
+        var rc = campo.getBoundingClientRect();
+        pop.style.left = (r.left - rc.left + r.width/2) + 'px';
+        pop.style.top  = (r.top - rc.top + r.height/3) + 'px';
+      }
+      campo.appendChild(pop);
+      setTimeout(function(){
+        try{ campo.removeChild(pop); }catch(e){}
+      }, 900);
+    }
   }
 
   push('Combate iniciado: ' + A.id + ' contra ' + B.id + '.', 'fin');
