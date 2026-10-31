@@ -5404,7 +5404,10 @@ function codLer(codigo){
   }
 
   // valida formato dos campos
-  if(campos.length !== 6) return { erro:'Estrutura do código está diferente do esperado.' };
+  // 6 campos = codigo antigo (sem moeda)  |  7 campos = codigo com moeda (G-Coins/Diamantes)
+  if(campos.length !== 6 && campos.length !== 7){
+    return { erro:'Estrutura do código está diferente do esperado (' + campos.length + ' campos; esperava 6 ou 7).' };
+  }
 
   var itensBrutos = campos[0];
   var xp = Number(campos[1]) || 0;
@@ -5516,11 +5519,166 @@ function codAplicar(pacote, id2){
   return ganhos;
 }
 
+// ================= CODIGOS NO SERVIDOR (v29) =================
+// O codigo curto (GACHA-XXXXXXXX) e so um bilhete: o premio fica
+// guardado no servidor. Resgatar exige estar logado.
+
+function codCurto(txt){
+  var t = String(txt || '').trim().toUpperCase().replace(/\s+/g, '');
+  if(!t) return '';
+  if(t.indexOf('GACHA-') !== 0) t = 'GACHA-' + t;
+  return t;
+}
+function ehCodigoCurto(txt){
+  var t = codCurto(txt);
+  return t.length === 14 && t.indexOf('GACHA-') === 0;
+}
+
+async function codResgatarServidor(codigo){
+  var s = lgSessao();
+  if(!s || !s.passe){
+    return { ok:false, erro:'Entre na sua conta para resgatar o código.' };
+  }
+  try{
+    var r = await fetch(LG_API + '/codigo-resgatar', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.passe },
+      body: JSON.stringify({ codigo: codigo })
+    });
+    var d = null;
+    try{ d = await r.json(); }catch(e){ d = {}; }
+    if(r.status === 200) return { ok:true, premio: d.premio || {}, resposta: d };
+    return { ok:false, erro: (d && d.erro) || ('Erro ' + r.status) };
+  }catch(e){
+    return { ok:false, erro:'Sem conexão com o servidor.' };
+  }
+}
+
+// aplica o premio que veio do servidor
+function codAplicarServidor(premio){
+  var ganhos = [];
+  premio = premio || {};
+  var itens = premio.itens || [];
+
+  for(var i=0;i<itens.length;i++){
+    var p = itens[i];
+    if(!SYSTEMS[p.sys]) continue;
+
+    var bag = (p.rank && SYSTEMS[p.sys].items) ? (SYSTEMS[p.sys].items[p.rank] || []) : [];
+    var nome;
+    if(p.item !== undefined && p.item >= 0 && bag.length && bag[p.item] !== undefined){
+      nome = bag[p.item];
+    } else if(bag.length){
+      nome = bag[Math.floor(Math.random()*bag.length)];
+    } else {
+      nome = 'Item ' + (p.cls || '');
+    }
+
+    var cl = null;
+    var cls = SYSTEMS[p.sys].classes || [];
+    for(var k=0;k<cls.length;k++) if(cls[k].rank === p.rank) cl = cls[k];
+
+    var item = {
+      uid:'cod'+Date.now()+i+Math.random().toString(36).slice(2,5),
+      rank: p.rank || '--',
+      name: nome,
+      cls: cl ? cl.name : (p.cls || 'Código'),
+      color: cl ? cl.color : '#facc15',
+      prob: cl ? cl.prob : 0,
+      ts: Date.now()
+    };
+    var lista = loadInv(p.sys, coll);
+    lista.unshift(item);
+    saveInv(p.sys, coll, lista);
+    ganhos.push(item);
+  }
+
+  if(premio.xp && typeof ganharXp === 'function'){
+    try{ ganharXp(coll, Number(premio.xp), 'codigo'); }catch(e){}
+  }
+  if(premio.tokens && typeof tokDar === 'function'){
+    try{ tokDar(coll, Number(premio.tokens)); }catch(e){}
+  }
+  if(premio.moedas && typeof darMoedas === 'function'){
+    try{
+      darMoedas(Number(premio.moedas.gc)||0, Number(premio.moedas.dm)||0, 'codigo');
+    }catch(e){}
+  }
+  return ganhos;
+}
+
+function codRenderGanhos(ganhos){
+  var card = document.getElementById('cdPremiosCard');
+  var boxP = document.getElementById('cdPremios');
+  if(card && boxP && ganhos.length){
+    var hh = '';
+    for(var i=0;i<ganhos.length;i++){
+      var g = ganhos[i];
+      hh += '<div class="cd-item">'
+         +  '<div class="bd2" style="color:' + g.color + ';background:' + g.color + '20;border:1px solid ' + g.color + '66">' + esc(g.rank) + '</div>'
+         +  '<div style="min-width:0;flex:1"><strong>' + esc(g.name) + '</strong>'
+         +  '<small>' + esc(g.cls) + '</small></div></div>';
+    }
+    boxP.innerHTML = hh;
+    document.getElementById('cdPremioInfo').textContent = ganhos.length + ' item(ns)';
+    card.style.display = '';
+  }
+}
+
+async function codResgatarCurto(campo, msg){
+  var codigo = codCurto(campo.value);
+  msg.className = 'cd-msg';
+  msg.textContent = 'Consultando...';
+
+  var r = await codResgatarServidor(codigo);
+  if(!r.ok){
+    msg.className = 'cd-msg bad';
+    msg.textContent = r.erro;
+    return;
+  }
+
+  var ganhos = codAplicarServidor(r.premio);
+  campo.value = '';
+
+  // guarda no historico local desta colecao
+  var hh = codHist(coll);
+  hh[codigo] = Number(hh[codigo] || 0) + 1;
+  hh.detalhes = hh.detalhes || {};
+  hh.detalhes[codigo] = {
+    quando: new Date().toISOString().slice(0,10),
+    premio: ganhos.length ? ganhos[0].name : 'Prêmio do servidor',
+    itens: ganhos.length,
+    usos: hh[codigo]
+  };
+  codHistSet(coll, hh);
+
+  var p = r.premio || {};
+  msg.className = 'cd-msg ok';
+  msg.textContent = 'Resgatado! ' + (ganhos.length ? (ganhos.length + ' item(ns) foram para a coleção "' + coll + '".') : 'Prêmio aplicado.')
+    + (p.xp ? (' +' + p.xp + ' XP.') : '')
+    + (p.tokens ? (' +' + p.tokens + ' token(s).') : '')
+    + (p.moedas ? (' +' + (p.moedas.gc||0) + ' G-Coins, +' + (p.moedas.dm||0) + ' diamantes.') : '');
+
+  codRenderGanhos(ganhos);
+  try{ renderStats(); renderList(); renderColls(); }catch(e){}
+  codRenderHist();
+}
+
 function codResgatar(){
   var msg = document.getElementById('cdMsg');
   var campo = document.getElementById('cdEntrada');
   if(!msg || !campo) return;
 
+  // codigo curto = guardado no servidor
+  if(ehCodigoCurto(campo.value)){
+    codResgatarCurto(campo, msg);
+    return;
+  }
+
+  codResgatarAntigo(campo, msg);
+}
+
+function codResgatarAntigo(campo, msg){
   var r = codLer(campo.value);
   if(r.erro){
     msg.className = 'cd-msg bad';
