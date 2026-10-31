@@ -5352,7 +5352,101 @@ function trLog(txt, cls){
 }
 
 /* ---- a luta ---- */
-function lutarTorre(){
+/* ===== TORRE NO SERVIDOR (v39) =====
+   O jogo so PEDE a luta. Quem decide o andar, calcula os atributos,
+   sorteia o item e credita as moedas e o servidor. Assim nao adianta
+   editar o localStorage: ele nao manda mais no andar nem no saldo. */
+async function pedirLutaTorre(){
+  var s = lgSessao();
+  if(!s || !s.passe){
+    toast('Entre na sua conta para subir a torre.');
+    try{ lgModo('entrar'); lgMostrar(true); }catch(e){}
+    return null;
+  }
+  try{
+    var r = await fetch(LG_API + '/torre', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.passe },
+      body: JSON.stringify({ colecao: coll })
+    });
+    var d = null;
+    try{ d = await r.json(); }catch(e){ d = {}; }
+    if(r.status === 200) return d;
+    toast((d && d.erro) || ('Não foi possível lutar (' + r.status + ').'));
+    return null;
+  }catch(e){
+    toast('Sem conexão com o servidor.');
+    return null;
+  }
+}
+
+async function lutarTorre(){
+  var btn = document.getElementById('trLutar');
+  if(btn){ btn.disabled = true; btn.textContent = '⚔ Lutando...'; }
+
+  var d = await pedirLutaTorre();
+
+  if(btn){ btn.disabled = false; btn.textContent = '⚔ Lutar neste andar'; }
+  if(!d) return;
+
+  var log = document.getElementById('trLog');
+  if(log) log.innerHTML = '';
+
+  // o servidor mandou o resultado da luta
+  trLog('Andar ' + d.andar + (d.boss ? ' — ' + d.nome : ' — ' + d.nome) + '.', 'win');
+
+  if(d.venceu){
+    if(d.premio && d.premio.item){
+      var it = d.premio.item;
+      var nome = it.nome || it.name || 'Item';
+      trLog((d.boss ? 'ARTEFATO: ' : 'ARMA: ') + nome + ' (' + (it.grupo || it.cls || '') + ').', 'art');
+    }
+    if(d.premio && d.premio.moedas){
+      trLog('+' + d.premio.moedas + ' G-Coins.', 'win');
+    }
+    if(d.premio && d.premio.xp){
+      trLog('+' + d.premio.xp + ' XP.', 'win');
+    }
+    trLog('Vitória no andar ' + d.andar + '. Próximo: ' + d.proximoAndar + '.', 'win');
+  } else {
+    trLog('Vida restante no combate: ' + (d.minhaVida || 0) + '.');
+    trLog('Derrota no andar ' + d.andar + '. A torre continua no mesmo andar.', 'lose');
+    trLog('Ganhe XP e artefatos nos andares anteriores para ficar mais forte.', '');
+  }
+
+  // o saldo que vale e o que o servidor devolveu
+  if(typeof d.gcoins === 'number'){
+    try{
+      var m = moedas();
+      m.gc = Number(d.gcoins) || 0;
+      moedasSalvar(m);
+      moedasRender();
+    }catch(e){}
+  }
+
+  // o servidor guardou o andar: espelhamos para a tela
+  try{
+    if(d.proximoAndar){
+      var reg = trDe(coll);
+      reg.andar = d.proximoAndar;
+      reg.recorde = d.recorde || reg.recorde;
+      trSet(coll, reg);
+    }
+  }catch(e){}
+
+  // traz o que o servidor gravou e redesenha
+  try{
+    var b = await syBaixar();
+    if(b.ok && b.dados) syAplicar(b.dados, true);
+  }catch(e){}
+
+  renderTorre();
+  try{ renderStats(); renderList(); renderColls(); }catch(e){}
+  if(typeof renderNivelBox === 'function') renderNivelBox();
+}
+
+// a luta antiga fica guardada, mas nao e mais usada
+function lutarTorreLocal(){
   var reg = trDe(coll);
   var andar = Math.min(TORRE_ANDARES, reg.andar);
   var boss = ehAndarBoss(andar);
