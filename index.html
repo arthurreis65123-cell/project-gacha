@@ -1467,7 +1467,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
           <div class="lj-topo">
             <div>
               <h3>LOJA</h3>
-              <p>Personagens, armas e códigos</p>
+              <p>Personagens e armas mágicas da Forja Astral</p>
             </div>
             <button class="lj-x" id="ljFechar" type="button">✕</button>
           </div>
@@ -7724,15 +7724,15 @@ try{
   ];
 
   var GRADES = [
-    { g:'Comum',         moeda:'gc', preco:2000  },
-    { g:'Incomum',       moeda:'gc', preco:5000  },
-    { g:'Raro',          moeda:'gc', preco:12000 },
-    { g:'Muito Raro',    moeda:'gc', preco:25000 },
-    { g:'Heroico',       moeda:'gc', preco:50000 },
-    { g:'Épico',         moeda:'gc', preco:90000 },
-    { g:'Lendário',      moeda:'dm', preco:300   },
-    { g:'Transcendente', moeda:'dm', preco:600   },
-    { g:'Divino',        moeda:'dm', preco:1200  }
+    { g:'Comum',         moeda:'gc', preco:2000   },
+    { g:'Incomum',       moeda:'gc', preco:6000   },
+    { g:'Raro',          moeda:'gc', preco:15000  },
+    { g:'Muito Raro',    moeda:'gc', preco:30000  },
+    { g:'Heroico',       moeda:'gc', preco:55000  },
+    { g:'Épico',         moeda:'gc', preco:100000 },
+    { g:'Lendário',      moeda:'dm', preco:1500   },
+    { g:'Transcendente', moeda:'dm', preco:4000   },
+    { g:'Divino',        moeda:'dm', preco:10000  }
   ];
 
   var aba = 'pers';
@@ -7749,6 +7749,89 @@ try{
     try{ var all = loadColls(); return !!all[p.nome]; }catch(e){ return false; }
   }
 
+  /* ===== ESPADA MÁGICA EM PIXEL ART =====
+     Desenhada em blocos, direto no canvas. A cor muda pela raridade:
+     lendária em roxo, transcendente em ciano, divina em dourado. */
+  var PXE = { W: 16, H: 30 };
+
+  function palEspada(grau){
+    var por = {
+      'Comum':        { fio:'#cbd5e1', gume:'#94a3b8', cabo:'#6b7280', pomo:'#9CA3AF', aura:'#94a3b8' },
+      'Incomum':      { fio:'#bae6fd', gume:'#38bdf8', cabo:'#475569', pomo:'#38BDF8', aura:'#38bdf8' },
+      'Raro':         { fio:'#bbf7d0', gume:'#4ade80', cabo:'#3f6212', pomo:'#4ADE80', aura:'#4ade80' },
+      'Muito Raro':   { fio:'#fef08a', gume:'#facc15', cabo:'#78350f', pomo:'#FACC15', aura:'#facc15' },
+      'Heroico':      { fio:'#fed7aa', gume:'#fb923c', cabo:'#7c2d12', pomo:'#FB923C', aura:'#fb923c' },
+      'Épico':        { fio:'#fecdd3', gume:'#fb7185', cabo:'#881337', pomo:'#FB7185', aura:'#fb7185' },
+      'Lendário':     { fio:'#e9d5ff', gume:'#c084fc', cabo:'#4c1d95', pomo:'#C084FC', aura:'#c084fc' },
+      'Transcendente':{ fio:'#cffafe', gume:'#22d3ee', cabo:'#155e75', pomo:'#22D3EE', aura:'#22d3ee' },
+      'Divino':       { fio:'#fff7cc', gume:'#fde047', cabo:'#854d0e', pomo:'#FDE047', aura:'#fde047' }
+    };
+    return por[grau] || por['Comum'];
+  }
+
+  function desenhaEspada(ctx, grau, t){
+    var P = palEspada(grau);
+    var W = PXE.W, H = PXE.H;
+    ctx.clearRect(0,0,W,H);
+
+    var pulsa = Math.sin((t||0)/520) > 0 ? 1 : 0;
+    function B(x,y,w,hh,cor){ ctx.fillStyle = cor; ctx.fillRect(x,y,w,hh); }
+
+    // ---- lamina: da ponta (topo) ao guarda ----
+    // ponta
+    B(7, 1, 2, 2, P.fio);
+    B(6, 3, 4, 2, P.fio);
+    B(6, 3, 1, 2, P.gume);      // sombra do fio
+    // corpo da lamina
+    B(6, 5, 4, 13, P.fio);
+    B(6, 5, 1, 13, P.gume);     // lado esquerdo mais escuro = volume
+    B(9, 5, 1, 13, P.fio);
+    // risco central (o "brilho" da lamina)
+    B(7, 4, 1, 14, '#ffffff');
+    B(7, 18, 1, 2, P.aura);
+
+    // ---- serrilha dracônica na direita ----
+    B(10, 6, 1, 1, P.gume);
+    B(10, 9, 1, 1, P.gume);
+    B(10, 12, 1, 1, P.gume);
+    B(10, 15, 1, 1, P.gume);
+
+    // ---- guarda (as asas do dragão) ----
+    B(3, 18, 10, 2, P.pomo);
+    B(2, 19, 2, 2, P.pomo);     // asa esquerda
+    B(12, 19, 2, 2, P.pomo);    // asa direita
+    B(4, 20, 8, 1, P.gume);
+    B(3, 18, 10, 1, '#ffffff'); // brilho de cima da guarda
+
+    // ---- cabo ----
+    B(7, 21, 2, 6, P.cabo);
+    B(7, 21, 1, 6, P.gume);     // volume do cabo
+    B(7, 23, 2, 1, P.pomo);     // anel
+    B(7, 25, 2, 1, P.pomo);
+
+    // ---- pomo ----
+    B(6, 27, 4, 2, P.pomo);
+    B(6, 27, 4, 1, '#ffffff');
+
+    // ---- aura/faisca conforme a raridade (pulsa) ----
+    if(pulsa){
+      B(11, 10-4, 1, 1, P.aura);
+      B(4, 12, 1, 1, P.aura);
+      B(12, 21, 1, 1, P.aura);
+      B(3, 25, 1, 1, P.aura);
+    }
+  }
+
+  function desenhaArma(cv, grau){
+    if(!cv || !cv.getContext) return;
+    try{
+      var ctx = cv.getContext('2d');
+      var W = cv.width / PXE.W;      // quantos pixels cada bloco ocupa
+      ctx.setTransform(W, 0, 0, W, 0, 0);
+      desenhaEspada(ctx, grau, Date.now());
+    }catch(e){}
+  }
+
   function desenhaBoneco(cv, cor, pose){
     if(!cv || !cv.getContext) return;
     try{
@@ -7756,6 +7839,17 @@ try{
       ctx.setTransform(4,0,0,4,0,0);
       pxDesenhar(ctx, pxPaleta(cor), pose || 'parado', Date.now());
     }catch(e){}
+  }
+
+  // um nome real de arma do jogo, para mostrar no card
+  function exemploArma(){
+    try{
+      if(typeof DATA !== 'undefined' && DATA.armas && DATA.armas.length){
+        var w = DATA.armas[Math.floor(Math.random()*DATA.armas.length)];
+        return w.n || 'Arma da Forja';
+      }
+    }catch(e){}
+    return 'Arma da Forja';
   }
 
   function cards(){
@@ -7778,11 +7872,12 @@ try{
       for(var j=0;j<GRADES.length;j++){
         var gr = GRADES[j];
         var mo = gr.moeda === 'dm' ? '💎' : '🪙';
+        var ex = exemploArma();
         out += '<div class="lj-item" data-gra="'+gr.g+'">'
             +  '<div class="arte"><canvas data-arma="'+esc2(gr.g)+'" width="88" height="119"></canvas></div>'
             +  '<div class="info">'
-            +  '<div class="nm">Arma '+esc2(gr.g)+'</div>'
-            +  '<div class="sub">'+(gr.moeda==='dm'?'arma lendária':'arma comum')+'</div>'
+            +  '<div class="nm">Arma mágica '+esc2(gr.g)+'</div>'
+            +  '<div class="sub">Forjada na bigorna astral.<br>Ex.: <b>'+esc2(ex)+'</b></div>'
             +  '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmt(gr.preco)
             +  ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
             +  '<button class="bt">Comprar</button>'
@@ -7807,7 +7902,8 @@ try{
     for(var i=0;i<cvs.length;i++){
       var cor = cvs[i].getAttribute('data-cor');
       var arma = cvs[i].getAttribute('data-arma');
-      desenhaBoneco(cvs[i], cor || (arma ? '#facc15' : '#8b5cf6'), arma ? 'guerra' : 'parado');
+      if(arma) desenhaArma(cvs[i], arma);
+      else desenhaBoneco(cvs[i], cor || '#8b5cf6', 'parado');
     }
 
     var itens = box.querySelectorAll('[data-pers],[data-gra]');
@@ -7866,18 +7962,19 @@ try{
     var mo = gr.moeda === 'dm' ? '💎' : '🪙';
     var d = el2('ljVitrine');
     d.className = '';
-    d.innerHTML = '<div class="lj-det"><div class="hd"><h3>Arma '+esc2(gr.g)+'</h3><span>'+mo+' '+fmt(gr.preco)+'</span></div>'
+    d.innerHTML = '<div class="lj-det"><div class="hd"><h3>Arma mágica '+esc2(gr.g)+'</h3><span>'+mo+' '+fmt(gr.preco)+'</span></div>'
       + '<div class="bd">'
       + '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119" style="width:130px;height:176px;image-rendering:pixelated"></canvas></div>'
-      + '<div style="color:var(--muted);font-size:12px;line-height:1.6">Uma arma '+esc2(gr.g)
-      + ' forjada na bigorna astral. Vai direto para a coleção ativa.</div>'
+      + '<div style="color:var(--muted);font-size:12px;line-height:1.6">Uma arma mágica de grau '
+      + esc2(gr.g) + ', forjada na bigorna astral. Pode vir como espada, lâmina ou cajado — '
+      + 'o nome é sorteado entre as armas da forja, e ela entra direto na sua coleção.</div>'
       + '<div class="sumrow" style="margin-top:14px">'
       + '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmt(gr.preco)+'</button>'
       + '</div><div id="ljMsg"></div>'
       + '<button class="secondary" id="ljVoltar" style="margin-top:10px;width:100%">‹ Voltar</button>'
       + '</div></div>';
 
-    desenhaBoneco(el2('ljDetCv'), '#facc15', 'guerra');
+    desenhaArma(el2('ljDetCv'), gr.g);
     var vv2 = el2('ljVoltar');
     if(vv2) vv2.onclick = render;
     el2('ljComprarArma').onclick = function(){ comprarArma(gr); };
