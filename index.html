@@ -949,6 +949,46 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 #lobby .lb-moedas .dm{color:#67e8f9}
 #lobby .lb-moedas i{font-style:normal;font-size:18px}
 
+/* topo agrupado: perfil + moedas, como uma barra de jogador */
+#lobby .lb-topo .lb-dir{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+#lobby .lb-conta{display:flex;align-items:center;gap:11px;border:1px solid var(--line);
+  border-radius:999px;background:rgba(17,23,42,.8);padding:7px 15px 7px 8px}
+#lobby .lb-conta .av{width:34px;height:34px;border-radius:50%;flex:0 0 34px;display:grid;
+  place-items:center;font-size:15px;font-weight:950;color:#0b0d12;
+  background:linear-gradient(135deg,var(--accent),var(--accent2))}
+#lobby .lb-conta .nm{font-size:13.5px;font-weight:950;line-height:1.15}
+#lobby .lb-conta .id2{font-size:10px;color:var(--muted);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+#lobby .lb-conta.sem .nm{color:var(--muted)}
+/* moedas com formato de "recurso de jogo": icone em selo + valor */
+#lobby .lb-moedas{gap:0;padding:0;border-radius:999px;background:rgba(17,23,42,.8)}
+#lobby .lb-moedas .m{display:flex;align-items:center;gap:9px;padding:7px 15px}
+#lobby .lb-moedas .m+.m{border-left:1px solid var(--line)}
+#lobby .lb-moedas .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  font-size:14px;line-height:1;font-style:normal}
+#lobby .lb-moedas .gc .ic{background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.5)}
+#lobby .lb-moedas .dm .ic{background:rgba(103,232,249,.16);border:1px solid rgba(103,232,249,.5)}
+#lobby .lb-moedas .vl{font-size:14px;font-weight:950;letter-spacing:-.01em}
+#lobby .lb-moedas .gc .vl{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,.3)}
+#lobby .lb-moedas .dm .vl{color:#67e8f9;text-shadow:0 0 10px rgba(103,232,249,.3)}
+/* botao de perfil ao lado das moedas */
+#lobby .lb-perfil{cursor:pointer;font-family:inherit;font-weight:900;font-size:12px;
+  border:1px solid var(--line);border-radius:999px;background:rgba(17,23,42,.8);
+  color:var(--text);padding:10px 15px;display:flex;align-items:center;gap:8px}
+#lobby .lb-perfil:hover{border-color:var(--accent);background:var(--panel2)}
+#lobby .lb-perfil i{font-style:normal;font-size:15px}
+@media(max-width:820px){
+  #lobby .lb-topo{flex-wrap:wrap;gap:8px}
+  #lobby .lb-conta{padding:6px 12px 6px 6px}
+  #lobby .lb-conta .av{width:28px;height:28px;flex-basis:28px;font-size:13px}
+  #lobby .lb-conta .nm{font-size:12.5px}
+  #lobby .lb-moedas .m{padding:6px 11px;gap:7px}
+  #lobby .lb-moedas .ic{width:22px;height:22px;font-size:12px}
+  #lobby .lb-moedas .vl{font-size:13px}
+  #lobby .lb-perfil{padding:9px 12px;font-size:11.5px}
+  #lobby .lb-perfil .txt{display:none}
+}
+
 /* palco central */
 #lobby .lb-palco{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   text-align:center;z-index:2;padding:0 18px;max-width:min(92vw,620px)}
@@ -1059,9 +1099,15 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
         <h1>Salão de Invocação</h1>
       </div>
     </div>
-    <div class="lb-moedas">
-      <span class="gc"><i>🪙</i><span id="lbGC">0</span></span>
-      <span class="dm"><i>💎</i><span id="lbDM">0</span></span>
+    <div class="lb-dir">
+      <div class="lb-conta" id="lbConta"></div>
+      <div class="lb-moedas">
+        <span class="m gc"><i class="ic">🪙</i><span class="vl" id="lbGC">0</span></span>
+        <span class="m dm"><i class="ic">💎</i><span class="vl" id="lbDM">0</span></span>
+      </div>
+      <button class="lb-perfil" id="lbBtnPerfil" type="button">
+        <i>👤</i><span class="txt">Perfil</span>
+      </button>
     </div>
   </div>
 
@@ -6557,6 +6603,29 @@ function lbRender(){
   if(g) g.textContent = (typeof moedaFmt === 'function') ? moedaFmt(m.gc) : m.gc;
   if(d) d.textContent = (typeof moedaFmt === 'function') ? moedaFmt(m.dm) : m.dm;
 
+  // barra da conta: avatar, nome, ID e o nivel do personagem ativo
+  var conta = document.getElementById('lbConta');
+  if(conta){
+    var ses = (typeof lgSessao === 'function') ? lgSessao() : null;
+    if(ses){
+      var niv = 1;
+      try{
+        var reg = (typeof lvlDe === 'function') ? lvlDe(coll) : null;
+        niv = reg && reg.nivel ? reg.nivel : 1;
+      }catch(e){}
+      var ini2 = String(ses.usuario || '?').charAt(0).toUpperCase();
+      conta.className = 'lb-conta';
+      conta.innerHTML = '<div class="av">' + esc(ini2) + '</div>'
+        + '<div><div class="nm">' + esc(ses.usuario) + '</div>'
+        + '<div class="id2">ID ' + esc(lgIdCurto(ses.usuario)) + ' · nível ' + niv + '</div></div>';
+    } else {
+      conta.className = 'lb-conta sem';
+      conta.innerHTML = '<div class="av">?</div>'
+        + '<div><div class="nm">Sem conta</div>'
+        + '<div class="id2">entre para salvar</div></div>';
+    }
+  }
+
   var logo = document.getElementById('lbLogo');
   if(logo && typeof LOGO_SVG !== 'undefined' && !logo.innerHTML) logo.innerHTML = LOGO_SVG;
 
@@ -6590,6 +6659,8 @@ function lbIr(v){
   if(j) j.onclick = function(){ lbIr('v-gacha'); };
   var a = document.getElementById('lbAjustes');
   if(a) a.onclick = function(){ lbIr('v-set'); };
+  var pf = document.getElementById('lbBtnPerfil');
+  if(pf) pf.onclick = function(){ lbIr('v-perfil'); };
 })();
 
 // o botao da marca volta para o lobby
