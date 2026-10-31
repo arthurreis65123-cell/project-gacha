@@ -420,7 +420,7 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   padding:0;margin-bottom:14px;position:relative;overflow:hidden}
 
 /* o campo */
-.campo{position:relative;height:340px;overflow:hidden;
+.campo{position:relative;height:330px;overflow:hidden;
   background:
     radial-gradient(ellipse at 22% 78%, rgba(74,222,128,.22), transparent 46%),
     radial-gradient(ellipse at 78% 30%, rgba(56,189,248,.18), transparent 44%),
@@ -431,19 +431,32 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   background:repeating-linear-gradient(115deg,rgba(255,255,255,.022) 0 2px,transparent 2px 13px)}
 
 /* plataformas */
-.plataforma{position:absolute;width:186px;height:56px;border-radius:50%;
-  background:radial-gradient(ellipse at center,rgba(139,92,246,.34),rgba(88,60,170,.12) 62%,transparent 76%);
-  border-top:2px solid rgba(167,139,250,.4)}
-.plat-b{left:7%;bottom:34px}
-.plat-a{right:7%;top:74px;
-  background:radial-gradient(ellipse at center,rgba(56,189,248,.32),rgba(30,110,160,.12) 62%,transparent 76%);
+/* as duas plataformas ficam no MESMO nivel, com os pes apoiados */
+.plataforma{position:absolute;width:210px;height:44px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.3),rgba(88,60,170,.1) 64%,transparent 78%);
+  border-top:2px solid rgba(167,139,250,.4);bottom:52px}
+.plat-b{left:5%}
+.plat-a{right:5%;
+  background:radial-gradient(ellipse at center,rgba(56,189,248,.3),rgba(30,110,160,.1) 64%,transparent 78%);
   border-top-color:rgba(56,189,248,.45)}
 
-/* bonecos */
-.campo canvas.boneco{position:absolute;image-rendering:pixelated;image-rendering:crisp-edges;
-  filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
-.boneco-b{left:7%;bottom:66px;width:152px;height:206px}
-.boneco-a{right:7%;top:104px;width:132px;height:179px}
+/* bonecos: os dois no chao, um de frente para o outro */
+.campo canvas.boneco{position:absolute;bottom:74px;image-rendering:pixelated;
+  image-rendering:crisp-edges;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
+.boneco-b{left:6%;width:164px;height:222px}
+.boneco-a{right:6%;width:164px;height:222px}
+/* quem esta na esquerda encara a direita: espelha o desenho */
+.boneco-b{transform:scaleX(-1)}
+/* o lutador da esquerda olha para a direita, e vice-versa */
+.boneco-b canvas{transform:none}
+/* avanco: cada um anda na direcao do oponente */
+.campo .fight .boneco-b{animation:avancaB .34s ease}
+.campo .fight .boneco-a{animation:avancaA .34s ease}
+/* recuo de quem levou o golpe */
+.campo .levou .boneco-b{animation:recuaB .3s ease}
+.campo .levou .boneco-a{animation:recuaA .3s ease}
+@keyframes recuaB{0%{transform:translateX(0)}45%{transform:translateX(-16px)}100%{transform:translateX(0)}}
+@keyframes recuaA{0%{transform:translateX(0)}45%{transform:translateX(16px)}100%{transform:translateX(0)}}
 .campo .fight .boneco-b{animation:avancaB .34s ease}
 .campo .fight .boneco-a{animation:avancaA .34s ease}
 @keyframes avancaB{0%{transform:translateX(0)}45%{transform:translateX(26px)}100%{transform:translateX(0)}}
@@ -457,8 +470,8 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .hud{position:absolute;min-width:210px;border:2px solid rgba(226,232,240,.5);
   border-radius:12px;background:rgba(8,11,24,.88);padding:9px 12px 10px;
   backdrop-filter:blur(3px);box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.hud-b{left:6%;top:16px}
-.hud-a{right:6%;bottom:26px}
+.hud-b{left:3%;top:14px}
+.hud-a{right:3%;top:14px}
 .hud .nm{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   font-size:12.5px;font-weight:950;margin-bottom:6px}
 .hud .nm .lv{font-size:10.5px;color:var(--muted);
@@ -4023,6 +4036,7 @@ function startPvp(){
   var maxTurnos = 22;
 
   pvpTimer = setInterval(function(){
+    try{
     turno++;
     if(turno > maxTurnos || hpA <= 0 || hpB <= 0){
       clearInterval(pvpTimer); pvpTimer = null;
@@ -4030,7 +4044,8 @@ function startPvp(){
       return;
     }
 
-    el('roundLbl').textContent = 'Turno ' + turno;
+    var lblTurno = el('roundLbl');
+    if(lblTurno) lblTurno.textContent = 'Turno ' + turno;
 
     // quem ataca primeiro tem vantagem de velocidade
     var Aaggrediu = true;
@@ -4076,6 +4091,12 @@ function startPvp(){
         r2.crit ? 'crit' : '');
       if(Aaggrediu){ A.hp = hpA; hp('A', hpA, A.vida); } else { B.hp = hpB; hp('B', hpB, B.vida); }
       if(!r2.errou && r2.v > 0 && defensor.statusPower && Math.random() < 0.42){ pvpStatusApply(atacante, defensor.statusPower, defensor, push); }
+    }
+    }catch(err){
+      // nunca mais travar em silencio: mostra o motivo e encerra o combate
+      if(window.console) console.warn('erro no turno do pvp:', err && err.message);
+      clearInterval(pvpTimer); pvpTimer = null;
+      push('O combate parou por um erro: ' + (err && err.message ? err.message : err), 'fin');
     }
   }, 620);
 
