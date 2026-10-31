@@ -2649,6 +2649,19 @@ async function pedirSorteio(qtd){
   if(btn1) btn1.disabled = true;
   if(btn5) btn5.disabled = true;
   try{
+    // sobe o progresso primeiro: o servidor cobra do saldo da CONTA,
+    // e ele precisa estar atualizado antes do sorteio
+    try{
+      syStatus('', 'Sincronizando antes de invocar...');
+      var env = await syEnviar(syColetar());
+      if(!env.ok){
+        syStatus('bad', 'Falha ao sincronizar: ' + env.erro, 6000);
+        toast('Não consegui sincronizar antes de invocar. Tente de novo.');
+        return null;
+      }
+      syStatus('ok', 'Saldo atualizado', 1500);
+    }catch(e){}
+
     var r = await fetch(LG_API + '/invocar', {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.passe },
@@ -6204,7 +6217,7 @@ try{ moedasRender(); }catch(e){}
 var SY_OFF = 'projectGachaSyncOff.v1';
 var SY_BACKUP = 'projectGachaBackup.v1';
 var SY_EM = 'projectGachaSyncEm.v1';
-var SY_NAO_TOCA = [STORE_PERFIL, STORE_COD, STORE_SESSAO, STORE_MOEDAS, SY_OFF, SY_BACKUP, SY_EM];
+var SY_NAO_TOCA = [STORE_PERFIL, STORE_COD, STORE_SESSAO, SY_OFF, SY_BACKUP, SY_EM];
 
 function syOff(){
   try{ return localStorage.getItem(SY_OFF) === 'sim'; }catch(e){ return false; }
