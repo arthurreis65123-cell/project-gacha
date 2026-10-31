@@ -1190,6 +1190,69 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
   #lobby .lb-pe{position:fixed}
 }
 
+
+/* ========== LOJA: janela sobre o jogo (v48) ========== */
+#ljModal{position:fixed;inset:0;z-index:9500;display:none;
+  background:rgba(3,5,12,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:22px}
+#ljModal.on{display:flex}
+.lj-janela{width:min(96vw,1040px);max-height:92vh;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:22px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(20,25,44,.99),rgba(10,13,26,.99));
+  box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.lj-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+  padding:18px 22px 14px;border-bottom:1px solid var(--line)}
+.lj-topo h3{margin:0;font-size:19px;letter-spacing:.14em;font-weight:950}
+.lj-topo p{margin:5px 0 0;font-size:12px;color:var(--muted)}
+.lj-x{width:36px;height:36px;flex:0 0 36px;border-radius:11px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(17,23,42,.9);color:var(--text);
+  font-size:15px;font-weight:900}
+.lj-x:hover{border-color:#fb7185;color:#fecdd3}
+.lj-abas{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;
+  padding:12px 22px 0}
+.lj-abas button{cursor:pointer;font-family:inherit;font-size:13px;font-weight:900;
+  padding:12px 10px;border-radius:13px;border:1px solid var(--line);
+  background:rgba(17,23,42,.72);color:var(--muted)}
+.lj-abas button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;color:#fff;box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.lj-corpo{padding:16px 22px 6px;overflow:auto;flex:1}
+.lj-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px}
+.lj-item{border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(170deg,rgba(28,35,62,.9),rgba(14,18,36,.95));
+  display:flex;flex-direction:column;transition:transform .16s ease,border-color .16s ease}
+.lj-item:hover{transform:translateY(-4px);border-color:var(--accent)}
+.lj-item .arte{height:118px;display:grid;place-items:center;position:relative;
+  background:radial-gradient(ellipse at 50% 82%,rgba(139,92,246,.22),transparent 70%)}
+.lj-item .arte canvas{width:96px;height:130px;image-rendering:pixelated;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.lj-item .info{padding:13px 15px 15px;border-top:1px solid var(--line);flex:1;
+  display:flex;flex-direction:column}
+.lj-item .nm{font-size:14.5px;font-weight:950}
+.lj-item .sub{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.45;flex:1}
+.lj-item .pr{display:flex;align-items:baseline;gap:6px;margin-top:11px;
+  font-size:16px;font-weight:950}
+.lj-item .pr.gc{color:#fb923c}
+.lj-item .pr.dm{color:#fb7185}
+.lj-item .pr small{font-size:10.5px;font-weight:800;opacity:.7}
+.lj-item .bt{margin-top:11px;cursor:pointer;font-family:inherit;font-weight:950;
+  font-size:13px;padding:11px;border-radius:12px;border:0;
+  background:linear-gradient(135deg,#e11d48,#be123c);color:#fff}
+.lj-item .bt:hover{filter:brightness(1.12)}
+.lj-item.ja .bt{background:linear-gradient(135deg,#22c55e,#16a34a);color:#04240f}
+.lj-item .tag2{position:absolute;top:9px;right:9px;font-size:9px;font-weight:950;
+  border-radius:999px;padding:3px 8px;background:#4ADE80;color:#052e16}
+.lj-pe{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:13px 22px 16px;border-top:1px solid var(--line)}
+.lj-pe span{font-size:13px;font-weight:950;color:#fbbf24}
+.lj-pe button{cursor:pointer;font-family:inherit;font-weight:900;font-size:12.5px;
+  padding:10px 18px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(17,23,42,.9);color:var(--text)}
+@media(max-width:700px){
+  .lj-grade{grid-template-columns:1fr 1fr}
+  .lj-item .arte{height:96px}
+  .lj-item .arte canvas{width:76px;height:103px}
+  .lj-abas button{font-size:11.5px;padding:10px 6px}
+}
 </style>
 </head>
 <body>
@@ -1390,15 +1453,40 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       <section class="view" id="v-loja">
         <div class="vtitle"><h2>Loja</h2><span id="ljSaldo">-</span></div>
         <div class="card2">
-          <div class="tabs" style="padding-top:13px">
-            <button class="tab active" id="ljTabPers">Personagens</button>
-            <button class="tab" id="ljTabArmas">Armas</button>
-          </div>
-          <div class="lj-grid" id="ljVitrine">
-            <div style="padding:22px 4px;color:var(--muted);font-size:12.5px">Carregando a loja...</div>
+          <div class="bd" style="text-align:center;padding:26px 18px">
+            <p style="margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.6">
+              A loja abre em uma janela sobre o jogo, como nos jogos de tiro.</p>
+            <button class="primary" id="ljAbrir" style="min-width:220px">🛒 Abrir a loja</button>
           </div>
         </div>
       </section>
+
+      <!-- ===== LOJA: janela sobre o jogo ===== -->
+      <div id="ljModal">
+        <div class="lj-janela">
+          <div class="lj-topo">
+            <div>
+              <h3>LOJA</h3>
+              <p>Personagens, armas e códigos</p>
+            </div>
+            <button class="lj-x" id="ljFechar" type="button">✕</button>
+          </div>
+
+          <div class="lj-abas" id="ljAbas">
+            <button class="on" data-lj="pers">Personagens</button>
+            <button data-lj="armas">Armas</button>
+          </div>
+
+          <div class="lj-corpo">
+            <div class="lj-grade" id="ljVitrine"></div>
+          </div>
+
+          <div class="lj-pe">
+            <span id="ljSaldo2">🪙 0 · 💎 0</span>
+            <button id="ljFechar2" type="button">Fechar</button>
+          </div>
+        </div>
+      </div>
 
       <section class="view" id="v-pvp">
         <div class="vtitle"><h2>Arena PvP</h2><span>coleção contra coleção</span></div>
@@ -7683,6 +7771,7 @@ try{
             +  '<div class="nm">'+esc2(p.nome)+'</div>'
             +  '<div class="sub">'+esc2(p.titulo)+'</div>'
             +  '<div class="pr '+(tem?'':'dm')+'">'+(tem ? '✓ Já possui' : ('💎 '+fmt(p.dm)+' <small>diamantes</small>'))+'</div>'
+            +  '<button class="bt">'+(tem ? 'Usar' : 'Comprar')+'</button>'
             +  '</div></div>';
       }
     } else {
@@ -7696,6 +7785,7 @@ try{
             +  '<div class="sub">'+(gr.moeda==='dm'?'arma lendária':'arma comum')+'</div>'
             +  '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmt(gr.preco)
             +  ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
+            +  '<button class="bt">Comprar</button>'
             +  '</div></div>';
       }
     }
@@ -7729,6 +7819,13 @@ try{
         };
       })(itens[k]);
     }
+
+    // o saldo tambem aparece no pe da janela
+    var s2 = el2('ljSaldo2');
+    if(s2){
+      var mm = moedas();
+      s2.textContent = '🪙 ' + fmt(mm.gc) + '  ·  💎 ' + fmt(mm.dm);
+    }
   }
 
   function detalhePers(pid){
@@ -7736,9 +7833,9 @@ try{
     for(var i=0;i<PERS.length;i++) if(PERS[i].id === pid) p = PERS[i];
     if(!p) return;
     var tem = temPers(p);
-    var d = el2('ljDetalhe');
-    d.style.display = '';
-    d.innerHTML = '<div class="hd"><h3>'+esc2(p.nome)+' — '+esc2(p.titulo)+'</h3>'
+    var d = el2('ljVitrine');
+    d.className = '';
+    d.innerHTML = '<div class="lj-det"><div class="hd"><h3>'+esc2(p.nome)+' — '+esc2(p.titulo)+'</h3>'
       + '<span>'+(tem ? 'já possui' : '💎 '+fmt(p.dm))+'</span></div>'
       + '<div class="bd">'
       + '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119" style="width:130px;height:176px;image-rendering:pixelated"></canvas></div>'
@@ -7746,9 +7843,13 @@ try{
       + '<div class="sumrow" style="margin-top:14px">'
       + (tem ? '<button class="secondary" id="ljAtivar" style="width:100%">Usar este personagem</button>'
             : '<button class="primary" id="ljComprar" style="width:100%">Comprar por 💎 '+fmt(p.dm)+'</button>')
-      + '</div><div id="ljMsg"></div></div>';
+      + '</div><div id="ljMsg"></div>'
+      + '<button class="secondary" id="ljVoltar" style="margin-top:10px;width:100%">‹ Voltar</button>'
+      + '</div></div>';
 
     desenhaBoneco(el2('ljDetCv'), p.cor, 'vitoria');
+    var vv = el2('ljVoltar');
+    if(vv) vv.onclick = render;
 
     var bc = el2('ljComprar');
     if(bc) bc.onclick = function(){ comprarPers(p); };
@@ -7763,18 +7864,22 @@ try{
     for(var i=0;i<GRADES.length;i++) if(GRADES[i].g === grade) gr = GRADES[i];
     if(!gr) return;
     var mo = gr.moeda === 'dm' ? '💎' : '🪙';
-    var d = el2('ljDetalhe');
-    d.style.display = '';
-    d.innerHTML = '<div class="hd"><h3>Arma '+esc2(gr.g)+'</h3><span>'+mo+' '+fmt(gr.preco)+'</span></div>'
+    var d = el2('ljVitrine');
+    d.className = '';
+    d.innerHTML = '<div class="lj-det"><div class="hd"><h3>Arma '+esc2(gr.g)+'</h3><span>'+mo+' '+fmt(gr.preco)+'</span></div>'
       + '<div class="bd">'
       + '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119" style="width:130px;height:176px;image-rendering:pixelated"></canvas></div>'
       + '<div style="color:var(--muted);font-size:12px;line-height:1.6">Uma arma '+esc2(gr.g)
       + ' forjada na bigorna astral. Vai direto para a coleção ativa.</div>'
       + '<div class="sumrow" style="margin-top:14px">'
       + '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmt(gr.preco)+'</button>'
-      + '</div><div id="ljMsg"></div></div>';
+      + '</div><div id="ljMsg"></div>'
+      + '<button class="secondary" id="ljVoltar" style="margin-top:10px;width:100%">‹ Voltar</button>'
+      + '</div></div>';
 
     desenhaBoneco(el2('ljDetCv'), '#facc15', 'guerra');
+    var vv2 = el2('ljVoltar');
+    if(vv2) vv2.onclick = render;
     el2('ljComprarArma').onclick = function(){ comprarArma(gr); };
   }
 
@@ -7843,14 +7948,32 @@ try{
     }catch(e){ msg('Não consegui concluir a compra.', false); }
   }
 
+  function abrirLoja(){
+    var m = el2('ljModal');
+    if(m) m.classList.add('on');
+    render();
+  }
+  function fecharLoja(){
+    var m = el2('ljModal');
+    if(m) m.classList.remove('on');
+  }
+
   function ligarAbas(){
-    var tp = el2('ljTabPers'), ta = el2('ljTabArmas');
-    if(tp) tp.onclick = function(){
-      aba='pers'; tp.classList.add('active'); if(ta) ta.classList.remove('active'); render();
-    };
-    if(ta) ta.onclick = function(){
-      aba='armas'; ta.classList.add('active'); if(tp) tp.classList.remove('active'); render();
-    };
+    var abas = document.querySelectorAll('#ljAbas [data-lj]');
+    for(var i=0;i<abas.length;i++){
+      abas[i].onclick = (function(b){
+        return function(){
+          for(var j=0;j<abas.length;j++) abas[j].classList.toggle('on', abas[j]===b);
+          aba = b.getAttribute('data-lj');
+          render();
+        };
+      })(abas[i]);
+    }
+    var ab = el2('ljAbrir');       if(ab) ab.onclick = abrirLoja;
+    var f1 = el2('ljFechar');      if(f1) f1.onclick = fecharLoja;
+    var f2 = el2('ljFechar2');     if(f2) f2.onclick = fecharLoja;
+    var md = el2('ljModal');
+    if(md) md.onclick = function(ev){ if(ev.target === md) fecharLoja(); };
   }
 
   // so age quando a loja estiver visivel
