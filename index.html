@@ -467,11 +467,16 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 @keyframes golpe{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.6)}}
 
 /* HUD de vida sobre cada lutador */
-.hud{position:absolute;min-width:210px;border:2px solid rgba(226,232,240,.5);
-  border-radius:12px;background:rgba(8,11,24,.88);padding:9px 12px 10px;
+/* as barras ficam ABAIXO do campo, uma de cada lado,
+   para a queda da vida acontecer a vista */
+.hud{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(94%,820px);border:2px solid rgba(226,232,240,.45);
+  border-radius:12px;background:rgba(8,11,24,.9);padding:9px 13px 10px;
   backdrop-filter:blur(3px);box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.hud-b{left:3%;top:14px}
-.hud-a{right:3%;top:14px}
+.hud-b{left:4%;transform:none;width:min(46%,430px)}
+.hud-a{left:auto;right:4%;transform:none;width:min(46%,430px)}
+/* a faixa das barras, logo depois do campo */
+.faixa-hud{position:relative;height:82px;margin-top:-4px}
 .hud .nm{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   font-size:12.5px;font-weight:950;margin-bottom:6px}
 .hud .nm .lv{font-size:10.5px;color:var(--muted);
@@ -3893,6 +3898,9 @@ function startPvp(){
     +   '<canvas class="boneco boneco-a" id="pxA" width="88" height="119"></canvas>'
     +   '<div class="golpe" id="golpeA"></div>'
     +   '<div class="golpe" id="golpeB"></div>'
+    + '</div>'
+    // ---- barras de vida ABAIXO do campo, uma de cada lado ----
+    + '<div class="faixa-hud">'
     +   '<div class="hud hud-b">'
     +     '<div class="nm"><span>' + esc(B.id) + '</span><span class="lv">VIDA ' + B.vida + '</span></div>'
     +     '<div class="barra" id="hpBarB"><i></i></div>'
@@ -3970,6 +3978,12 @@ function startPvp(){
     }catch(e){ if(window.console) console.warn('bonecos do pvp:', e.message); }
   }
   desenharLutadores();
+
+  // marca o fim da luta: o HUD do vencedor acende, o do perdedor apaga
+  function marcarFim(cor, tipo){
+    var hud = document.querySelector('.hud-' + String(cor).toLowerCase());
+    if(hud) hud.classList.add(tipo);
+  }
 
   // marca o golpe: brilho no alvo e tremida no HUD
   function marcarGolpe(cor){
@@ -4113,8 +4127,8 @@ function startPvp(){
     }
 
     if(vencedor){
-      el(vencedor.id === A.id ? 'A' : 'B').classList.add('win');
-      el(perdedor.id === A.id ? 'A' : 'B').classList.add('lose');
+      marcarFim(vencedor.id === A.id ? 'A' : 'B', 'win');
+      marcarFim(perdedor.id === A.id ? 'A' : 'B', 'lose');
       push('VENCEDOR: ' + vencedor.id + ' (' + Math.round((vencedor === A ? hpA : hpB) / vencedor.vida * 100) + '% de vida restante).', 'fin');
 
       // XP: 100 por inimigo derrotado
