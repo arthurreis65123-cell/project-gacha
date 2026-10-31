@@ -420,7 +420,7 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   padding:0;margin-bottom:14px;position:relative;overflow:hidden}
 
 /* o campo */
-.campo{position:relative;height:340px;overflow:hidden;
+.campo{position:relative;height:330px;overflow:hidden;
   background:
     radial-gradient(ellipse at 22% 78%, rgba(74,222,128,.22), transparent 46%),
     radial-gradient(ellipse at 78% 30%, rgba(56,189,248,.18), transparent 44%),
@@ -431,19 +431,41 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   background:repeating-linear-gradient(115deg,rgba(255,255,255,.022) 0 2px,transparent 2px 13px)}
 
 /* plataformas */
-.plataforma{position:absolute;width:186px;height:56px;border-radius:50%;
-  background:radial-gradient(ellipse at center,rgba(139,92,246,.34),rgba(88,60,170,.12) 62%,transparent 76%);
-  border-top:2px solid rgba(167,139,250,.4)}
-.plat-b{left:7%;bottom:34px}
-.plat-a{right:7%;top:74px;
-  background:radial-gradient(ellipse at center,rgba(56,189,248,.32),rgba(30,110,160,.12) 62%,transparent 76%);
+/* as duas plataformas ficam no MESMO nivel, com os pes apoiados */
+.plataforma{position:absolute;width:210px;height:44px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.3),rgba(88,60,170,.1) 64%,transparent 78%);
+  border-top:2px solid rgba(167,139,250,.4);bottom:52px}
+.plat-b{left:5%}
+.plat-a{right:5%;
+  background:radial-gradient(ellipse at center,rgba(56,189,248,.3),rgba(30,110,160,.1) 64%,transparent 78%);
   border-top-color:rgba(56,189,248,.45)}
 
-/* bonecos */
-.campo canvas.boneco{position:absolute;image-rendering:pixelated;image-rendering:crisp-edges;
-  filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
-.boneco-b{left:7%;bottom:66px;width:152px;height:206px}
-.boneco-a{right:7%;top:104px;width:132px;height:179px}
+/* bonecos: os dois no chao, um de frente para o outro */
+.campo canvas.boneco{position:absolute;bottom:74px;image-rendering:pixelated;
+  image-rendering:crisp-edges;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
+.boneco-b{left:6%;width:164px;height:222px}
+.boneco-a{right:6%;width:164px;height:222px}
+/* quem esta na esquerda encara a direita: espelha o desenho */
+.boneco-b{transform:scaleX(-1)}
+/* o lutador da esquerda olha para a direita, e vice-versa */
+.boneco-b canvas{transform:none}
+/* numero do dano subindo */
+.dano-pop{position:absolute;transform:translate(-50%,0);pointer-events:none;
+  font-size:20px;font-weight:1000;color:#FB7185;text-shadow:0 2px 8px rgba(0,0,0,.9);
+  animation:sobeDano .9s ease forwards;z-index:5}
+.dano-pop.crit{color:#FDE047;font-size:24px}
+@keyframes sobeDano{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}
+  25%{opacity:1;transform:translate(-50%,-4px) scale(1.1)}
+  100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
+
+/* avanco: cada um anda na direcao do oponente */
+.campo .fight .boneco-b{animation:avancaB .34s ease}
+.campo .fight .boneco-a{animation:avancaA .34s ease}
+/* recuo de quem levou o golpe */
+.campo .levou .boneco-b{animation:recuaB .3s ease}
+.campo .levou .boneco-a{animation:recuaA .3s ease}
+@keyframes recuaB{0%{transform:translateX(0)}45%{transform:translateX(-16px)}100%{transform:translateX(0)}}
+@keyframes recuaA{0%{transform:translateX(0)}45%{transform:translateX(16px)}100%{transform:translateX(0)}}
 .campo .fight .boneco-b{animation:avancaB .34s ease}
 .campo .fight .boneco-a{animation:avancaA .34s ease}
 @keyframes avancaB{0%{transform:translateX(0)}45%{transform:translateX(26px)}100%{transform:translateX(0)}}
@@ -454,11 +476,16 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 @keyframes golpe{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.6)}}
 
 /* HUD de vida sobre cada lutador */
-.hud{position:absolute;min-width:210px;border:2px solid rgba(226,232,240,.5);
-  border-radius:12px;background:rgba(8,11,24,.88);padding:9px 12px 10px;
+/* as barras ficam ABAIXO do campo, uma de cada lado,
+   para a queda da vida acontecer a vista */
+.hud{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(94%,820px);border:2px solid rgba(226,232,240,.45);
+  border-radius:12px;background:rgba(8,11,24,.9);padding:9px 13px 10px;
   backdrop-filter:blur(3px);box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.hud-b{left:6%;top:16px}
-.hud-a{right:6%;bottom:26px}
+.hud-b{left:4%;transform:none;width:min(46%,430px)}
+.hud-a{left:auto;right:4%;transform:none;width:min(46%,430px)}
+/* a faixa das barras, logo depois do campo */
+.faixa-hud{position:relative;height:82px;margin-top:-4px}
 .hud .nm{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   font-size:12.5px;font-weight:950;margin-bottom:6px}
 .hud .nm .lv{font-size:10.5px;color:var(--muted);
@@ -1162,6 +1189,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
   #lobby .lb-btn:hover,#lobby .lb-btn:active{transform:none}
   #lobby .lb-pe{position:fixed}
 }
+
 </style>
 </head>
 <body>
@@ -1358,6 +1386,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       </section>
 
       <!-- ============ ABA: COMPARAR ============ -->
+      <!-- ============ ABA: LOJA ============ -->
       <section class="view" id="v-cmp">
         <div class="vtitle"><h2>Comparar coleções</h2><span id="cmpCount">marque 2 ou mais</span></div>
         <div class="card2" id="cmpPanel">
@@ -1371,7 +1400,6 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
         </div>
       </section>
 
-      <!-- ============ ABA: PVP ============ -->
       <section class="view" id="v-pvp">
         <div class="vtitle"><h2>Arena PvP</h2><span>coleção contra coleção</span></div>
 
@@ -3880,6 +3908,9 @@ function startPvp(){
     +   '<canvas class="boneco boneco-a" id="pxA" width="88" height="119"></canvas>'
     +   '<div class="golpe" id="golpeA"></div>'
     +   '<div class="golpe" id="golpeB"></div>'
+    + '</div>'
+    // ---- barras de vida ABAIXO do campo, uma de cada lado ----
+    + '<div class="faixa-hud">'
     +   '<div class="hud hud-b">'
     +     '<div class="nm"><span>' + esc(B.id) + '</span><span class="lv">VIDA ' + B.vida + '</span></div>'
     +     '<div class="barra" id="hpBarB"><i></i></div>'
@@ -3958,6 +3989,12 @@ function startPvp(){
   }
   desenharLutadores();
 
+  // marca o fim da luta: o HUD do vencedor acende, o do perdedor apaga
+  function marcarFim(cor, tipo){
+    var hud = document.querySelector('.hud-' + String(cor).toLowerCase());
+    if(hud) hud.classList.add(tipo);
+  }
+
   // marca o golpe: brilho no alvo e tremida no HUD
   function marcarGolpe(cor){
     try{
@@ -4000,18 +4037,44 @@ function startPvp(){
     return { v: Math.max(1, Math.round(reduzido)), crit: crit, errou:false };
   }
 
+  // mostra o dano: usa a CENA (canvas do boneco e HUD), nao mais os cartoes antigos
   function golpe(cor, valor, crit){
-    var f = el(cor);
-    f.classList.add('hit');
-    setTimeout(function(){ f.classList.remove('hit'); }, 340);
-    var fl = el('fl' + cor);
-    fl.classList.add('on');
-    setTimeout(function(){ fl.classList.remove('on'); }, 360);
-    var np = el('np' + cor);
-    np.textContent = '-' + valor + (crit ? ' CRIT' : '');
-    np.classList.remove('on');
-    void np.offsetWidth;
-    np.classList.add('on');
+    var lado = String(cor).toLowerCase();          // 'a' ou 'b'
+    var cv = el('px' + String(cor).toUpperCase());
+    var hud = document.querySelector('.hud-' + lado);
+
+    // tremida no boneco
+    if(cv){
+      cv.classList.remove('levou');
+      void cv.offsetWidth;
+      cv.classList.add('levou');
+      setTimeout(function(){ cv.classList.remove('levou'); }, 340);
+    }
+    // tremida no HUD
+    if(hud){
+      hud.classList.remove('hit');
+      void hud.offsetWidth;
+      hud.classList.add('hit');
+      setTimeout(function(){ hud.classList.remove('hit'); }, 340);
+    }
+
+    // numero do dano flutuando sobre o boneco
+    if(cv){
+      var pop = document.createElement('div');
+      pop.className = 'dano-pop' + (crit ? ' crit' : '');
+      pop.textContent = '-' + valor + (crit ? '!' : '');
+      var campo = el('pvpCampo');
+      if(campo){
+        var r = cv.getBoundingClientRect();
+        var rc = campo.getBoundingClientRect();
+        pop.style.left = (r.left - rc.left + r.width/2) + 'px';
+        pop.style.top  = (r.top - rc.top + r.height/3) + 'px';
+      }
+      campo.appendChild(pop);
+      setTimeout(function(){
+        try{ campo.removeChild(pop); }catch(e){}
+      }, 900);
+    }
   }
 
   push('Combate iniciado: ' + A.id + ' contra ' + B.id + '.', 'fin');
@@ -4023,6 +4086,7 @@ function startPvp(){
   var maxTurnos = 22;
 
   pvpTimer = setInterval(function(){
+    try{
     turno++;
     if(turno > maxTurnos || hpA <= 0 || hpB <= 0){
       clearInterval(pvpTimer); pvpTimer = null;
@@ -4030,7 +4094,8 @@ function startPvp(){
       return;
     }
 
-    el('roundLbl').textContent = 'Turno ' + turno;
+    var lblTurno = el('roundLbl');
+    if(lblTurno) lblTurno.textContent = 'Turno ' + turno;
 
     // quem ataca primeiro tem vantagem de velocidade
     var Aaggrediu = true;
@@ -4077,6 +4142,12 @@ function startPvp(){
       if(Aaggrediu){ A.hp = hpA; hp('A', hpA, A.vida); } else { B.hp = hpB; hp('B', hpB, B.vida); }
       if(!r2.errou && r2.v > 0 && defensor.statusPower && Math.random() < 0.42){ pvpStatusApply(atacante, defensor.statusPower, defensor, push); }
     }
+    }catch(err){
+      // nunca mais travar em silencio: mostra o motivo e encerra o combate
+      if(window.console) console.warn('erro no turno do pvp:', err && err.message);
+      clearInterval(pvpTimer); pvpTimer = null;
+      push('O combate parou por um erro: ' + (err && err.message ? err.message : err), 'fin');
+    }
   }, 620);
 
   function finalizar(){
@@ -4092,8 +4163,8 @@ function startPvp(){
     }
 
     if(vencedor){
-      el(vencedor.id === A.id ? 'A' : 'B').classList.add('win');
-      el(perdedor.id === A.id ? 'A' : 'B').classList.add('lose');
+      marcarFim(vencedor.id === A.id ? 'A' : 'B', 'win');
+      marcarFim(perdedor.id === A.id ? 'A' : 'B', 'lose');
       push('VENCEDOR: ' + vencedor.id + ' (' + Math.round((vencedor === A ? hpA : hpB) / vencedor.vida * 100) + '% de vida restante).', 'fin');
 
       // XP: 100 por inimigo derrotado
