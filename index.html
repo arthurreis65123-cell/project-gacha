@@ -2633,15 +2633,86 @@ function gachaRecusar(qtd){
   try{ moedasRender(); }catch(e){}
 }
 
-el('summonOne').onclick = function(){
-  if(!gachaPode(1)){ gachaRecusar(1); return; }
-  gastarMoedas(GACHA_CUSTO, 0, 'invocar x1');
-  batchGot = []; reelAmount = 1; reelLastAmount = 1; reelQueue = [reelDraw()]; spinQueued(true);
+// ================= INVOCAR NO SERVIDOR (v30) =================
+// O jogo nao sorteia mais: pede o resultado e so anima a roleta.
+// O servidor confere o saldo, sorteia, grava o item e debita a moeda.
+
+async function pedirSorteio(qtd){
+  var s = lgSessao();
+  if(!s || !s.passe){
+    toast('Entre na sua conta para invocar.');
+    try{ lgModo('entrar'); lgMostrar(true); }catch(e){}
+    return null;
+  }
+
+  var btn1 = el('summonOne'), btn5 = el('summonFive');
+  if(btn1) btn1.disabled = true;
+  if(btn5) btn5.disabled = true;
+  try{
+    var r = await fetch(LG_API + '/invocar', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.passe },
+      body: JSON.stringify({ sistema: current, quantidade: qtd, colecao: coll })
+    });
+    var d = null;
+    try{ d = await r.json(); }catch(e){ d = {}; }
+
+    if(r.status === 200 && d.itens && d.itens.length){
+      // o servidor ja gravou o item: aqui so atualizamos a tela
+      if(typeof d.gcoins === 'number'){
+        try{
+          var m = moedas();
+          m.gc = Number(d.gcoins) || 0;
+          moedasSalvar(m);
+          moedasRender();
+        }catch(e){}
+      }
+      return d.itens;
+    }
+
+    if(r.status === 402){
+      toast('G-Coins insuficientes. Precisa de ' + (d.precisa||0) + ' e você tem ' + (d.tem||0) + '.');
+      return null;
+    }
+    toast((d && d.erro) || ('Não foi possível invocar (' + r.status + ').'));
+    return null;
+  }catch(e){
+    toast('Sem conexão com o servidor.');
+    return null;
+  } finally {
+    if(btn1) btn1.disabled = false;
+    if(btn5) btn5.disabled = false;
+  }
+}
+
+// o item que veio do servidor entra na fila da roleta
+function animarDoServidor(itens){
+  if(!itens || !itens.length) return;
+  batchGot = [];
+  reelAmount = itens.length;
+  reelLastAmount = itens.length;
+  reelQueue = itens.slice(0);
+  reelRunning = false;
+  spinQueued(true);
+}
+
+el('summonOne').onclick = async function(){
+  var itens = await pedirSorteio(1);
+  if(itens) animarDoServidor(itens);
 };
-el('summonFive').onclick = function(){
-  if(!gachaPode(5)){ gachaRecusar(5); return; }
-  gastarMoedas(GACHA_CUSTO * 5, 0, 'invocar x5');
-  batchGot = []; spinFive();
+el('summonFive').onclick = async function(){
+  var itens = await pedirSorteio(5);
+  if(itens) animarDoServidor(itens);
+};
+
+// girar de novo: pede outro sorteio ao servidor
+var syReelGoAntigo = el('reelGo').onclick;
+el('reelGo').onclick = async function(){
+  var qtd = (typeof reelLastAmount === 'number' && reelLastAmount > 1) ? 5 : 1;
+  var itens = await pedirSorteio(qtd);
+  if(!itens) return;
+  el('reel').classList.remove('open');
+  setTimeout(function(){ animarDoServidor(itens); }, 60);
 };
 
 
