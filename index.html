@@ -420,7 +420,7 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   padding:0;margin-bottom:14px;position:relative;overflow:hidden}
 
 /* o campo */
-.campo{position:relative;height:330px;overflow:hidden;
+.campo{position:relative;height:340px;overflow:hidden;
   background:
     radial-gradient(ellipse at 22% 78%, rgba(74,222,128,.22), transparent 46%),
     radial-gradient(ellipse at 78% 30%, rgba(56,189,248,.18), transparent 44%),
@@ -431,41 +431,19 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
   background:repeating-linear-gradient(115deg,rgba(255,255,255,.022) 0 2px,transparent 2px 13px)}
 
 /* plataformas */
-/* as duas plataformas ficam no MESMO nivel, com os pes apoiados */
-.plataforma{position:absolute;width:210px;height:44px;border-radius:50%;
-  background:radial-gradient(ellipse at center,rgba(139,92,246,.3),rgba(88,60,170,.1) 64%,transparent 78%);
-  border-top:2px solid rgba(167,139,250,.4);bottom:52px}
-.plat-b{left:5%}
-.plat-a{right:5%;
-  background:radial-gradient(ellipse at center,rgba(56,189,248,.3),rgba(30,110,160,.1) 64%,transparent 78%);
+.plataforma{position:absolute;width:186px;height:56px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.34),rgba(88,60,170,.12) 62%,transparent 76%);
+  border-top:2px solid rgba(167,139,250,.4)}
+.plat-b{left:7%;bottom:34px}
+.plat-a{right:7%;top:74px;
+  background:radial-gradient(ellipse at center,rgba(56,189,248,.32),rgba(30,110,160,.12) 62%,transparent 76%);
   border-top-color:rgba(56,189,248,.45)}
 
-/* bonecos: os dois no chao, um de frente para o outro */
-.campo canvas.boneco{position:absolute;bottom:74px;image-rendering:pixelated;
-  image-rendering:crisp-edges;filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
-.boneco-b{left:6%;width:164px;height:222px}
-.boneco-a{right:6%;width:164px;height:222px}
-/* quem esta na esquerda encara a direita: espelha o desenho */
-.boneco-b{transform:scaleX(-1)}
-/* o lutador da esquerda olha para a direita, e vice-versa */
-.boneco-b canvas{transform:none}
-/* numero do dano subindo */
-.dano-pop{position:absolute;transform:translate(-50%,0);pointer-events:none;
-  font-size:20px;font-weight:1000;color:#FB7185;text-shadow:0 2px 8px rgba(0,0,0,.9);
-  animation:sobeDano .9s ease forwards;z-index:5}
-.dano-pop.crit{color:#FDE047;font-size:24px}
-@keyframes sobeDano{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}
-  25%{opacity:1;transform:translate(-50%,-4px) scale(1.1)}
-  100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
-
-/* avanco: cada um anda na direcao do oponente */
-.campo .fight .boneco-b{animation:avancaB .34s ease}
-.campo .fight .boneco-a{animation:avancaA .34s ease}
-/* recuo de quem levou o golpe */
-.campo .levou .boneco-b{animation:recuaB .3s ease}
-.campo .levou .boneco-a{animation:recuaA .3s ease}
-@keyframes recuaB{0%{transform:translateX(0)}45%{transform:translateX(-16px)}100%{transform:translateX(0)}}
-@keyframes recuaA{0%{transform:translateX(0)}45%{transform:translateX(16px)}100%{transform:translateX(0)}}
+/* bonecos */
+.campo canvas.boneco{position:absolute;image-rendering:pixelated;image-rendering:crisp-edges;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
+.boneco-b{left:7%;bottom:66px;width:152px;height:206px}
+.boneco-a{right:7%;top:104px;width:132px;height:179px}
 .campo .fight .boneco-b{animation:avancaB .34s ease}
 .campo .fight .boneco-a{animation:avancaA .34s ease}
 @keyframes avancaB{0%{transform:translateX(0)}45%{transform:translateX(26px)}100%{transform:translateX(0)}}
@@ -476,16 +454,11 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 @keyframes golpe{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.6)}}
 
 /* HUD de vida sobre cada lutador */
-/* as barras ficam ABAIXO do campo, uma de cada lado,
-   para a queda da vida acontecer a vista */
-.hud{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
-  width:min(94%,820px);border:2px solid rgba(226,232,240,.45);
-  border-radius:12px;background:rgba(8,11,24,.9);padding:9px 13px 10px;
+.hud{position:absolute;min-width:210px;border:2px solid rgba(226,232,240,.5);
+  border-radius:12px;background:rgba(8,11,24,.88);padding:9px 12px 10px;
   backdrop-filter:blur(3px);box-shadow:0 8px 22px rgba(0,0,0,.5)}
-.hud-b{left:4%;transform:none;width:min(46%,430px)}
-.hud-a{left:auto;right:4%;transform:none;width:min(46%,430px)}
-/* a faixa das barras, logo depois do campo */
-.faixa-hud{position:relative;height:82px;margin-top:-4px}
+.hud-b{left:6%;top:16px}
+.hud-a{right:6%;bottom:26px}
 .hud .nm{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   font-size:12.5px;font-weight:950;margin-bottom:6px}
 .hud .nm .lv{font-size:10.5px;color:var(--muted);
@@ -1189,48 +1162,6 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
   #lobby .lb-btn:hover,#lobby .lb-btn:active{transform:none}
   #lobby .lb-pe{position:fixed}
 }
-
-/* ================= LOJA (v43) ================= */
-.lj-hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
-  border:1px solid var(--line);border-radius:18px;padding:18px;
-  background:linear-gradient(140deg,rgba(26,33,64,.92),rgba(16,21,42,.95));
-  margin-bottom:14px;position:relative;overflow:hidden}
-.lj-hero:after{content:"🛒";position:absolute;right:14px;top:-22px;font-size:96px;
-  opacity:.08;pointer-events:none}
-.lj-hero h3{margin:0 0 6px;font-size:19px;letter-spacing:-.02em}
-.lj-hero p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6;max-width:560px}
-.lj-hero-txt{position:relative;z-index:1}
-.lj-hero-art{position:relative;z-index:1;width:120px;height:150px}
-.lj-hero-art canvas{width:100%;height:100%;image-rendering:pixelated}
-
-.lj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-  gap:11px;padding:6px 15px 16px}
-.lj-item{border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;
-  background:rgba(17,23,42,.82);display:flex;flex-direction:column;
-  transition:transform .16s ease,border-color .16s ease}
-.lj-item:hover{transform:translateY(-3px);border-color:var(--accent)}
-.lj-item .arte{height:132px;display:grid;place-items:center;position:relative;
-  background:radial-gradient(ellipse at 50% 78%,rgba(139,92,246,.2),transparent 68%)}
-.lj-item .arte canvas{width:104px;height:142px;image-rendering:pixelated;
-  filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
-.lj-item .info{padding:10px 12px 12px;border-top:1px solid var(--line)}
-.lj-item .nm{font-size:13px;font-weight:950;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis}
-.lj-item .sub{font-size:10.5px;color:var(--muted);margin-top:3px}
-.lj-item .pr{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:13px;font-weight:950}
-.lj-item .pr.gc{color:#fbbf24}
-.lj-item .pr.dm{color:#67e8f9}
-.lj-item .pr small{font-size:10px;font-weight:800;opacity:.75}
-.lj-item .tag2{position:absolute;top:9px;right:9px;font-size:9px;font-weight:950;
-  border-radius:999px;padding:3px 8px;background:var(--accent);color:#0b0d12}
-.lj-item .tag2.novo{background:#4ADE80;color:#052e16}
-.lj-item.ja{border-color:rgba(74,222,128,.5)}
-.lj-item.ja .pr{color:#4ADE80}
-.lj-det-arte{display:grid;place-items:center;padding:8px 0 14px}
-.lj-det-arte canvas{width:150px;height:205px;image-rendering:pixelated;
-  filter:drop-shadow(0 10px 18px rgba(0,0,0,.55))}
-.lj-pal{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.lj-pal i{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25)}
 </style>
 </head>
 <body>
@@ -1427,31 +1358,16 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       </section>
 
       <!-- ============ ABA: COMPARAR ============ -->
-      <!-- ============ ABA: LOJA ============ -->
-      <section class="view" id="v-loja">
-        <div class="vtitle"><h2>Loja</h2><span id="ljSaldo">-</span></div>
-
-        <div class="lj-hero">
-          <div class="lj-hero-txt">
-            <h3>Loja do Salão</h3>
-            <p>Personagens prontos e armas lendárias se compram com <b>Diamantes</b>.
-               As armas até o épico saem por <b>G-Coins</b>.</p>
+      <section class="view" id="v-cmp">
+        <div class="vtitle"><h2>Comparar coleções</h2><span id="cmpCount">marque 2 ou mais</span></div>
+        <div class="card2" id="cmpPanel">
+          <div class="cmp-bar" style="padding-top:13px">
+            <button class="primary" id="cmpRun">Comparar</button>
+            <button class="secondary" id="cmpClear">Limpar seleção</button>
+            <span class="cmp-note" id="cmpNote">Escolha as coleções que deseja comparar.</span>
           </div>
-          <div class="lj-hero-art" id="ljHeroArt"></div>
-        </div>
-
-        <div class="card2">
-          <div class="tabs" style="padding-top:13px">
-            <button class="tab active" id="ljTabPers">Personagens</button>
-            <button class="tab" id="ljTabArmas">Armas</button>
-          </div>
-          <div class="chips-row" id="ljFiltros"></div>
-          <div class="lj-grid" id="ljVitrine"></div>
-        </div>
-
-        <div class="card2" id="ljDetalheCard" style="display:none">
-          <div class="hd"><h3 id="ljDetTitulo">-</h3><span id="ljDetPreco">-</span></div>
-          <div class="bd" id="ljDetCorpo"></div>
+          <div class="cmp-pick" id="cmpPick"></div>
+          <div class="cmp-grid" id="cmpOut"></div>
         </div>
       </section>
 
@@ -3964,9 +3880,6 @@ function startPvp(){
     +   '<canvas class="boneco boneco-a" id="pxA" width="88" height="119"></canvas>'
     +   '<div class="golpe" id="golpeA"></div>'
     +   '<div class="golpe" id="golpeB"></div>'
-    + '</div>'
-    // ---- barras de vida ABAIXO do campo, uma de cada lado ----
-    + '<div class="faixa-hud">'
     +   '<div class="hud hud-b">'
     +     '<div class="nm"><span>' + esc(B.id) + '</span><span class="lv">VIDA ' + B.vida + '</span></div>'
     +     '<div class="barra" id="hpBarB"><i></i></div>'
@@ -4045,12 +3958,6 @@ function startPvp(){
   }
   desenharLutadores();
 
-  // marca o fim da luta: o HUD do vencedor acende, o do perdedor apaga
-  function marcarFim(cor, tipo){
-    var hud = document.querySelector('.hud-' + String(cor).toLowerCase());
-    if(hud) hud.classList.add(tipo);
-  }
-
   // marca o golpe: brilho no alvo e tremida no HUD
   function marcarGolpe(cor){
     try{
@@ -4093,44 +4000,18 @@ function startPvp(){
     return { v: Math.max(1, Math.round(reduzido)), crit: crit, errou:false };
   }
 
-  // mostra o dano: usa a CENA (canvas do boneco e HUD), nao mais os cartoes antigos
   function golpe(cor, valor, crit){
-    var lado = String(cor).toLowerCase();          // 'a' ou 'b'
-    var cv = el('px' + String(cor).toUpperCase());
-    var hud = document.querySelector('.hud-' + lado);
-
-    // tremida no boneco
-    if(cv){
-      cv.classList.remove('levou');
-      void cv.offsetWidth;
-      cv.classList.add('levou');
-      setTimeout(function(){ cv.classList.remove('levou'); }, 340);
-    }
-    // tremida no HUD
-    if(hud){
-      hud.classList.remove('hit');
-      void hud.offsetWidth;
-      hud.classList.add('hit');
-      setTimeout(function(){ hud.classList.remove('hit'); }, 340);
-    }
-
-    // numero do dano flutuando sobre o boneco
-    if(cv){
-      var pop = document.createElement('div');
-      pop.className = 'dano-pop' + (crit ? ' crit' : '');
-      pop.textContent = '-' + valor + (crit ? '!' : '');
-      var campo = el('pvpCampo');
-      if(campo){
-        var r = cv.getBoundingClientRect();
-        var rc = campo.getBoundingClientRect();
-        pop.style.left = (r.left - rc.left + r.width/2) + 'px';
-        pop.style.top  = (r.top - rc.top + r.height/3) + 'px';
-      }
-      campo.appendChild(pop);
-      setTimeout(function(){
-        try{ campo.removeChild(pop); }catch(e){}
-      }, 900);
-    }
+    var f = el(cor);
+    f.classList.add('hit');
+    setTimeout(function(){ f.classList.remove('hit'); }, 340);
+    var fl = el('fl' + cor);
+    fl.classList.add('on');
+    setTimeout(function(){ fl.classList.remove('on'); }, 360);
+    var np = el('np' + cor);
+    np.textContent = '-' + valor + (crit ? ' CRIT' : '');
+    np.classList.remove('on');
+    void np.offsetWidth;
+    np.classList.add('on');
   }
 
   push('Combate iniciado: ' + A.id + ' contra ' + B.id + '.', 'fin');
@@ -4142,7 +4023,6 @@ function startPvp(){
   var maxTurnos = 22;
 
   pvpTimer = setInterval(function(){
-    try{
     turno++;
     if(turno > maxTurnos || hpA <= 0 || hpB <= 0){
       clearInterval(pvpTimer); pvpTimer = null;
@@ -4150,8 +4030,7 @@ function startPvp(){
       return;
     }
 
-    var lblTurno = el('roundLbl');
-    if(lblTurno) lblTurno.textContent = 'Turno ' + turno;
+    el('roundLbl').textContent = 'Turno ' + turno;
 
     // quem ataca primeiro tem vantagem de velocidade
     var Aaggrediu = true;
@@ -4198,12 +4077,6 @@ function startPvp(){
       if(Aaggrediu){ A.hp = hpA; hp('A', hpA, A.vida); } else { B.hp = hpB; hp('B', hpB, B.vida); }
       if(!r2.errou && r2.v > 0 && defensor.statusPower && Math.random() < 0.42){ pvpStatusApply(atacante, defensor.statusPower, defensor, push); }
     }
-    }catch(err){
-      // nunca mais travar em silencio: mostra o motivo e encerra o combate
-      if(window.console) console.warn('erro no turno do pvp:', err && err.message);
-      clearInterval(pvpTimer); pvpTimer = null;
-      push('O combate parou por um erro: ' + (err && err.message ? err.message : err), 'fin');
-    }
   }, 620);
 
   function finalizar(){
@@ -4219,8 +4092,8 @@ function startPvp(){
     }
 
     if(vencedor){
-      marcarFim(vencedor.id === A.id ? 'A' : 'B', 'win');
-      marcarFim(perdedor.id === A.id ? 'A' : 'B', 'lose');
+      el(vencedor.id === A.id ? 'A' : 'B').classList.add('win');
+      el(perdedor.id === A.id ? 'A' : 'B').classList.add('lose');
       push('VENCEDOR: ' + vencedor.id + ' (' + Math.round((vencedor === A ? hpA : hpB) / vencedor.vida * 100) + '% de vida restante).', 'fin');
 
       // XP: 100 por inimigo derrotado
@@ -6936,7 +6809,7 @@ var LOBBY_BOTOES = [
   { v:'v-torre',   i:'🗼', t:'Torre',      s:'500 andares e chefes',       poso:'p4' },
   { v:'v-diario',  i:'🎁', t:'Diário',     s:'Presente de cada dia',       poso:'p5' },
   { v:'v-pvp',     i:'⚔',  t:'PvP',        s:'Lutar contra outra coleção', poso:'p6' },
-  { v:'v-loja',    i:'🛒', t:'Loja',       s:'Personagens e armas',        poso:'p7' },
+  { v:'v-cmp',     i:'⚖',  t:'Comparar',   s:'Medir duas coleções',        poso:'p7' },
   { v:'v-codigos', i:'🎟', t:'Códigos',    s:'Resgatar códigos',           poso:'p8' },
   { v:'v-perfil',  i:'👤', t:'Perfil',     s:'Seu personagem principal',   poso:'p9' },
   { v:'v-set',     i:'⚙',  t:'Ajustes',    s:'Conta, tema e sincronização',poso:'p10' }
@@ -7083,284 +6956,6 @@ document.addEventListener('keydown', function(e){
   var aberto = document.querySelector('.view.active');
   if(aberto) lbAbrir();
 });
-
-/* ================= LOJA (v43) =================
-   Personagens prontos em pixel e armas.
-   Regra de preco: Diamantes para personagens e armas LENDARIAS em diante;
-   G-Coins para as armas ate o epico. */
-
-var LJ_PERSONAGENS = [
-  { id:'p_vanguarda', nome:'Vanguarda',  titulo:'Linha de frente',   dm:800,  cor:'#8b5cf6', av:'🛡️',
-    bio:'Armadura pesada e capa violeta. Aguenta mais pancada que qualquer outro.' },
-  { id:'p_lume',      nome:'Lume',       titulo:'Chama viva',        dm:1200, cor:'#fb7185', av:'🔥',
-    bio:'Cabelo em brasa e olhos acesos. Ataque puro.' },
-  { id:'p_zed',       nome:'Zed',        titulo:'Sombra rápida',     dm:1500, cor:'#22d3ee', av:'⚡',
-    bio:'Movimento antes do pensamento. Esquiva alta.' },
-  { id:'p_raiz',      nome:'Raiz',       titulo:'Guardião antigo',   dm:2000, cor:'#4ade80', av:'🌳',
-    bio:'Vida enorme, ataque baixo. Feito para durar.' },
-  { id:'p_sol',       nome:'Sol',        titulo:'Dourado',           dm:2800, cor:'#facc15', av:'☀️',
-    bio:'Armadura dourada e presença de comandante.' },
-  { id:'p_astral',    nome:'Astral',     titulo:'Além do véu',       dm:4000, cor:'#c084fc', av:'🔮',
-    bio:'Capa estelar. O mais caro do salão, e o mais bonito.' }
-];
-
-var LJ_GRADES = [
-  { g:'Comum',        moeda:'gc', preco:2000  },
-  { g:'Incomum',      moeda:'gc', preco:5000  },
-  { g:'Raro',         moeda:'gc', preco:12000 },
-  { g:'Muito Raro',   moeda:'gc', preco:25000 },
-  { g:'Heroico',      moeda:'gc', preco:50000 },
-  { g:'Épico',        moeda:'gc', preco:90000 },
-  { g:'Lendário',     moeda:'dm', preco:300   },
-  { g:'Transcendente',moeda:'dm', preco:600   },
-  { g:'Divino',       moeda:'dm', preco:1200  }
-];
-
-var ljAba = 'pers';
-var ljSel = null;
-
-function ljPode(moeda, preco){
-  var m = moedas();
-  return moeda === 'dm' ? (m.dm >= preco) : (m.gc >= preco);
-}
-
-function ljSaldo(){
-  var m = moedas();
-  return (typeof moedaFmt === 'function' ? moedaFmt(m.gc) : m.gc) + ' · '
-       + (typeof moedaFmt === 'function' ? moedaFmt(m.dm) : m.dm);
-}
-
-// ja possui? (o personagem virou uma colecao com o nome dele)
-function ljTemPersonagem(p){
-  try{ var all = loadColls(); return !!all[p.nome]; }catch(e){ return false; }
-}
-
-function ljCards(){
-  var out = '';
-  if(ljAba === 'pers'){
-    for(var i=0;i<LJ_PERSONAGENS.length;i++){
-      var p = LJ_PERSONAGENS[i];
-      var tem = ljTemPersonagem(p);
-      out += '<div class="lj-item'+(tem?' ja':'')+'" data-pers="'+p.id+'">'
-          +  '<div class="arte"><canvas data-arte="'+p.cor+'" width="88" height="119"></canvas>'
-          +  (i===0 ? '<span class="tag2 novo">NOVO</span>' : '')
-          +  '</div>'
-          +  '<div class="info">'
-          +    '<div class="nm">'+esc(p.nome)+'</div>'
-          +    '<div class="sub">'+esc(p.titulo)+'</div>'
-          +    '<div class="pr dm">'+(tem ? '✓ Já possui' : ('💎 '+fmtNum(p.dm)+' <small>diamantes</small>'))+'</div>'
-          +  '</div></div>';
-    }
-  } else {
-    for(var j=0;j<LJ_GRADES.length;j++){
-      var gr = LJ_GRADES[j];
-      var mo = gr.moeda === 'dm' ? '💎' : '🪙';
-      out += '<div class="lj-item" data-gra="'+gr.g+'">'
-          +  '<div class="arte"><canvas data-arma="'+gr.g+'" width="88" height="119"></canvas></div>'
-          +  '<div class="info">'
-          +    '<div class="nm">Arma '+esc(gr.g)+'</div>'
-          +    '<div class="sub">'+(gr.moeda==='dm'?'arma lendária':'arma comum')+'</div>'
-          +    '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmtNum(gr.preco)+
-               ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
-          +  '</div></div>';
-    }
-  }
-  return out;
-}
-
-function fmtNum(n){ return String(Math.floor(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
-
-function ljRender(){
-  var sal = document.getElementById('ljSaldo');
-  if(sal) sal.textContent = 'G-Coins ' + ljSaldo();
-
-  var box = document.getElementById('ljVitrine');
-  if(box){
-    box.innerHTML = ljCards();
-    // desenha os bonecos de cada card
-    var cvs = box.querySelectorAll('canvas');
-    for(var i=0;i<cvs.length;i++){
-      try{
-        var cor = cvs[i].getAttribute('data-arte');
-        var gr  = cvs[i].getAttribute('data-arma');
-        var ctx = cvs[i].getContext('2d');
-        if(ctx) ctx.setTransform(4,0,0,4,0,0);
-        if(ctx) pxDesenhar(ctx, pxPaleta(cor || '#8b5cf6'), gr ? 'guerra' : 'parado', Date.now());
-      }catch(e){}
-    }
-    var itens = box.querySelectorAll('[data-pers],[data-gra]');
-    for(var k=0;k<itens.length;k++){
-      itens[k].onclick = (function(el2){
-        return function(){
-          var pid = el2.getAttribute('data-pers');
-          if(pid) ljDetalhePersonagem(pid);
-          else ljDetalheArma(el2.getAttribute('data-gra'));
-        };
-      })(itens[k]);
-    }
-  }
-
-  // o hero mostra o personagem ativo
-  var art = document.getElementById('ljHeroArt');
-  if(art && !art.innerHTML){
-    art.innerHTML = '<canvas id="ljHeroCv" width="88" height="119"></canvas>';
-    try{
-      var c = document.getElementById('ljHeroCv');
-      var ctx2 = c.getContext('2d'); ctx2.setTransform(4,0,0,4,0,0);
-      var pa = (typeof persAtivo === 'function') ? persAtivo() : null;
-      pxDesenhar(ctx2, pxPaleta(pa && pa.cor ? pa.cor : null), 'parado', Date.now());
-    }catch(e){}
-  }
-}
-
-function ljDetalhePersonagem(pid){
-  var p = null;
-  for(var i=0;i<LJ_PERSONAGENS.length;i++) if(LJ_PERSONAGENS[i].id === pid) p = LJ_PERSONAGENS[i];
-  if(!p) return;
-  ljSel = { tipo:'pers', p:p };
-  var tem = ljTemPersonagem(p);
-  var card = document.getElementById('ljDetalheCard');
-  document.getElementById('ljDetTitulo').textContent = p.nome + ' — ' + p.titulo;
-  document.getElementById('ljDetPreco').textContent = tem ? 'já possui' : ('💎 ' + fmtNum(p.dm));
-  document.getElementById('ljDetCorpo').innerHTML =
-      '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119"></canvas></div>'
-    + '<div class="sub" style="color:var(--muted);font-size:12px;line-height:1.6">' + esc(p.bio) + '</div>'
-    + '<div class="lj-pal"><i style="background:'+p.cor+'"></i></div>'
-    + '<div class="sumrow" style="margin-top:14px">'
-    +   (tem
-          ? '<button class="secondary" id="ljAtivar" style="width:100%">Usar este personagem</button>'
-          : '<button class="primary" id="ljComprar" style="width:100%">Comprar por 💎 '+fmtNum(p.dm)+'</button>')
-    + '</div>'
-    + '<div id="ljMsgDet"></div>';
-  card.style.display = '';
-
-  try{
-    var c = document.getElementById('ljDetCv');
-    var ctx = c.getContext('2d'); ctx.setTransform(4,0,0,4,0,0);
-    pxDesenhar(ctx, pxPaleta(p.cor), 'vitoria', Date.now());
-  }catch(e){}
-
-  var bc = document.getElementById('ljComprar');
-  if(bc) bc.onclick = function(){ ljComprarPersonagem(p); };
-  var ba = document.getElementById('ljAtivar');
-  if(ba) ba.onclick = function(){
-    try{ persAtivar(p.nome); toast('Agora você joga com ' + p.nome + '.'); lbRender(); ljRender(); }catch(e){}
-  };
-}
-
-function ljDetalheArma(grade){
-  var gr = null;
-  for(var i=0;i<LJ_GRADES.length;i++) if(LJ_GRADES[i].g === grade) gr = LJ_GRADES[i];
-  if(!gr) return;
-  var mo = gr.moeda === 'dm' ? '💎' : '🪙';
-  var nome = 'Arma ' + gr.g;
-  document.getElementById('ljDetTitulo').textContent = nome;
-  document.getElementById('ljDetPreco').textContent = mo + ' ' + fmtNum(gr.preco);
-  document.getElementById('ljDetCorpo').innerHTML =
-      '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119"></canvas></div>'
-    + '<div class="sub" style="color:var(--muted);font-size:12px;line-height:1.6">'
-    + 'Uma arma ' + esc(gr.g) + ' forjada na bigorna astral. Vai direto para a coleção ativa.'
-    + '</div>'
-    + '<div class="sumrow" style="margin-top:14px">'
-    +   '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmtNum(gr.preco)+'</button>'
-    + '</div><div id="ljMsgDet"></div>';
-  document.getElementById('ljDetalheCard').style.display = '';
-
-  try{
-    var c = document.getElementById('ljDetCv');
-    var ctx = c.getContext('2d'); ctx.setTransform(4,0,0,4,0,0);
-    pxDesenhar(ctx, pxPaleta('#facc15'), 'guerra', Date.now());
-  }catch(e){}
-
-  document.getElementById('ljComprarArma').onclick = function(){ ljComprarArma(gr); };
-}
-
-function ljMsg(txt, ok){
-  var b = document.getElementById('ljMsgDet');
-  if(!b) return;
-  b.className = 'cd-msg ' + (ok ? 'ok' : 'bad');
-  b.textContent = txt;
-  b.style.marginTop = '10px';
-}
-
-// --------- as compras (locais por enquanto) ---------
-function ljComprarPersonagem(p){
-  var m = moedas();
-  if(m.dm < p.dm){ ljMsg('Diamantes insuficientes. Faltam ' + fmtNum(p.dm - m.dm) + '.', false); return; }
-  if(ljTemPersonagem(p)){ ljMsg('Você já tem esse personagem.', false); return; }
-  if(!confirm('Comprar ' + p.nome + ' por ' + fmtNum(p.dm) + ' diamantes?')) return;
-
-  try{
-    gastarMoedas(0, p.dm, 'loja personagem ' + p.nome);
-    // cria o personagem como uma colecao nova
-    var all = loadColls();
-    all[p.nome] = {
-      id: p.nome, name: p.nome, avatar: p.av, cor: p.cor,
-      titulo: p.titulo, bio: p.bio, comprado: true,
-      criado: new Date().toISOString().slice(0,10)
-    };
-    saveColls(all);
-    ljMsg('Pronto! ' + p.nome + ' está na sua lista de personagens.', true);
-    ljRender();
-    try{ renderColls(); }catch(e){}
-  }catch(e){ ljMsg('Não consegui concluir a compra.', false); }
-}
-
-function ljComprarArma(gr){
-  var m = moedas();
-  var tem = gr.moeda === 'dm' ? m.dm : m.gc;
-  if(tem < gr.preco){
-    ljMsg((gr.moeda === 'dm' ? 'Diamantes' : 'G-Coins') + ' insuficientes. Faltam ' +
-      fmtNum(gr.preco - tem) + '.', false);
-    return;
-  }
-  if(!confirm('Comprar ' + gr.g + ' por ' + fmtNum(gr.preco) + '?')) return;
-  try{
-    if(gr.moeda === 'dm') gastarMoedas(0, gr.preco, 'loja arma ' + gr.g);
-    else gastarMoedas(gr.preco, 0, 'loja arma ' + gr.g);
-
-    // sorteia o nome e os atributos da arma na grade escolhida
-    var cfg = (typeof DATA !== 'undefined' && DATA.armas && DATA.armas.length) ? DATA.armas : [{n:'Arma Simples'}];
-    var w = cfg[Math.floor(Math.random()*cfg.length)];
-    var g2 = null;
-    for(var i=0;i<ARMA_GRADES.length;i++) if(ARMA_GRADES[i].g === gr.g) g2 = ARMA_GRADES[i];
-    if(!g2) g2 = ARMA_GRADES[0];
-    var jit = 0.9 + Math.random()*0.2;
-    var arma = {
-      uid:'lj'+Date.now()+Math.random().toString(36).slice(2,5),
-      rank: g2.g.substring(0,2).toUpperCase(),
-      name: w.n, cls: g2.g, color: g2.color, prob: 0,
-      p: Math.round(g2.p*jit), v: Math.round(g2.v*jit), i: Math.round(g2.i*jit),
-      a: Math.round(g2.a*jit*10)/10, c: Math.round(g2.c*jit*10)/10,
-      ts: Date.now(), origem:'loja'
-    };
-    var lista = loadInv('weapons', coll);
-    lista.unshift(arma);
-    saveInv('weapons', coll, lista);
-
-    ljMsg('Comprada! ' + arma.name + ' (' + g2.g + ') entrou na sua coleção.', true);
-    ljRender();
-    try{ renderStats(); renderList(); }catch(e){}
-  }catch(e){ ljMsg('Não consegui concluir a compra.', false); }
-}
-
-// abas e filtros
-(function(){
-  var tp = document.getElementById('ljTabPers');
-  var ta = document.getElementById('ljTabArmas');
-  if(tp) tp.onclick = function(){ ljAba='pers'; tp.classList.add('active'); ta.classList.remove('active'); ljRender(); };
-  if(ta) ta.onclick = function(){ ljAba='armas'; ta.classList.add('active'); tp.classList.remove('active'); ljRender(); };
-})();
-
-// a loja desenha quando entra na tela
-try{
-  var vLoja = document.getElementById('v-loja');
-  if(vLoja && window.MutationObserver){
-    new MutationObserver(function(){
-      if(vLoja.classList.contains('active')) ljRender();
-    }).observe(vLoja, { attributes:true, attributeFilter:['class'] });
-  }
-}catch(e){}
 
 try{ pfInit(); }catch(e){}
 try{ lgInit(); }catch(e){}
