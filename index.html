@@ -5423,6 +5423,9 @@ function codLer(codigo){
   }
 
   // monta os itens
+  // formato de cada item:  sistema-posicao-itemIdx
+  //   itemIdx = -1  -> o jogo sorteia um item daquela classe
+  //   itemIdx >= 0  -> entrega EXATAMENTE aquele item
   var itens = [];
   if(itensBrutos && itensBrutos !== '0'){
     var lista = itensBrutos.split(',');
@@ -5430,14 +5433,31 @@ function codLer(codigo){
       var par = lista[i].split('-');
       var sysIdx = Number(par[0]);
       var pos = Number(par[1]);
+      var itemIdx = (par.length > 2) ? Number(par[2]) : -1;
+      if(isNaN(itemIdx)) itemIdx = -1;
+
       var s = TABELA_COD[sysIdx];
       if(!s) continue;
       var cls = s.classes[pos - 1];
-      itens.push({ sys: s.id, sysLabel: s.label, rank: cls ? cls.rank : null, clsNome: cls ? cls.name : null });
+      itens.push({
+        sys: s.id, sysLabel: s.label,
+        rank: cls ? cls.rank : null,
+        clsNome: cls ? cls.name : null,
+        itemIdx: itemIdx
+      });
     }
   }
 
-  return { pacote: { itens: itens, xp: xp, tokens: tok, limite: limite, ate: ate, id: id } };
+  // moeda do codigo (v27): campo no formato  gcoins:diamantes
+  var moedasPac = null;
+  if(campos.length > 6 && campos[6] && campos[6] !== '0'){
+    var mp = String(campos[6]).split(':');
+    var gcv = Number(mp[0]) || 0;
+    var dmv = Number(mp[1]) || 0;
+    if(gcv || dmv) moedasPac = { gc: gcv, dm: dmv };
+  }
+
+  return { pacote: { itens: itens, xp: xp, tokens: tok, limite: limite, ate: ate, id: id, moedas: moedasPac } };
 }
 
 // aplica o premio na colecao
@@ -5457,7 +5477,15 @@ function codAplicar(pacote, id2){
     if(!SYSTEMS[p.sys]) continue;
 
     var bag = (p.rank && SYSTEMS[p.sys].items) ? (SYSTEMS[p.sys].items[p.rank] || []) : [];
-    var nome = bag.length ? bag[Math.floor(Math.random()*bag.length)] : ('Item ' + (p.clsNome || ''));
+    var nome;
+    // item exato quando o codigo manda o indice; senao sorteia um da classe
+    if(p.itemIdx !== undefined && p.itemIdx >= 0 && bag.length && bag[p.itemIdx] !== undefined){
+      nome = bag[p.itemIdx];
+    } else if(bag.length){
+      nome = bag[Math.floor(Math.random()*bag.length)];
+    } else {
+      nome = 'Item ' + (p.clsNome || '');
+    }
 
     var cl = null;
     var cls = SYSTEMS[p.sys].classes || [];
@@ -5479,6 +5507,10 @@ function codAplicar(pacote, id2){
   }
   if(pacote.tokens && typeof tokDar === 'function'){
     try{ tokDar(id2, Number(pacote.tokens)); }catch(e){}
+  }
+  // moedas do codigo (v27): G-Coins e Diamantes sao da conta
+  if(pacote.moedas && typeof darMoedas === 'function'){
+    try{ darMoedas(Number(pacote.moedas.gc)||0, Number(pacote.moedas.dm)||0, 'codigo ' + (pacote.id||'')); }catch(e){}
   }
 
   return ganhos;
