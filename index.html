@@ -6843,7 +6843,8 @@ function syColetar(){
   try{ dados.tr  = loadJSON(STORE_TR, null); }catch(e){}
   try{ dados.daily = loadJSON(STORE_DAILY, null); }catch(e){}
   try{ dados.cod = loadJSON(STORE_COD, null); }catch(e){}
-  try{ dados.moedas = moedas(); }catch(e){}
+  // MOEDAS: nao sobem para o servidor. O saldo e dele, e so ele decide.
+  // Mandar daqui era a brecha: bastava editar o localStorage.
   dados.meta = { versao: 23, ativo: activeColl(), em: new Date().toISOString() };
   return dados;
 }
@@ -6926,21 +6927,21 @@ function syFundir(dados){
   if(dados.daily && !loadJSON(STORE_DAILY, null)) saveJSON(STORE_DAILY, dados.daily);
   if(dados.cod && !loadJSON(STORE_COD, null)) saveJSON(STORE_COD, dados.cod);
   if(dados.moedas && typeof dados.moedas === 'object'){
-    var mM = moedas();
-    if(!mM.gc && !mM.dm){
-      moedasSalvar({ gc: Number(dados.moedas.gc)||0, dm: Number(dados.moedas.dm)||0, hist: dados.moedas.hist || [] });
-      moedasRender();
-    }
+    moedasSalvar({
+      gc: Number(dados.moedas.gc) || 0,
+      dm: Number(dados.moedas.dm) || 0,
+      hist: (dados.moedas.hist || []).slice(0, 60)
+    });
+    moedasRender();
   }
 
-  // moedas: fica com o maior saldo dos dois lados, nunca reduz o que existe aqui
+  // moedas: o SERVIDOR e a fonte. Aqui so espelhamos o que ele disse.
   if(dados.moedas && typeof dados.moedas === 'object'){
-    var locaisM = moedas();
-    var gc = Math.max(Number(locaisM.gc) || 0, Number(dados.moedas.gc) || 0);
-    var dm = Math.max(Number(locaisM.dm) || 0, Number(dados.moedas.dm) || 0);
-    var hist = (locaisM.hist || []).concat(dados.moedas.hist || []);
-    hist.sort(function(a,b){ return String(b.em||'').localeCompare(String(a.em||'')); });
-    moedasSalvar({ gc: gc, dm: dm, hist: hist.slice(0,60) });
+    moedasSalvar({
+      gc: Number(dados.moedas.gc) || 0,
+      dm: Number(dados.moedas.dm) || 0,
+      hist: (dados.moedas.hist || []).slice(0, 60)
+    });
     moedasRender();
   }
 
