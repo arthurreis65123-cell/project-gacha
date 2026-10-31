@@ -7612,7 +7612,280 @@ try{
     if(vs) obs.observe(vs, { attributes: true, attributeFilter: ['class'] });
   }catch(e){}
 }catch(e){}
-</script>
+
+/* ================= LOJA (v48) =================
+   Bloco isolado: roda DEPOIS do jogo carregar e so mexe na loja.
+   Personagens e armas lendarias custam Diamantes; armas ate o epico, G-Coins. */
+
+(function(){
+  'use strict';
+
+  var PERS = [
+    { id:'p_vanguarda', nome:'Vanguarda', titulo:'Linha de frente', dm:800,  cor:'#8b5cf6', av:'🛡️',
+      bio:'Armadura pesada e capa violeta. Aguenta mais pancada que qualquer outro.' },
+    { id:'p_lume',      nome:'Lume',      titulo:'Chama viva',      dm:1200, cor:'#fb7185', av:'🔥',
+      bio:'Cabelo em brasa e olhos acesos. Ataque puro.' },
+    { id:'p_zed',       nome:'Zed',       titulo:'Sombra rápida',   dm:1500, cor:'#22d3ee', av:'⚡',
+      bio:'Movimento antes do pensamento. Esquiva alta.' },
+    { id:'p_raiz',      nome:'Raiz',      titulo:'Guardião antigo', dm:2000, cor:'#4ade80', av:'🌳',
+      bio:'Vida enorme, ataque baixo. Feito para durar.' },
+    { id:'p_sol',       nome:'Sol',       titulo:'Dourado',         dm:2800, cor:'#facc15', av:'☀️',
+      bio:'Armadura dourada e presença de comandante.' },
+    { id:'p_astral',    nome:'Astral',    titulo:'Além do véu',     dm:4000, cor:'#c084fc', av:'🔮',
+      bio:'Capa estelar. O mais caro do salão, e o mais bonito.' }
+  ];
+
+  var GRADES = [
+    { g:'Comum',         moeda:'gc', preco:2000  },
+    { g:'Incomum',       moeda:'gc', preco:5000  },
+    { g:'Raro',          moeda:'gc', preco:12000 },
+    { g:'Muito Raro',    moeda:'gc', preco:25000 },
+    { g:'Heroico',       moeda:'gc', preco:50000 },
+    { g:'Épico',         moeda:'gc', preco:90000 },
+    { g:'Lendário',      moeda:'dm', preco:300   },
+    { g:'Transcendente', moeda:'dm', preco:600   },
+    { g:'Divino',        moeda:'dm', preco:1200  }
+  ];
+
+  var aba = 'pers';
+
+  function fmt(n){
+    return String(Math.floor(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  }
+  function el2(id){ return document.getElementById(id); }
+  function esc2(v){ return String(v).replace(/[&<>"]/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); }); }
+
+  // ja possui esse personagem? (vira uma colecao com o nome dele)
+  function temPers(p){
+    try{ var all = loadColls(); return !!all[p.nome]; }catch(e){ return false; }
+  }
+
+  function desenhaBoneco(cv, cor, pose){
+    if(!cv || !cv.getContext) return;
+    try{
+      var ctx = cv.getContext('2d');
+      ctx.setTransform(4,0,0,4,0,0);
+      pxDesenhar(ctx, pxPaleta(cor), pose || 'parado', Date.now());
+    }catch(e){}
+  }
+
+  function cards(){
+    var out = '';
+    if(aba === 'pers'){
+      for(var i=0;i<PERS.length;i++){
+        var p = PERS[i];
+        var tem = temPers(p);
+        out += '<div class="lj-item'+(tem?' ja':'')+'" data-pers="'+p.id+'">'
+            +  '<div class="arte"><canvas data-cor="'+p.cor+'" width="88" height="119"></canvas>'
+            +  (i===0 ? '<span class="tag2 novo">NOVO</span>' : '')
+            +  '</div><div class="info">'
+            +  '<div class="nm">'+esc2(p.nome)+'</div>'
+            +  '<div class="sub">'+esc2(p.titulo)+'</div>'
+            +  '<div class="pr '+(tem?'':'dm')+'">'+(tem ? '✓ Já possui' : ('💎 '+fmt(p.dm)+' <small>diamantes</small>'))+'</div>'
+            +  '</div></div>';
+      }
+    } else {
+      for(var j=0;j<GRADES.length;j++){
+        var gr = GRADES[j];
+        var mo = gr.moeda === 'dm' ? '💎' : '🪙';
+        out += '<div class="lj-item" data-gra="'+gr.g+'">'
+            +  '<div class="arte"><canvas data-arma="'+esc2(gr.g)+'" width="88" height="119"></canvas></div>'
+            +  '<div class="info">'
+            +  '<div class="nm">Arma '+esc2(gr.g)+'</div>'
+            +  '<div class="sub">'+(gr.moeda==='dm'?'arma lendária':'arma comum')+'</div>'
+            +  '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmt(gr.preco)
+            +  ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
+            +  '</div></div>';
+      }
+    }
+    return out;
+  }
+
+  function render(){
+    var sal = el2('ljSaldo');
+    if(sal){
+      var m = moedas();
+      sal.textContent = '🪙 ' + fmt(m.gc) + '  ·  💎 ' + fmt(m.dm);
+    }
+    var box = el2('ljVitrine');
+    if(!box) return;
+    box.className = 'lj-grid';
+    box.innerHTML = cards();
+
+    var cvs = box.querySelectorAll('canvas');
+    for(var i=0;i<cvs.length;i++){
+      var cor = cvs[i].getAttribute('data-cor');
+      var arma = cvs[i].getAttribute('data-arma');
+      desenhaBoneco(cvs[i], cor || (arma ? '#facc15' : '#8b5cf6'), arma ? 'guerra' : 'parado');
+    }
+
+    var itens = box.querySelectorAll('[data-pers],[data-gra]');
+    for(var k=0;k<itens.length;k++){
+      itens[k].onclick = (function(node){
+        return function(){
+          var pid = node.getAttribute('data-pers');
+          if(pid) detalhePers(pid); else detalheArma(node.getAttribute('data-gra'));
+        };
+      })(itens[k]);
+    }
+  }
+
+  function detalhePers(pid){
+    var p = null;
+    for(var i=0;i<PERS.length;i++) if(PERS[i].id === pid) p = PERS[i];
+    if(!p) return;
+    var tem = temPers(p);
+    var d = el2('ljDetalhe');
+    d.style.display = '';
+    d.innerHTML = '<div class="hd"><h3>'+esc2(p.nome)+' — '+esc2(p.titulo)+'</h3>'
+      + '<span>'+(tem ? 'já possui' : '💎 '+fmt(p.dm))+'</span></div>'
+      + '<div class="bd">'
+      + '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119" style="width:130px;height:176px;image-rendering:pixelated"></canvas></div>'
+      + '<div style="color:var(--muted);font-size:12px;line-height:1.6">'+esc2(p.bio)+'</div>'
+      + '<div class="sumrow" style="margin-top:14px">'
+      + (tem ? '<button class="secondary" id="ljAtivar" style="width:100%">Usar este personagem</button>'
+            : '<button class="primary" id="ljComprar" style="width:100%">Comprar por 💎 '+fmt(p.dm)+'</button>')
+      + '</div><div id="ljMsg"></div></div>';
+
+    desenhaBoneco(el2('ljDetCv'), p.cor, 'vitoria');
+
+    var bc = el2('ljComprar');
+    if(bc) bc.onclick = function(){ comprarPers(p); };
+    var ba = el2('ljAtivar');
+    if(ba) ba.onclick = function(){
+      try{ persAtivar(p.nome); toast('Agora você joga com ' + p.nome + '.'); render(); lbRender(); }catch(e){}
+    };
+  }
+
+  function detalheArma(grade){
+    var gr = null;
+    for(var i=0;i<GRADES.length;i++) if(GRADES[i].g === grade) gr = GRADES[i];
+    if(!gr) return;
+    var mo = gr.moeda === 'dm' ? '💎' : '🪙';
+    var d = el2('ljDetalhe');
+    d.style.display = '';
+    d.innerHTML = '<div class="hd"><h3>Arma '+esc2(gr.g)+'</h3><span>'+mo+' '+fmt(gr.preco)+'</span></div>'
+      + '<div class="bd">'
+      + '<div class="lj-det-arte"><canvas id="ljDetCv" width="88" height="119" style="width:130px;height:176px;image-rendering:pixelated"></canvas></div>'
+      + '<div style="color:var(--muted);font-size:12px;line-height:1.6">Uma arma '+esc2(gr.g)
+      + ' forjada na bigorna astral. Vai direto para a coleção ativa.</div>'
+      + '<div class="sumrow" style="margin-top:14px">'
+      + '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmt(gr.preco)+'</button>'
+      + '</div><div id="ljMsg"></div></div>';
+
+    desenhaBoneco(el2('ljDetCv'), '#facc15', 'guerra');
+    el2('ljComprarArma').onclick = function(){ comprarArma(gr); };
+  }
+
+  function msg(txt, ok){
+    var b = el2('ljMsg');
+    if(!b) return;
+    b.className = 'cd-msg ' + (ok ? 'ok' : 'bad');
+    b.textContent = txt;
+    b.style.marginTop = '10px';
+  }
+
+  function comprarPers(p){
+    var m = moedas();
+    if(temPers(p)){ msg('Você já tem esse personagem.', false); return; }
+    if(m.dm < p.dm){ msg('Diamantes insuficientes. Faltam ' + fmt(p.dm - m.dm) + '.', false); return; }
+    if(!confirm('Comprar ' + p.nome + ' por ' + fmt(p.dm) + ' diamantes?')) return;
+    try{
+      gastarMoedas(0, p.dm, 'loja: ' + p.nome);
+      var all = loadColls();
+      all[p.nome] = {
+        id: p.nome, name: p.nome, avatar: p.av, cor: p.cor,
+        titulo: p.titulo, bio: p.bio, comprado: true,
+        criado: new Date().toISOString().slice(0,10)
+      };
+      saveColls(all);
+      msg('Pronto! ' + p.nome + ' está na sua lista de personagens.', true);
+      render();
+      try{ renderColls(); }catch(e){}
+    }catch(e){ msg('Não consegui concluir a compra.', false); }
+  }
+
+  function comprarArma(gr){
+    var m = moedas();
+    var tem = gr.moeda === 'dm' ? m.dm : m.gc;
+    if(tem < gr.preco){
+      msg((gr.moeda === 'dm' ? 'Diamantes' : 'G-Coins') + ' insuficientes. Faltam ' + fmt(gr.preco - tem) + '.', false);
+      return;
+    }
+    if(!confirm('Comprar a arma ' + gr.g + ' por ' + fmt(gr.preco) + '?')) return;
+    try{
+      if(gr.moeda === 'dm') gastarMoedas(0, gr.preco, 'loja: arma ' + gr.g);
+      else gastarMoedas(gr.preco, 0, 'loja: arma ' + gr.g);
+
+      var pool = (typeof DATA !== 'undefined' && DATA.armas && DATA.armas.length)
+        ? DATA.armas : [{ n:'Arma Simples' }];
+      var w = pool[Math.floor(Math.random()*pool.length)];
+      var g2 = null;
+      for(var i=0;i<ARMA_GRADES.length;i++) if(ARMA_GRADES[i].g === gr.g) g2 = ARMA_GRADES[i];
+      if(!g2) g2 = ARMA_GRADES[0];
+      var jit = 0.9 + Math.random()*0.2;
+      var arma = {
+        uid:'lj'+Date.now()+Math.random().toString(36).slice(2,5),
+        rank: g2.g.substring(0,2).toUpperCase(),
+        name: w.n, cls: g2.g, color: g2.color, prob: 0,
+        p: Math.round(g2.p*jit), v: Math.round(g2.v*jit), i: Math.round(g2.i*jit),
+        a: Math.round(g2.a*jit*10)/10, c: Math.round(g2.c*jit*10)/10,
+        ts: Date.now(), origem: 'loja'
+      };
+      var lista = loadInv('weapons', coll);
+      lista.unshift(arma);
+      saveInv('weapons', coll, lista);
+
+      msg('Comprada! ' + arma.name + ' (' + g2.g + ') entrou na sua coleção.', true);
+      render();
+      try{ renderStats(); renderList(); }catch(e){}
+    }catch(e){ msg('Não consegui concluir a compra.', false); }
+  }
+
+  function ligarAbas(){
+    var tp = el2('ljTabPers'), ta = el2('ljTabArmas');
+    if(tp) tp.onclick = function(){
+      aba='pers'; tp.classList.add('active'); if(ta) ta.classList.remove('active'); render();
+    };
+    if(ta) ta.onclick = function(){
+      aba='armas'; ta.classList.add('active'); if(tp) tp.classList.remove('active'); render();
+    };
+  }
+
+  // so age quando a loja estiver visivel
+  function quandoAbrir(){
+    var v = el2('v-loja');
+    if(v && v.classList.contains('active')) render();
+  }
+
+  function iniciar(){
+    ligarAbas();
+    var v = el2('v-loja');
+    if(v){
+      try{
+        new MutationObserver(quandoAbrir).observe(v, { attributes:true, attributeFilter:['class'] });
+      }catch(e){}
+    }
+    // reage tambem ao clique no botao do lobby
+    var btns = document.querySelectorAll('.nav button[data-view]');
+    for(var i=0;i<btns.length;i++){
+      var b = btns[i];
+      if(b.getAttribute('data-view') === 'v-loja'){
+        var antes = b.onclick;
+        b.onclick = function(ev){ if(antes) try{ antes(ev); }catch(e){}; setTimeout(render, 30); };
+      }
+    }
+    render();
+  }
+
+  // roda depois do jogo carregar
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(iniciar, 60); });
+  } else {
+    setTimeout(iniciar, 60);
+  }
+})();
 </script>
 
 <!-- ============ SINCRONIZACAO SEGURA (v23) ============ -->
