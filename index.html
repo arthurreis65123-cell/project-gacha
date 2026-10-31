@@ -412,24 +412,75 @@ body[data-theme="hacker"] .reel-track{font-family:var(--font)}
 .pvp-pick strong{font-size:13px}
 .pvp-pick small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 
-.arena{border:1px solid var(--line);border-radius:18px;background:
-  radial-gradient(circle at 50% 120%, rgba(139,92,246,.18), transparent 60%),
-  linear-gradient(180deg, rgba(10,14,30,.96), rgba(6,8,18,.98));
-  padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
-.arena:before{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.5),transparent)}
-.fighters{display:grid;grid-template-columns:1fr 46px 1fr;gap:8px;align-items:center}
-.fighter{border:1px solid var(--line);border-radius:16px;background:rgba(17,23,42,.9);padding:12px;min-width:0;position:relative;transition:transform .18s ease, border-color .18s ease}
-.fighter.hit{animation:shake .32s ease}
-.fighter.win{border-color:#4ADE80;box-shadow:0 0 0 2px rgba(74,222,128,.25)}
-.fighter.lose{opacity:.5}
+/* ===== CENA DE BATALHA (v40) =====
+   inspirada nos jogos de batalha por turno: campo com horizonte,
+   uma plataforma de cada lado, HUD de vida sobre cada lutador. */
+.arena{border:1px solid var(--line);border-radius:18px;
+  background:linear-gradient(180deg,#1b2450 0%,#141a37 42%,#0d1226 100%);
+  padding:0;margin-bottom:14px;position:relative;overflow:hidden}
+
+/* o campo */
+.campo{position:relative;height:340px;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 22% 78%, rgba(74,222,128,.22), transparent 46%),
+    radial-gradient(ellipse at 78% 30%, rgba(56,189,248,.18), transparent 44%),
+    linear-gradient(180deg,#243066 0%,#1a2350 46%,#131b3c 47%,#0e142e 100%)}
+.campo:before{content:"";position:absolute;left:0;right:0;top:38%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(148,163,184,.35),transparent)}
+.campo:after{content:"";position:absolute;left:0;right:0;bottom:0;height:58%;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.022) 0 2px,transparent 2px 13px)}
+
+/* plataformas */
+.plataforma{position:absolute;width:186px;height:56px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.34),rgba(88,60,170,.12) 62%,transparent 76%);
+  border-top:2px solid rgba(167,139,250,.4)}
+.plat-b{left:7%;bottom:34px}
+.plat-a{right:7%;top:74px;
+  background:radial-gradient(ellipse at center,rgba(56,189,248,.32),rgba(30,110,160,.12) 62%,transparent 76%);
+  border-top-color:rgba(56,189,248,.45)}
+
+/* bonecos */
+.campo canvas.boneco{position:absolute;image-rendering:pixelated;image-rendering:crisp-edges;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.55))}
+.boneco-b{left:7%;bottom:66px;width:152px;height:206px}
+.boneco-a{right:7%;top:104px;width:132px;height:179px}
+.campo .fight .boneco-b{animation:avancaB .34s ease}
+.campo .fight .boneco-a{animation:avancaA .34s ease}
+@keyframes avancaB{0%{transform:translateX(0)}45%{transform:translateX(26px)}100%{transform:translateX(0)}}
+@keyframes avancaA{0%{transform:translateX(0)}45%{transform:translateX(-26px)}100%{transform:translateX(0)}}
+.golpe{position:absolute;width:74px;height:74px;border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(251,191,36,.75) 42%,transparent 70%)}
+.golpe.on{animation:golpe .42s ease}
+@keyframes golpe{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.6)}}
+
+/* HUD de vida sobre cada lutador */
+.hud{position:absolute;min-width:210px;border:2px solid rgba(226,232,240,.5);
+  border-radius:12px;background:rgba(8,11,24,.88);padding:9px 12px 10px;
+  backdrop-filter:blur(3px);box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.hud-b{left:6%;top:16px}
+.hud-a{right:6%;bottom:26px}
+.hud .nm{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  font-size:12.5px;font-weight:950;margin-bottom:6px}
+.hud .nm .lv{font-size:10.5px;color:var(--muted);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.hud .barra{height:9px;border-radius:99px;background:rgba(255,255,255,.1);
+  overflow:hidden;border:1px solid rgba(148,163,184,.3)}
+.hud .barra i{display:block;height:100%;width:100%;
+  background:linear-gradient(90deg,#4ADE80,#22D3EE);transition:width .32s ease}
+.hud .barra.low i{background:linear-gradient(90deg,#FB7185,#FB923C)}
+.hud .num{font-size:10.5px;color:var(--muted);margin-top:5px;
+  font-variant-numeric:tabular-nums;text-align:right}
+.hud.hit{animation:shake .3s ease}
+/* a barra de vida do lutador A (o do canto) */
+#hpnA, #hpnB{display:none}
+
+.round{text-align:center;font-size:11px;letter-spacing:2px;font-weight:950;
+  text-transform:uppercase;color:var(--muted);padding:11px 0 3px}
+.log{max-height:190px;overflow:auto;display:grid;gap:5px;margin:0;padding:12px 16px 16px}
+/* lutador vencedor/perdedor na cena */
+.hud.win{border-color:#4ADE80;box-shadow:0 0 0 2px rgba(74,222,128,.28)}
+.hud.lose{opacity:.55}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-.fighter h4{margin:0 0 6px;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fighter .pw{font-size:11px;color:var(--muted);margin-bottom:8px}
-.hpbar{height:12px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid var(--line)}
-.hpbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4ADE80,#22D3EE);transition:width .35s ease}
-.hpbar.low i{background:linear-gradient(90deg,#FB7185,#FB923C)}
-.hpnum{font-size:11px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
-.vs{text-align:center;font-size:18px;font-weight:1000;color:var(--accent);text-shadow:0 0 12px var(--glow)}
 .round{text-align:center;font-size:11px;letter-spacing:2px;font-weight:950;text-transform:uppercase;color:var(--muted);margin:12px 0 2px}
 .log{max-height:190px;overflow:auto;display:grid;gap:5px;margin-top:10px}
 .logline{font-size:11.5px;line-height:1.5;border-left:2px solid var(--line);padding:4px 8px;color:#c7d2e8;background:rgba(255,255,255,.02)}
@@ -3815,8 +3866,31 @@ function startPvp(){
     return out2;
   }
 
+  // nomes das coleções e a cor de cada perfil, para colorir os bonecos
+  function corDe(id2){
+    try{ var p = (typeof persDe === 'function') ? persDe(id2) : null; return p && p.cor ? p.cor : null; }catch(e){ return null; }
+  }
+
   arena.innerHTML = '<div class="arena">'
-    + '<div class="fighters">' + fighterHtml(A, A.id, 'A') + '<div class="vs">VS</div>' + fighterHtml(B, B.id, 'B') + '</div>'
+    // ---- cena de batalha ----
+    + '<div class="campo" id="pvpCampo">'
+    +   '<div class="plataforma plat-b"></div>'
+    +   '<div class="plataforma plat-a"></div>'
+    +   '<canvas class="boneco boneco-b" id="pxB" width="88" height="119"></canvas>'
+    +   '<canvas class="boneco boneco-a" id="pxA" width="88" height="119"></canvas>'
+    +   '<div class="golpe" id="golpeA"></div>'
+    +   '<div class="golpe" id="golpeB"></div>'
+    +   '<div class="hud hud-b">'
+    +     '<div class="nm"><span>' + esc(B.id) + '</span><span class="lv">VIDA ' + B.vida + '</span></div>'
+    +     '<div class="barra" id="hpBarB"><i></i></div>'
+    +     '<div class="num" id="hpNumB">' + B.vida + ' / ' + B.vida + '</div>'
+    +   '</div>'
+    +   '<div class="hud hud-a">'
+    +     '<div class="nm"><span>' + esc(A.id) + '</span><span class="lv">VIDA ' + A.vida + '</span></div>'
+    +     '<div class="barra" id="hpBarA"><i></i></div>'
+    +     '<div class="num" id="hpNumA">' + A.vida + ' / ' + A.vida + '</div>'
+    +   '</div>'
+    + '</div>'
     + '<div class="round" id="roundLbl">Preparando...</div>'
     + '<div class="log" id="pvpLog"></div>'
     + '</div>'
@@ -3856,10 +3930,64 @@ function startPvp(){
 
   function hp(cor, val, max){
     var pct = Math.max(0, Math.round((val / max) * 100));
-    var bar = el('hp' + cor);
-    bar.style.width = pct + '%';
-    bar.parentNode.classList.toggle('low', pct <= 30);
-    el('hpn' + cor).textContent = Math.max(0, val) + ' / ' + max;
+    var bar = el('hpBar' + cor);
+    if(bar){
+      var i = bar.querySelector('i');
+      if(i) i.style.width = pct + '%';
+      bar.classList.toggle('low', pct <= 30);
+    }
+    var num = el('hpNum' + cor);
+    if(num) num.textContent = Math.max(0, val) + ' / ' + max;
+  }
+
+  // desenha os dois bonecos na cena
+  function desenharLutadores(){
+    try{
+      var cvB = el('pxB'), cvA = el('pxA');
+      if(cvB && cvB.getContext){
+        var cB = cvB.getContext('2d');
+        cB.setTransform(4,0,0,4,0,0);
+        pxDesenhar(cB, pxPaleta(corDe(pvpSel[1])), 'guerra', Date.now());
+      }
+      if(cvA && cvA.getContext){
+        var cA = cvA.getContext('2d');
+        cA.setTransform(4,0,0,4,0,0);
+        pxDesenhar(cA, pxPaleta(corDe(pvpSel[0])), 'defesa', Date.now());
+      }
+    }catch(e){ if(window.console) console.warn('bonecos do pvp:', e.message); }
+  }
+  desenharLutadores();
+
+  // marca o golpe: brilho no alvo e tremida no HUD
+  function marcarGolpe(cor){
+    try{
+      var g = el('golpe' + cor);
+      if(g){
+        var alvo = (cor === 'A') ? el('pxA') : el('pxB');
+        if(alvo){
+          var r = alvo.getBoundingClientRect();
+          var campo = el('pvpCampo');
+          if(campo){
+            var rc = campo.getBoundingClientRect();
+            g.style.left = (r.left - rc.left + r.width/2 - 37) + 'px';
+            g.style.top = (r.top - rc.top + r.height/2 - 37) + 'px';
+          }
+        }
+        g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+        setTimeout(function(){ g.classList.remove('on'); }, 460);
+      }
+      var hud = document.querySelector('.hud-' + cor.toLowerCase());
+      if(hud){ hud.classList.remove('hit'); void hud.offsetWidth; hud.classList.add('hit'); }
+    }catch(e){}
+  }
+
+  // golpe: acende o brilho e sacode quem levou
+  function golpeAnim(cor){
+    var g = el('golpe' + cor);
+    if(!g) return;
+    g.style.opacity = '';
+    g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+    setTimeout(function(){ g.classList.remove('on'); }, 460);
   }
 
   function dano(ataque, defesa, criticoPct, esquivaPct, cor){
@@ -3933,7 +4061,7 @@ function startPvp(){
       push(atacante.id + ' ataca com ' + (atacante.melhorArma ? atacante.melhorArma.name : 'as mãos') + ' e causa ' + r1.v + (r1.crit ? ' (crítico!)' : '') + '.', r1.crit ? 'crit' : '');
     }
 
-    if(Aaggrediu){ B.hp = hpB; hp('B', hpB, B.vida); } else { A.hp = hpA; hp('A', hpA, A.vida); }
+    if(Aaggrediu){ B.hp = hpB; hp('B', hpB, B.vida); marcarGolpe('B'); } else { A.hp = hpA; hp('A', hpA, A.vida); marcarGolpe('A'); }
     if(!r1.errou && r1.v > 0 && atacante.statusPower && Math.random() < 0.42){ pvpStatusApply(defensor, atacante.statusPower, atacante, push); }
 
     // contra-ataque, se sobreviveu
