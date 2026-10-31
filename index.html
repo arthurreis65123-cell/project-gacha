@@ -929,6 +929,29 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
   transition:border-color .18s ease,background .18s ease,transform .18s ease}
 #lbVoltar:hover{border-color:var(--accent);background:var(--panel2);transform:translateX(-2px)}
 #lbVoltar i{font-style:normal;font-size:15px;line-height:1}
+/* a conta e as moedas no mesmo bloco, como uma barra de jogador */
+.lg-area{display:flex;align-items:center;gap:0;border:1px solid var(--line);
+  border-radius:999px;background:rgba(17,23,42,.8);padding:0;overflow:hidden}
+.lg-area .pill,.lg-area .pill.moedas{border:0;border-radius:0;background:transparent;padding:0}
+.lg-area .pill.itens{display:flex;align-items:center;gap:6px;padding:0 14px;height:100%;
+  font-size:12px;font-weight:950}
+.lg-area .pill.moedas{gap:0}
+.lg-area .pill.moedas .m{padding:8px 14px}
+.lg-area .pill.moedas .m+.m{border-left:1px solid var(--line)}
+.lg-area .sep{display:none}
+/* a conta dentro do bloco */
+.lg-area .lg-user{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 8px;
+  border:0;border-right:1px solid var(--line);border-radius:0;background:transparent}
+.lg-area .lg-user .av{width:28px;height:28px;flex:0 0 28px;font-size:13px}
+.lg-area .lg-user .nm{font-size:12.5px}
+.lg-area .lg-user .em,.lg-area .lg-user .id2{font-size:10px}
+/* os botoes de sincronizar ficam fora do bloco, discretos */
+.lg-area .lg-out{margin-left:8px}
+@media(max-width:819px){
+  .lg-area{flex-wrap:wrap;border-radius:16px}
+  .lg-area .pill.itens{display:none}
+  .lg-area .lg-user{border-right:0}
+}
 @media(max-width:819px){
   #lbVoltar{padding:8px 11px;font-size:11.5px}
   #lbVoltar .txt{display:none}
@@ -1183,7 +1206,7 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
       <div class="brand"><div class="brand-logo" id="brandLogo"></div><div><h1>PROJECT GACHA</h1></div></div>
 
       <div class="lg-area">
-      <div class="pill">✧ <span id="count">0</span> itens</div>
+      <div class="pill itens">✧ <span id="count">0</span> itens</div>
       <div class="pill moedas" id="moedasBar">
         <span class="m gc"><span class="ic">🪙</span><span id="mGC">0</span><span class="ganho" id="mGCg"></span></span>
         <span class="sep"></span>
@@ -6363,8 +6386,14 @@ function lgBarra(){
     alvo.id = 'lgUserBar';
     alvo.className = 'pill';
     alvo.style.marginLeft = 'auto';
-    var cab = document.querySelector('.topbar');
-    if(cab) cab.appendChild(alvo);
+    // entra no mesmo bloco das moedas, ficando a esquerda delas
+    var bloco = document.querySelector('.lg-area');
+    var moedas = document.getElementById('moedasBar');
+    if(bloco && moedas) bloco.insertBefore(alvo, moedas);
+    else {
+      var cab = document.querySelector('.topbar');
+      if(cab) cab.appendChild(alvo);
+    }
   }
   if(!s){
     alvo.innerHTML = '<button class="lg-out" id="lgBtnEntrar" style="margin:0">Entrar</button>';
@@ -6665,6 +6694,17 @@ function lbIr(v){
   try{ showView(v); }catch(e){}
   if(v === 'v-gacha'){ try{ renderStats(); renderList(); }catch(e){} }
 }
+
+// botao "Salao" da barra do topo: volta ao lobby
+(function(){
+  var v = document.getElementById('lbVoltar');
+  if(v){
+    v.onclick = function(ev){
+      if(ev) ev.preventDefault();
+      lbAbrir();
+    };
+  }
+})();
 
 // botoes do pe
 (function(){
