@@ -1387,16 +1387,16 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 
       <!-- ============ ABA: COMPARAR ============ -->
       <!-- ============ ABA: LOJA ============ -->
-      <section class="view" id="v-cmp">
-        <div class="vtitle"><h2>Comparar coleções</h2><span id="cmpCount">marque 2 ou mais</span></div>
-        <div class="card2" id="cmpPanel">
-          <div class="cmp-bar" style="padding-top:13px">
-            <button class="primary" id="cmpRun">Comparar</button>
-            <button class="secondary" id="cmpClear">Limpar seleção</button>
-            <span class="cmp-note" id="cmpNote">Escolha as coleções que deseja comparar.</span>
+      <section class="view" id="v-loja">
+        <div class="vtitle"><h2>Loja</h2><span id="ljSaldo">-</span></div>
+        <div class="card2">
+          <div class="tabs" style="padding-top:13px">
+            <button class="tab active" id="ljTabPers">Personagens</button>
+            <button class="tab" id="ljTabArmas">Armas</button>
           </div>
-          <div class="cmp-pick" id="cmpPick"></div>
-          <div class="cmp-grid" id="cmpOut"></div>
+          <div class="lj-grid" id="ljVitrine">
+            <div style="padding:22px 4px;color:var(--muted);font-size:12.5px">Carregando a loja...</div>
+          </div>
         </div>
       </section>
 
@@ -6880,7 +6880,7 @@ var LOBBY_BOTOES = [
   { v:'v-torre',   i:'🗼', t:'Torre',      s:'500 andares e chefes',       poso:'p4' },
   { v:'v-diario',  i:'🎁', t:'Diário',     s:'Presente de cada dia',       poso:'p5' },
   { v:'v-pvp',     i:'⚔',  t:'PvP',        s:'Lutar contra outra coleção', poso:'p6' },
-  { v:'v-cmp',     i:'⚖',  t:'Comparar',   s:'Medir duas coleções',        poso:'p7' },
+  { v:'v-loja',    i:'🛒', t:'Loja',       s:'Personagens e armas',        poso:'p7' },
   { v:'v-codigos', i:'🎟', t:'Códigos',    s:'Resgatar códigos',           poso:'p8' },
   { v:'v-perfil',  i:'👤', t:'Perfil',     s:'Seu personagem principal',   poso:'p9' },
   { v:'v-set',     i:'⚙',  t:'Ajustes',    s:'Conta, tema e sincronização',poso:'p10' }
