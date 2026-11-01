@@ -7989,11 +7989,12 @@ try{
       'Transcendente':{ fio:'#cffafe', gume:'#22d3ee', cabo:'#155e75', pomo:'#22D3EE', aura:'#22d3ee' },
       'Divino':       { fio:'#fff7cc', gume:'#fde047', cabo:'#854d0e', pomo:'#FDE047', aura:'#fde047' }
     };
-    return por[grau] || por['Comum'];
+    return por[grau] || null;
   }
 
   function desenhaEspada(ctx, grau, t){
     var P = palEspada(grau);
+    if(!P) P = palEspada('Comum');
     var W = PXE.W, H = PXE.H;
     ctx.clearRect(0,0,W,H);
 
@@ -8052,16 +8053,25 @@ try{
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,cv.width,cv.height);
 
-      var nome = nomeArma || ARMA_POR_GRAU[grau] || null;
+      // aceita tanto o GRAU ("Heroico") quanto o NOME da arma ("Espada Rubra")
+      var nome = nomeArma || null;
+      if(!nome){
+        nome = ARMA_POR_GRAU[grau] || (ARMA_MAP[grau] ? grau : null);
+      }
+      if(!nome && grau){
+        // se veio um nome de arma direto, usa ele
+        for(var k in ARMA_MAP){ if(k === grau){ nome = grau; break; } }
+      }
       if(nome && ARMA_MAP[nome]){
         // arte de verdade: desenha no tamanho do canvas, sem esticar torto
         pxArma(ctx, nome, cv.width, cv.height);
         return;
       }
-      // reserva: a espada desenhada por blocos
+      // reserva: a espada desenhada por blocos (com um grau VALIDO)
+      var grauValido = palEspada(grau) ? grau : 'Comum';
       var W = cv.width / PXE.W;
       ctx.setTransform(W, 0, 0, W, 0, 0);
-      desenhaEspada(ctx, grau, Date.now());
+      desenhaEspada(ctx, grauValido, Date.now());
       ctx.setTransform(1,0,0,1,0,0);
     }catch(e){}
   }
