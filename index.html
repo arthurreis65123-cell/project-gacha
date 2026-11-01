@@ -7132,7 +7132,10 @@ function pxDesenhar(ctx, pal, estado, t){
 
 /* Ligado ao lobby: desenha no canvas e reanima */
 var lbPxPal = null;
-var lbPxEstado = 'parado';  var PIX_PAL = ["#e49c90", "#f0c0b4", "#845448", "#e4c0a8", "#000018", "#00000c", "#0c000c", "#000024", "#0c0000", "#607890", "#3c2424", "#484854", "#30303c", "#60606c", "#000030", "#b47878", "#cc8478", "#181824", "#6c483c", "#b4786c", "#a86054", "#304878", "#e4b4a8", "#241824", "#000c3c", "#241830", "#242430", "#18243c", "#000c30", "#000000", "#180c18", "#180000", "#24243c", "#183054", "#c0786c", "#3c609c", "#c0e4fc", "#3c3c48", "#789ca8", "#b4e4fc", "#54606c", "#243054", "#0c0c18", "#243048", "#30486c", "#181830", "#0c0018", "#303c54", "#48609c", "#609cc0", "#c0b49c", "#3c4854", "#483030", "#182448", "#000c24", "#6084a8", "#1854a8", "#d89084", "#0c1824", "#3c546c"];
+var lbPxEstado = 'parado';  var TRONCO_PAL = ["#000014", "#0a000a", "#00000a", "#00001e", "#000028", "#0a0000", "#464650", "#0a0014", "#5a646e", "#000032", "#32466e", "#6e463c", "#140000", "#000a3c", "#bee6fa", "#14141e", "#46505a", "#324678", "#32323c", "#64788c", "#647896", "#3c5064", "#000a32", "#1e325a", "#1e2846", "#466496", "#6e4632", "#000000", "#1e1428", "#3c3c50", "#323246", "#64646e", "#141e3c", "#78a0aa", "#1e1e3c", "#463232", "#141e32", "#82a0aa", "#142846", "#1e3250", "#505a64", "#282832", "#282846", "#4664a0", "#1e1e28", "#a06e5a", "#c8b496", "#3c4650", "#50505a", "#465050", "#323c46", "#28323c", "#3c466e", "#142850", "#1e2850", "#bedcfa", "#b4e6fa", "#0a0a14", "#1e1e32", "#141432", "#14000a", "#3c3c46", "#281e32", "#78828c", "#14143c", "#325064", "#f0fafa", "#46648c", "#284678", "#5aa0be", "#320000", "#64463c", "#140a14", "#28283c", "#28141e", "#6e7882", "#82828c", "#000a1e", "#648296", "#5a8296", "#000a28", "#466482", "#143c78", "#145aaa", "#143278", "#1e4682", "#5a3c32", "#50281e"];
+  var TRONCO_MAP = {"0": {"w": 22, "h": 21, "mapa": [".......Vzz...iiz......", "....YAUjQy5zkkkkZzx...", "...mB6jky5kkkjzzCZBz..", "..wzCzzkkkjjkzBzzzBBI.", "..zQ17zjkkjjBjjzzBBBZ.", "..BBZ1ZzjzBjjjzBBBBBBz", ".wBZj1ZzCBjjQz7jfBBBBz", ".wBzj1zzjBjzBv5jBBjQQz", "..jjB5yzQjzzjZvzjjzBBz", "...v7zBBBzzBjjz7fzzBjC", "...zizzjCzjQQjzz1jBjz1", "...IzzBzZzBjjBjBzyjzzz", "..1IZzCZzzBBBBBQzzZzZz", "..1ZZzCzzzBBBBQBzzIzZv", "..1ZzF1BzzBBjjBC11Smz1", ".YZzzzCzBjjjBBzBz1zzz7", "v5zzZZkkzzzzkkkzmzZzT.", "111zvZkjkkjkkjZZBzZf..", "zz1f..zVkkkkkkfZzzT...", "......YBkjkkjk17fw....", ".......zjZZkzz11F....."]}, "1": {"w": 21, "h": 21, "mapa": ["......SiF....TFG.....", "...zfmVFFvIzzmVVIx...", "...FGG8Fzz1zi8VezG...", "..WzGzzmzF1zGeV8bVi..", "..a8VFGIz7zezzVz8bGa.", "..zebinomVzzbzmf6b8x.", ".zGmzyzVoVzbzzGfGo8nd", ".F6zfzmeleVbz8GIGz8VU", "3zU8F.mGVV8zG6VimGzG6", "7I6el.neG8888eefSm8e6", "777z..ZGzlVez8VI.F8Vm", ".....7yzoVV8Ge1y.Y7z7", ".....1zzzjjBZZzz.....", ".....y5zzzzQzz1z.....", ".....7nzIZZZm6mI.....", ".....2GzfGV8Gzzep....", "....0nnpfGVzzzzzi....", "....3zfnfzVzbzVzS....", "....v6lIfzzzm8b8i....", "....zfzII6VeGzVea....", ".....3vIGVmeVeGv....."]}, "2": {"w": 22, "h": 21, "mapa": ["........Olzzfzz.......", "....dA.0f15zttz..OYq..", "...8J8.1odzzkkzz2zzz..", "...UzzGzVLzzlwLzzkzzY.", "...Ivy01fLKozKz2bkbzY.", "..OzvyGLllkkzLLzJzbbLT", "..Jzo1LLdokkzLzzzbbkzg", ".TzzzeLLObzkmzzzzbblwd", ".TezdeLLwbzbzNdzzozav.", "..USlzJNzbbJbzzz6TLzo.", "...iL1zzzbbbi2v01zzbzq", "..vfL1VVLbbbzzzLLzzbzL", "..58L1GVezbbzzzzGozbzz", "..18L1IVGozzzzzz1zzbkV", "..18gi1GVzkbbbb0yvvgkJ", ".gV8LGezVlbbbbLzz1LLwS", "01zoLTzLzflobkkzlzzz0.", "7y0LWzVLbbzzbbbzzkz8..", "z11T.pzLJ1Jzzb8ezb8...", "......zL0.Ozzz11vg....", ".......2...gzzz1v....."]}, "3": {"w": 22, "h": 21, "mapa": ["........zz..w71..z....", "....GQmTzz77zjjTQjQ...", "...ejzjCC11CkkQjkzz4..", "..oQzz7yzzjkjzykkzbXA.", "..zBC7yyzQQz66zzzzztzz", ".gqQC7azgzVbzzjzzzzzz8", ".Uzzz7zPHzzztCj8HXzzze", ".gzljzzzsKzzKzjzqAKKzg", ".gczQjqzOszzxQkqzddKXU", "..37BzzrqHrrvQkQz3HzXg", "...ObUzzqzttzCC77zzAiz", "..yzzqFzHzztXz87zqzzjQ", "..yjkZz6FzfTTTzT7BzkkQ", "..yQkjoT8zzz8oTF7Qzjkz", ".g6qzjvSFTfOTUzzvCyzCT", ".Uzzqy7z8tXz8Txzz7Xbt8", "YFzzzxqoIzooTzzzAzzzbp", "v13zzYzzuzzXzzzdzzzzzg", "zz7TzWzPt7ztzzz8zzzzGg", "......zzr.Nzzz7y3zz6..", ".......4...szzy7vz...."]}, "4": {"w": 21, "h": 21, "mapa": ["........00xxz........", ".....zLw803bJWKJ.....", "....0dczmnbNhPPbz....", "...DqzHHzzHhHbxLqM...", "...AHMJhhhPHzxMhhh...", "..0qPh8JHHAb0qHhzbe3.", "..3zAbzMbbb0vLHHzbc0.", ".qd300NHqqqqdWbbcHAdd", "0VMNd0NHHhhhPdM0NHAbJ", "0mez0v8OcrrWGzz0OLbba", ".fmvO3zzzbbbbmzzzmz00", ".N0OO0yBBBBZZzBBa003.", "..3OO3NDMDMxzZBBaOd3.", "..3NOxNHNHNNdZzzxOAM.", "..3NNdNANHPNN000OONNA", "..3HqNAHNHhNPNN0ONNqA", "..3N3NAHHHhHhNHWOONAA", "....0NzHhHhhHHHPaOdHd", "....zNhHhHzhHzNhz.Wd.", ".....dhNhHHhNPdD.....", ".....WOOHAAHONN......"]}, "5": {"w": 19, "h": 21, "mapa": ["........D49D.......", "...zJDMr94zzrDz....", "...rzzDzDzrzzzzzDDX", "...4uzzMzDDzzzzzuzD", "...z4uzDtzzzzzzzDzM", "...DrDzztzzzzzz4zr.", "...DDDzztNzzzzDzzr.", "...DzrzzrzzzzzzzzN.", "..DzzDrADzzrrrzzzz.", "..rzz4NhzzzPrD9zzzM", ".Dzzz4zDWWWUUx4zzz9", "9hzr4NzTTzm6939zzz9", "9z9z9z44439Dr3Nzzz.", ".4MH4z4hh4zzzHzhzU.", "..M4Dz9hzNDzzz9PDd.", "...HzD9zuzzzzD9N9N.", "...HzD9zuzzzzzrrzU.", "...rzD9zuzzzDzzzzN.", "..DzDz4zuzzzzzzzzz.", "..DM4z9huzzzz4Mzzz9", ".....W4HhNWzW..sssN"]}, "6": {"w": 20, "h": 21, "mapa": [".....9D.....444.....", "....zNzDDDMrPhhr....", "....3zzD33DhzzzzN...", "...zzNz04HzzzzDDz...", "...z3HNzXhhzzDzzz...", "...zzDHcXzzDzzzuur..", "...zzzDzXzzzzzzEEr..", "..zzzzzDDDzuEzEEEzr.", "..rzzzEuEEzEEzzEEEr.", ".WzuElzzzzzzmwczzEM.", ".zzEtBzkkkzzQj3zEu4.", "1kkzrFBkkkjQz77EEzr.", "yCibcziiiiiaz0zEErz.", ".25z4zzzuEEuzjkzzNP.", ".3zrzzuzzuEEEj7k4Nz.", ".AzNzuEEEEEEE00jMzz.", "zzzMhuEEEEuEEbP4xzz.", "MzzzjjjtEEEEEjjCzzzW", "..OMzzkkkkkkkjz2NNNN", "....zEEzzzzzzzz49...", "....WWWbbbbbbNx....."]}, "7": {"w": 19, "h": 21, "mapa": ["........0vvvv......", ".......zfo6zU......", "......Fzj66IO......", "......zy1j66z......", ".....0z071B6S......", ".....7z7vyBIf3.....", "....v1zzzzBiiivv...", ".zj6U6FzzzS6G66mzv.", "..yzGzB71QIU6zjjy..", "..zQjzZ7zzzIZjzw0..", ".zzipzzizzizzp666C.", ".wQkkjzzzj66zkkjjB.", ".zzjjjzzzQQjjkQzzy.", ".zQyz0BzzQQBz127zQz", ".fpvFIBzQyyyw70wIIv", "0l6z.oBZB6lII7.36IF", "06m..fzZB6zIzz.W66i", "Cjj..zzzzzzjjQ..66S", "yzz..yQjjjjQQz.7Qjz", "....7zzzzQzzzj.zz00", "....yzQBQQQQzz....."]}};
+
+  var PIX_PAL = ["#e49c90", "#f0c0b4", "#845448", "#e4c0a8", "#000018", "#00000c", "#0c000c", "#000024", "#0c0000", "#607890", "#3c2424", "#484854", "#30303c", "#60606c", "#000030", "#b47878", "#cc8478", "#181824", "#6c483c", "#b4786c", "#a86054", "#304878", "#e4b4a8", "#241824", "#000c3c", "#241830", "#242430", "#18243c", "#000c30", "#000000", "#180c18", "#180000", "#24243c", "#183054", "#c0786c", "#3c609c", "#c0e4fc", "#3c3c48", "#789ca8", "#b4e4fc", "#54606c", "#243054", "#0c0c18", "#243048", "#30486c", "#181830", "#0c0018", "#303c54", "#48609c", "#609cc0", "#c0b49c", "#3c4854", "#483030", "#182448", "#000c24", "#6084a8", "#1854a8", "#d89084", "#0c1824", "#3c546c"];
   var PIX_CORPO = {"frente": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".J111111111J.", ".01111111110.", ".01111111110.", "Mv222111222vM", "1GAAA111AAAG1", ".20G13131G02.", "..v1111111v..", "..2v11G11v2..", "..20YYYYY02..", ".01111111110.", "2101111111112", "2121110111012", "2120112110010", "0122100012010", "1020010100210", "1020010100010", "1021110111010", "1001011102112", "1001211122112", ".001020202202", "..011020002..", "..011020002..", "..011020002..", "..01102000...", "..21102202...", "..20102202...", "..20002202...", "...0002202...", "...000.20....", "...000.......", "...000......."]}, "frente2": {"w": 13, "h": 34, "mapa": ["...KG0000Y...", "..K0111111G..", ".K011111111J.", ".J1111111110K", ".01111111111K", ".011111111112", "Mv22211122212", "1GAAA011AAAv2", "2KGBBM11aBaG2", ".2001111110K.", "..K011111102.", "...2Y000022..", ".2111vvv1111.", ".111111111112", "2121111111110", "2121111111100", "2120110111010", "2120101101211", "2120001101211", "2120111101201", "1121111111001", "1021011101001", "1221001121000", ".221100211022", "..211120110..", "..211120110..", "...01120112..", "...01120112..", "...00020002..", "...2002000...", "...2002000...", "...2002000...", "...2002000...", "...2002000..."]}, "lado": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".J111111111J.", ".01111111110.", ".01111111110.", "Mv222111222vM", "1GAAA111AAAG1", ".20G13131G02.", "..v1111111v..", "..2v11G11v2..", "..20YYYYY02..", ".01111111110.", "2111111111012", "2101110111212", "0100112110212", "0102100012210", "0120010100201", "0100010100201", "0101110111201", "2112011101001", "2112211121001", "202202020100.", "..200020110..", "..200020110..", "..200020110..", "...00020110..", "...20220112..", "...20220102..", "...20220002..", "...2022000...", "....02.000...", ".......000...", ".......000..."]}, "lado_a": {"w": 13, "h": 34, "mapa": ["....2FFFFF2..", "....01111102.", "...211111110.", "...0111111112", "..21111111110", "..21111111110", "..22211111110", "..IAA20110110", "...BaG0102002", "..2001110200.", "..2111110002.", "....000002...", ".....2222....", ".....2000....", "....21111....", "....001112...", "....000112...", "....000010...", "....0001102..", "....0211002..", "....2111202..", "....0110002..", "....1100022..", "...2112002...", "....000002...", "....020002...", "...2100000...", "...21020002..", "...000.2000..", "..2002..0002.", "..002...2000.", ".200.....000.", "0100.....2002", "2002.....0102"]}, "lado_b": {"w": 11, "h": 34, "mapa": ["..2FFFFF2..", ".201111102.", ".011111110.", "21111111112", "01111111110", "01111111110", "02211111110", "AAA20120110", "2BaG0102002", "0101111200.", "0111110002.", ".2000002...", "....222....", "....000....", "...01112...", "..212110...", "..212110...", "..200010...", "..210010...", "..200210...", "..211010...", "...010112..", "...010112..", "..2110112..", "..211000...", "..21102....", "..21102....", "...0002....", "...2002....", "...2002....", "...2002....", "...2002....", "...100.....", "..2000....."]}, "lado_c": {"w": 13, "h": 34, "mapa": ["....2FFFFF2..", "....01111102.", "...211111110.", "...0111111112", "..21111111110", "..21111111110", "..22211111110", "..IAA20110110", "...BaG0102002", "..2001110200.", "..2111110002.", "....000002...", ".....2222....", ".....2000....", "....21011....", "....010112...", "....012110...", "....0100012..", "....0012110..", "....0011210..", "...02111210..", "...02111010..", "...020000112.", "....20110112.", "....01110002.", "....1110022..", "...2111000...", "...21100002..", "...10022000..", "..2002..2002.", "..000....000.", ".2002....000.", "0100.....200.", "2002.....000."]}, "costas_lado": {"w": 13, "h": 34, "mapa": ["..2FFFFF2....", ".201111102...", ".011111110...", "21111111112..", "01111111110..", "01111111110..", "01111111220..", "01102112AAA..", "2002011GaB2..", ".0021111010..", ".2000111110..", "...2000002...", "....2222.....", "....2002.....", "....01112....", "...211110....", "...011010....", "..2110210....", "..0110000....", "..01001002...", "..010011212..", "..012011212..", ".2112010202..", ".21120102....", ".20000110....", "..22001112...", "...0200110...", "..20020110...", "..0000.0012..", ".2000..2000..", ".0002...0002.", ".000....2000.", ".002.....2010", ".000......000"]}, "costas": {"w": 11, "h": 34, "mapa": ["..2FFFFF2..", ".201111102.", ".011111110.", "21111111112", "01111111110", "01111111110", "01111111220", "01102102AAA", "2002010GaB2", ".0021111010", ".2000111110", "...2000002.", "....222....", "....000....", "...21110...", "...011212..", "...011212..", "...011002..", "...011012..", "...010002..", "...012112..", "..211210...", "..211210...", "..2112112..", "...000112..", "....20112..", "....20112..", "....2000...", "....2002...", "....2002...", "....2002...", "....2002...", ".....001...", ".....0002.."]}, "costas_lado2": {"w": 13, "h": 34, "mapa": ["..2FFFFF2....", ".201111102...", ".011111110...", "21111111112..", "01111111110..", "01111111110..", "01111111220..", "01102112AAA..", "2002011GaB2..", ".0021111010..", ".2000111110..", "...2000002...", "....2222.....", "....2002.....", "....01112....", "...211100....", "...211100....", "...001000....", "..2001100....", "..2021120....", "..2000112....", "..2002110....", "..22002112...", "...2000110...", "...2000002...", "...2000202...", "...0000010...", "..20000010...", "..0000.0012..", ".20002.2000..", ".0000...2002.", ".000.....000.", "2002.....2010", "2010......000"]}, "costas2": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".01111111110.", ".01111111110.", ".01111111110.", "Mv111111111vM", "0v111111111v0", ".21111111112.", "..v1111111v..", "...2111112...", "..20YYYYY02..", ".01111011110.", "2111110111112", "2121110111212", "2120100010210", "0120010100200", "0020110110200", "0020110110200", "0020110110200", ".201110111200", "..01110111200", "..00002000202", "..0022220022.", "..010020002..", "..011020002..", "..01102000...", "..21102202...", "..20102202...", "...0002202...", "...0002202...", "...000.22....", "...000.......", "...002......."]}, "costas3": {"w": 13, "h": 34, "mapa": ["...KG0000Y...", "..K0111111G..", ".K011111111J.", ".J1111111110K", ".01111111111K", ".011111111112", "Mv11111111112", "1v11111111112", "2v111111111v2", ".2v11111111v.", "..K011111102.", "...2Y000022..", ".2011vvv1110.", ".011110111112", "2111111111110", "2121111111100", "2120101011000", "2120111111200", "2120111111200", "2120010110200", "0020111111001", "0021111111001", "0021111111000", ".220000000022", "..201020010..", "..211120110..", "...01120112..", "...01120112..", "...00020002..", "...2002000...", "...2002000...", "...2002000...", "...2002000...", "...2002000..."]}, "costas4": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".01111111110.", ".01111111110.", ".01111111110.", "Mv111111111vM", "0v111111111v0", ".21111111112.", "..v1111111v..", "...2111112...", "..20YYYYY02..", ".01111011110.", "2111110111112", "2121110111212", "0120100010212", "0020010100210", "0020110110200", "0020110110200", "0020110110200", "002111011102.", "00211101110..", "20200020000..", ".2200222200..", "..200020010..", "..200020110..", "...00020110..", "...20220112..", "...20220102..", "...2022000...", "...2022000...", "....22.000...", ".......000...", ".......200..."]}};
   var PIX_ARMAD = {"0": {"w": 23, "h": 22, "mapa": ["........QNQ...NND......", "....rReFoV6FooooF6sR...", "....IIqoFUJoooFNUVqIQ..", "...NVNDo2oooooAIUqII2B.", "..PI66UFFoJJJIJ2II2IIq.", "..qIA6UFJJFqIJJ8I2IIIIP", ".PIIJ6U682JJJ2k8qqIIIIN", ".WIIJ6NqAJJJ2q68qNIIJJP", "..IIK6NN22JAq26VJIIJqqP", "..kVV6NJI2NqqJV6NJJIII8", "...5k8IqKVq2IJq868VIIJ6", "...Nq6q2AqI2IIJ2A8AKqWU", "..sPq62VAAIIIIIIJ8NVbbN", "..6qq6qAIPIIIIIII8PqCCU", "..gqNN8IqqIIIIJJA6NPPB6", "..gIPP6IIqIIIJIIV66PIB6", ".QIIqPNqI2222IIqqUUIIPC", "g8Iqb8oo2PqqFoooqBBqqb.", "666qQ.FKooFooo2AIIICp..", ".666..qIoJoooo88qqq....", ".......IFJJoJJ86UbW....", "........JqqoFP466Q....."]}, "1": {"w": 22, "h": 22, "mapa": ["......jHHw....jH......", "....4BBQHbQ6NUDDDCf...", "...kQBBwb6UH6BDeD9b...", "...kDBBcHbU6HDDecD9H..", "..jDBHCbc6DcBecBbDcBj.", "..bDeHBBbocBoc9pb99Dj.", ".HBbcUBDbC9DocDCCBDDB.", ".HbcD6CCDbDD99DbHBBcDl", ".UBD9gHDCbe9oeDBHBBBDC", "kbBDB.kDCbeDBBDB6HeBDb", "gbCDj.7eDCDB9Dbe6RBDpB", "llllihkBCCDeeeeQ6.NQQN", ".....4AU6668666q6.....", ".....gNAq22JqqqN6.....", ".....4C6V222666bH.....", ".....4BbbCbCbBBBH.....", ".....HBpQQeee9c9eW....", ".....BCCCbeBccD9cH....", ".....bbBQD9ccD99DH....", ".....CBbbDBDBecDDH....", ".....CCCCDDBD9DDBj....", ".....SkCBBBDeDBH4....."]}, "2": {"w": 23, "h": 22, "mapa": [".........lQWQWWW.......", ".....r.sD686pacr.iWR...", "....i9f4Dl99cockgN99R..", "...4ePpgDp99ccpeBD999W.", "...6D6656e99l99xga3cxW.", "...gD8gxx5QW99eglaacxxp", "..99egHxxhoo99h999coc9h", ".l999eHxxcooQWet99cc99h", ".l9t99jxxcaaC9999tc9s6f", "..sklxHlxcccRolt9lRxxg.", "...5pAQilccch3c99Qxxxxi", "..RNl6Q9icccxlCblH9cc9i", "..5Dl6NDxccc9xxxxw9pllf", "..gDxgHDDeccc9999Ux9aa9", "..gWhQ6DDWa9cc999699ooD", "..gDpC6BDQooccc9k86Hx3D", ".h9exxClDlect9ce9lCxxhj", "469liWDxxQllcc3c9e9dx5.", "66gxlHDx9DD9ccc9xtoci..", ".66R..Qxck6999hg4c9e...", "......px9..R9tC66BW....", ".......sg...999665....."]}, "3": {"w": 23, "h": 22, "mapa": [".........A...4U..qU....", ".....IIiqA6kkAK6bKKI...", "....qqIV26gkJ0KVJ0VV7..", "...A2Ukk2VV23YNq02ttmr.", "..7VJ66kA222qBQ1qttanne", ".hLNJk6xxNNHem2Kqttnnne", ".hxVKkjmLnnaad2Immtttte", ".heeIARZLtnctn2VmfLttml", ".heeA0jmrxttt4KUmihfXXW", "..w4A2kWXLLrskGJ2g7tdth", "...4pNjZLtddZ52Vkpmnnth", "...ktxRmLtadtZs4kpmeVVV", "..kI2mgwLLdaRwwgklNK0Y2", "..72GqHbHrXRppbbpk2K002", "..NVI0ggbnneCWHHkg2qYKb", ".lxxBJ6QwlbWblbwk6V685B", ".WmZL67bbndteeRemr7tnde", "WgmttkifQpplWp9tmxmntnh", "4gkcxkmZZntnaantrtadnef", "lkgRilf9dkktccLkrmttXPh", "......pct..rttXk6pe4...", "........4...ttR64k7...."]}, "4": {"w": 22, "h": 22, "mapa": ["........44wSS.........", "......e4D5sDDrr9......", "....4SXQBDo9mZmco.....", "....7lmiccfXmL99s7....", "...rLf9ZmmmLmcsmmZm...", "..49LmS9LLiLcSfmZmxh..", "..4lL9wSccch59xLLccR4.", ".lfSo9sfRO747O9m9SXLSf", "4DSff4XLLLmmmXf44XLic9", "5D9j44srLLZmOO444ff9c9", ".CBbjjCbD99cccDAUwBcW4", ".4gwrjqqNANNNNNUq45C4l", "..4RrjrWQCCCH5qq2hjR4.", "..7frRffffXff4A2IrRlS.", "..7frRXiXXfXXSqNNWRlO.", "..4fxRXiXXmmLXff4rfiil", "..4LxRLffLmmmLXf4rfiLi", "..477fLfLmmmmmfmirrfLl", "....4XLmmmmmLmLmmWWfLf", "....7fmmmZZZLmZZm..Rf.", ".....RmZmZLmXmmSO.....", "......jliLlLXlf......."]}, "5": {"w": 20, "h": 22, "mapa": ["........E7EEO.......", "...99OXXm7OnZrOm....", "...ruuunrLdOuuuuLOOt", "...iZuuOddOXuuuuuuuE", "...sEduOddruuuuunOLE", "...ErduOtnruuuudXOXO", "...OOEnXOrLuuudOXLX.", "...OLOuLOXLLLZOOuuX.", "..OiLrrLELLXrOOLuuX.", "..ELuXnOSOrndnrOuuuE", ".XLuu7fXXLLXfh77XuuE", "ErXuXECb9DbBDlkEuuuE", "EXXtELrjPPjPPO7XuuLx", "EO7Z7uiiiEELLr7XLuX.", ".E7L7ufZZEOLLOmtmff.", "...xfuEZdXXLuOO7LEf.", "...LZOLndrLXuLE7fOf.", "...ruOundruuuuuuuul.", "...XuOundXuuuuuuuul.", "..OLOLitnnXuuXLuuuX.", "..OOEXXZZZrLLOSELuuE", ".....rrLLLOrR...rffX"]}, "6": {"w": 21, "h": 22, "mapa": ["......OO.....S7E.....", "....9OLLOSOSXtZZO....", "....4LtO74sLZLLLLf...", "...R4LtS77XZLttZZm...", "...m4OXZcZZttOOnnn...", "...mnOXhccZZLLnZnn...", "...tLnOL9iLOZnndaaX..", "...tLLLOmmXLndLaaaX..", "..XnnudLaandaaLaaaaX.", "..XndLanaadaaniaaaar.", ".9naa6RlooclC22Lnda7.", "7iidLgIKYIGKK2Indanr.", "8IBcXLqAIIIqqHsaaaLL.", "6VgDsnnnnnnnn77LaarZ.", ".7kA7nLLndaad7K0pnXZ.", ".ffX7nddnnnna42707Lt.", ".LLf7naaaaaaan77YSLt.", "7LLOnnaaaaaaaaac7fLZ.", "ELLOJKYJaaaaaaKK5XLLO", "...SFFo00v00vKKF4Xfff", "....nnannnnnnnnn7E...", "....rrRconnndiXr....."]}, "7": {"w": 20, "h": 22, "mapa": ["........4ggggw......", ".......lQCBBb.......", "......kqKKpBQ.......", "......4A4VBBC.......", ".....RI6k6KBb4......", ".....WI456KCb4......", "....w5IAUUKCQQjgS...", ".WV5CpgIKKqHCBBBCVw.", "..V2BBKQ6UbCbBpKKV..", "...II2qk5AIChCKKN4..", ".fVAIBKHkKNAq2IbblC.", ".PIqC2Vq8KBQQCq0JJ2.", ".RAKYKVqI6II2K0KqqN.", ".PIIV6UIIVIIKKIVIKK.", ".AqA64b2IV22qU54kqIU", ".QBH.WB2KCNANH454CCH", "5BBj.QBIKCBCCNk.4BCH", "5BBi.UUqICBUVIq..BBN", "VKKp.AIAVVVIKKq..BBN", "6Aq..6IKKKKKIqU.VIKU", "....sUVVVIIVVKK.4s44", "....6qq22222IUU....."]}};
 
@@ -7308,6 +7311,80 @@ var lbPxEstado = 'parado';  var PIX_PAL = ["#e49c90", "#f0c0b4", "#845448", "#e4
     return true;
   }
 
+  /* ===== PERSONAGEM COMPOSTO =====
+     Tronco = armadura real do usuário. Cabeça, braços e pernas desenhados
+     por blocos no estilo do boneco do jogo. Cor da pele segue o perfil. */
+  function pxPersonagemComp(ctx, idxTronco, alvoW, alvoH, corPerfil, pose){
+    var PC = { W:22, H:34 };
+    var T = TRONCO_MAP[String(idxTronco)] || TRONCO_MAP['0'];
+    var CH = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    var escala = Math.min(alvoW / PC.W, alvoH / PC.H);
+    if(escala >= 1) escala = Math.floor(escala);
+    if(escala < 1) escala = Math.min(alvoW / PC.W, alvoH / PC.H);
+    var ox = Math.round((alvoW - PC.W*escala)/2);
+    var oy = Math.round((alvoH - PC.H*escala)/2);
+    function B(x,y,w,hh,cor){
+      ctx.fillStyle = cor;
+      ctx.fillRect(Math.floor(ox+x*escala), Math.floor(oy+y*escala),
+                   Math.max(1,Math.ceil(w*escala)), Math.max(1,Math.ceil(hh*escala)));
+    }
+    var pele = corPerfil || '#f0c8b4';
+    var peleS = '#c08a72';
+    var cabelo = '#3a2a22';
+    var calca  = '#2e3446';
+    var bota   = '#1c2030';
+    var cont   = '#141828';
+
+    // ---- pernas ----
+    B( 6, 24, 4, 8, calca);
+    B(12, 24, 4, 8, calca);
+    B( 6, 32, 4, 2, bota);
+    B(12, 32, 4, 2, bota);
+    B( 6, 24, 1, 8, cont);
+    B(15, 24, 1, 8, cont);
+
+    // ---- bracos ----
+    B( 2, 15, 3, 8, pele);
+    B(17, 15, 3, 8, pele);
+    B( 2, 15, 1, 8, peleS);
+    B(19, 15, 1, 8, peleS);
+    B( 2, 23, 3, 3, pele);      // maos
+    B(17, 23, 3, 3, pele);
+
+    // ---- cabeca ----
+    B( 6,  4,10, 9, pele);
+    B( 6,  4, 1, 9, peleS);     // sombra do lado
+    B( 5,  2,12, 4, cabelo);    // cabelo
+    B( 5,  2,12, 1, '#241a14');
+    B( 5,  6, 2, 3, cabelo);    // costeleta
+    B(15,  6, 2, 3, cabelo);
+    B( 8,  8, 2, 2, cont);      // olhos
+    B(12,  8, 2, 2, cont);
+    B( 9, 11, 4, 1, peleS);     // boca
+    B( 5, 12,12, 2, pele);      // pescoco
+
+    // ---- tronco: a ARMADURA REAL do usuario, por cima ----
+    if(T){
+      var tel = escala;
+      var tw = T.w*tel, th = T.h*tel;
+      var tx = Math.round(ox + (PC.W*tel - tw)/2);
+      var ty = Math.round(oy + 14*tel);
+      for(var y=0;y<T.h;y++){
+        var lin = T.mapa[y];
+        for(var x=0;x<T.w;x++){
+          var c = lin.charAt(x);
+          if(c === '.') continue;
+          var k = CH.indexOf(c);
+          if(k < 0) continue;
+          ctx.fillStyle = TRONCO_PAL[k];
+          ctx.fillRect(Math.floor(tx + x*tel), Math.floor(ty + y*tel),
+                       Math.max(1,Math.ceil(tel)), Math.max(1,Math.ceil(tel)));
+        }
+      }
+    }
+    return true;
+  }
+
   // desenha uma arte (arma ou armadura) bloco por bloco
   function pxArte(ctx, nome, alvoW, alvoH){
     var A = ARTE_MAP[nome];
@@ -7407,7 +7484,7 @@ function pfArmaduraPintar(){
       ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0,0,cv.width,cv.height);
       ctx.imageSmoothingEnabled = false;
-      pxPersonagem(ctx, 'frente', idx, cv.width, cv.height, null);
+      pxPersonagemComp(ctx, idx, cv.width, cv.height, null, 'frente');
     }catch(e){}
   }
 
@@ -7440,7 +7517,10 @@ function lbBoneco(estado, corPerfil){
   if(!lbPxCtx) lbPxCtx = cv.getContext('2d');
   if(!lbPxCtx){ console.warn('lbBoneco: nao consegui o contexto 2d'); return; }
 
-  // ---- PERSONAGEM NOVO: corpo humano vestido com a armadura escolhida ----
+  // ---- PERSONAGEM: corpo no estilo do jogo + a SUA armadura por cima ----
+  lbPxPal = pxPaleta(corPerfil);
+  lbPxEstado = estado || lbPxEstado;
+
   var idxArm = 0;
   try{
     var pf = (typeof pfLer === 'function') ? pfLer() : null;
@@ -7451,18 +7531,9 @@ function lbBoneco(estado, corPerfil){
   lbPxCtx.clearRect(0,0,cv.width,cv.height);
   lbPxCtx.imageSmoothingEnabled = false;
 
-  var poseLb = 'frente';
-  if(lbPxEstado === 'ataque' || lbPxEstado === 'guerra' || lbPxEstado === 'vitoria' || lbPxEstado === 'lado') poseLb = 'lado';
-
-  var desenhou = false;
-  try{
-    desenhou = pxPersonagem(lbPxCtx, poseLb, idxArm, cv.width, cv.height, corPerfil);
-  }catch(e){ desenhou = false; }
-
-  // reserva: se o corpo novo faltar, usa o boneco antigo
-  if(!desenhou){
-    lbPxPal = pxPaleta(corPerfil);
-    lbPxEstado = estado || lbPxEstado;
+  var ok = false;
+  try{ ok = pxPersonagemComp(lbPxCtx, idxArm, cv.width, cv.height, corPerfil); }catch(e){ ok = false; }
+  if(!ok){
     lbPxCtx.setTransform(4, 0, 0, 4, 0, 0);
     pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now());
   }
@@ -7480,14 +7551,12 @@ function lbBoneco(estado, corPerfil){
       lbPxCtx.setTransform(1,0,0,1,0,0);
       lbPxCtx.clearRect(0,0,cv.width,cv.height);
       lbPxCtx.imageSmoothingEnabled = false;
-      if(!pxPersonagem(lbPxCtx, 'frente', i2, cv.width, cv.height, corPerfil)){
+      if(!pxPersonagemComp(lbPxCtx, i2, cv.width, cv.height, corPerfil)){
         lbPxCtx.setTransform(4,0,0,4,0,0);
         pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now());
       }
-    }catch(e){
-      try{ pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now()); }
-      catch(e2){ clearInterval(lbPxTimer); lbPxTimer = null; console.warn('animacao do boneco parou:', e2.message); }
     }
+    catch(e){ clearInterval(lbPxTimer); lbPxTimer = null; }
   }, 120);
 }
 
@@ -8339,7 +8408,7 @@ try{
         var p = PERS[i];
         var tem = temPers(p);
         out += '<div class="lj-item'+(tem?' ja':'')+'" data-pers="'+p.id+'">'
-            +  '<div class="arte"><canvas data-pers-arte="'+esc2(ARMADURA_POR_PERS(i))+'" width="88" height="119"></canvas>'
+            +  '<div class="arte"><canvas data-pers-arte="1" data-arm-idx="'+(i % 8)+'" width="88" height="119"></canvas>'
             +  (i===0 ? '<span class="tag2 novo">NOVO</span>' : '')
             +  '</div><div class="info">'
             +  '<div class="nm">'+esc2(p.nome)+'</div>'
@@ -8387,13 +8456,15 @@ try{
       var arma = cvs[i].getAttribute('data-arma');
       var arm  = cvs[i].getAttribute('data-pers-arte');
       if(arma) desenhaArma(cvs[i], arma);
-      else if(arm && ARTE_MAP[arm]){
+      else if(arm){
         try{
           var cx = cvs[i].getContext('2d');
           cx.setTransform(1,0,0,1,0,0);
           cx.clearRect(0,0,cvs[i].width,cvs[i].height);
           cx.imageSmoothingEnabled = false;
-          pxArte(cx, arm, cvs[i].width, cvs[i].height);
+          // personagem composto: corpo do jogo + armadura real do usuario
+          var idxA = parseInt(cvs[i].getAttribute('data-arm-idx'),10) || 0;
+          pxPersonagemComp(cx, idxA, cvs[i].width, cvs[i].height, null, 'frente');
         }catch(e){}
       }
       else desenhaBoneco(cvs[i], cor || '#8b5cf6', 'parado');
