@@ -865,6 +865,26 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .cd-linha .qz{color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px}
 .cd-linha .qc{margin-left:auto;color:#7f8cac;font-size:10px;white-space:nowrap}
 
+/* ===== INVENTÁRIO NO PERFIL (v48) ===== */
+.pf-inv{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.pf-inv-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 11px}
+.pf-inv-resumo{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.pf-inv-resumo .rc{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:11px;font-weight:800}
+.pf-inv-resumo .rc small{display:block;color:var(--muted);font-weight:600;font-size:9.5px;letter-spacing:.5px}
+.pf-inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px}
+.pf-it{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:10px 9px 9px;text-align:center;position:relative;transition:.15s}
+.pf-it:hover{border-color:#7c5cf0;transform:translateY(-2px)}
+.pf-it .arte{height:66px;display:grid;place-items:center;margin-bottom:7px}
+.pf-it .arte canvas{image-rendering:pixelated;width:44px;height:60px}
+.pf-it .icone{font-size:27px;line-height:1}
+.pf-it .nm{font-size:11px;font-weight:800;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-it .gr{font-size:9.5px;font-weight:800;letter-spacing:.4px;margin-top:3px}
+.pf-it .org{font-size:9px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.6px}
+.pf-it .pvp{display:block;width:100%;margin-top:7px;font-size:10.5px;font-weight:800;padding:6px 4px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.pf-it .pvp.on{background:linear-gradient(135deg,#7c5cf0,#22d3ee);border-color:transparent;color:#fff}
+.pf-it.eq{border-color:#22d3ee;box-shadow:0 0 0 1px #22d3ee inset}
+.pf-inv .empty{color:var(--muted);font-size:12px;padding:14px 4px}
+
 /* ===== PERFIL (v18) ===== */
 .pf-avatares{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:7px}
 .pf-av{aspect-ratio:1;border:1px solid var(--line);border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:20px;cursor:pointer;transition:.15s}
@@ -1719,6 +1739,18 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
             </div>
 
             <div class="pf-stats" id="pfStats"></div>
+
+            <div class="pf-inv">
+              <div class="lbl">Inventário</div>
+              <div class="pf-inv-tabs">
+                <button class="chip2 active" id="pfInvTabTudo">Tudo</button>
+                <button class="chip2" id="pfInvTabLoja">Da loja</button>
+                <button class="chip2" id="pfInvTabGacha">Do gacha</button>
+                <button class="chip2" id="pfInvTabPvp">Equipado no PvP</button>
+              </div>
+              <div id="pfInvResumo" class="pf-inv-resumo"></div>
+              <div id="pfInvGrid" class="pf-inv-grid"></div>
+            </div>
 
             <div class="pf-edit">
               <div class="lbl">Editar</div>
@@ -5946,6 +5978,171 @@ function pfApagar(){
   toast('Personagem apagado.');
 }
 
+/* ================= INVENTÁRIO NO PERFIL (v48) ================= */
+var pfInvFiltro = 'tudo';
+
+// junta TUDO que o personagem ativo tem: gacha + loja, em todos os sistemas
+function pfInvItens(){
+  var out = [], sistemas = ['power','weapons','racas','classes','niveis','artefatos','resist'];
+  for(var s=0;s<sistemas.length;s++){
+    var lista = [];
+    try{ lista = loadInv(sistemas[s], coll) || []; }catch(e){ lista = []; }
+    for(var i=0;i<lista.length;i++){
+      var it = lista[i];
+      if(!it) continue;
+      out.push({
+        uid: it.uid || (sistemas[s]+'-'+i),
+        name: it.name || it.n || 'Item',
+        cls: it.cls || '',
+        color: it.color || '#8b5cf6',
+        origem: (it.origem === 'loja') ? 'loja' : 'gacha',
+        sistema: sistemas[s],
+        arma: sistemas[s] === 'weapons'
+      });
+    }
+  }
+  return out;
+}
+
+// lista só os EQUIPADOS no PvP (os do sistema onde o PvP busca status)
+function pfInvEquipados(){
+  var lista = [];
+  try{ lista = loadInv('weapons', coll) || []; }catch(e){ lista = []; }
+  var out = [];
+  for(var i=0;i<lista.length;i++){
+    if(lista[i] && lista[i].equipado){
+      out.push({
+        uid: lista[i].uid || ('weapons-'+i),
+        name: lista[i].name || 'Item',
+        cls: lista[i].cls || '',
+        color: lista[i].color || '#22d3ee',
+        origem: lista[i].origem === 'loja' ? 'loja' : 'gacha',
+        sistema: 'weapons',
+        arma: true
+      });
+    }
+  }
+  return out;
+}
+
+function pfInvPintar(){
+  var box = document.getElementById('pfInvGrid');
+  var res = document.getElementById('pfInvResumo');
+  if(!box) return;
+
+  var todos = pfInvItens();
+  var loja = [], gacha = [];
+  for(var i=0;i<todos.length;i++){
+    if(todos[i].origem === 'loja') loja.push(todos[i]); else gacha.push(todos[i]);
+  }
+  var equipados = pfInvEquipados();
+
+  if(res){
+    res.innerHTML = ''
+      + '<div class="rc">'+todos.length+'<small>TOTAL</small></div>'
+      + '<div class="rc">'+loja.length+'<small>DA LOJA</small></div>'
+      + '<div class="rc">'+gacha.length+'<small>DO GACHA</small></div>'
+      + '<div class="rc">'+equipados.length+'<small>NO PVP</small></div>';
+  }
+
+  var lista = pfInvFiltro === 'loja' ? loja
+            : pfInvFiltro === 'gacha' ? gacha
+            : pfInvFiltro === 'pvp' ? equipados
+            : todos;
+
+  if(!lista.length){
+    box.innerHTML = '<div class="empty">'+(pfInvFiltro==='tudo'
+      ? 'Nada no inventário ainda. Invoque no gacha ou compre na loja.'
+      : 'Nenhum item neste filtro.')+'</div>';
+    return;
+  }
+
+  var out = '';
+  for(var j=0;j<lista.length && j<240;j++){
+    var it = lista[j];
+    var prend = it.equipado ? ' eq' : '';
+    out += '<div class="pf-it'+prend+'" data-inv="'+esc2(it.uid)+'">'
+        +  '<div class="arte">'
+        +  (it.arma
+              ? '<canvas width="16" height="30" data-esp="'+esc2(it.cls)+'"></canvas>'
+              : '<span class="icone" style="color:'+esc2(it.color)+'">⚔️</span>')
+        +  '</div>'
+        +  '<div class="nm" title="'+esc2(it.name)+'">'+esc2(it.name)+'</div>'
+        +  '<div class="gr" style="color:'+esc2(it.color)+'">'+esc2(it.cls||it.sistema)+'</div>'
+        +  '<div class="org">'+(it.origem==='loja'?'comprado na loja':'obtido no gacha')+'</div>'
+        +  '<button class="pvp'+(it.equipado?' on':'')+'" data-eq="'+esc2(it.uid)+'">'
+        +    (it.equipado ? '✓ No PvP' : 'Usar no PvP')
+        +  '</button>'
+        +  '</div>';
+  }
+  box.innerHTML = out;
+
+  // desenha as espadas em pixel art nos itens que são arma
+  var cvs = box.querySelectorAll('[data-esp]');
+  for(var k=0;k<cvs.length;k++){
+    try{ desenhaArma(cvs[k], cvs[k].getAttribute('data-esp')); }catch(e){}
+  }
+
+  // botão "usar no PvP"
+  var bts = box.querySelectorAll('[data-eq]');
+  for(var b=0;b<bts.length;b++){
+    bts[b].onclick = (function(uid){
+      return function(){
+        pfInvEquipar(uid);
+      };
+    })(bts[b].getAttribute('data-eq'));
+  }
+}
+
+// liga/desliga o item no PvP
+function pfInvEquipar(uid){
+  var lista = [];
+  try{ lista = loadInv('weapons', coll) || []; }catch(e){ lista = []; }
+  var achou = false, ligado = false;
+  for(var i=0;i<lista.length;i++){
+    if((lista[i].uid || '') === uid){
+      lista[i].equipado = !lista[i].equipado;
+      achou = true; ligado = !!lista[i].equipado;
+      break;
+    }
+  }
+  if(!achou){ toast('Esse item não pode ir para o PvP.'); return; }
+  try{ saveInv('weapons', coll, lista); }catch(e){}
+
+  // avisa o PvP, se ele tiver como recarregar a seleção
+  try{
+    if(typeof pvpSel !== 'undefined' && pvpSel.indexOf(coll) < 0 && ligado){
+      if(pvpSel.length >= 2) pvpSel.shift();
+      pvpSel.push(coll);
+    }
+    if(typeof renderPvpPick === 'function') renderPvpPick();
+  }catch(e){}
+
+  toast(ligado ? 'Item ligado ao PvP.' : 'Item desligado do PvP.');
+  pfInvPintar();
+}
+
+function pfInvLigarAbas(){
+  var pares = [
+    ['pfInvTabTudo','tudo'], ['pfInvTabLoja','loja'],
+    ['pfInvTabGacha','gacha'], ['pfInvTabPvp','pvp']
+  ];
+  for(var i=0;i<pares.length;i++){
+    (function(idBotao, valor){
+      var b = document.getElementById(idBotao);
+      if(!b) return;
+      b.onclick = function(){
+        pfInvFiltro = valor;
+        for(var j=0;j<pares.length;j++){
+          var o = document.getElementById(pares[j][0]);
+          if(o) o.className = 'chip2' + (pares[j][1] === valor ? ' active' : '');
+        }
+        pfInvPintar();
+      };
+    })(pares[i][0], pares[i][1]);
+  }
+}
+
 function pfRender(){
   var sem = document.getElementById('pfSemPersonagem');
   var com = document.getElementById('pfCard');
@@ -5965,6 +6162,9 @@ function pfRender(){
   com.style.display = '';
   document.getElementById('pfSub').textContent = p.nome;
   document.getElementById('pfDesde').textContent = 'desde ' + (p.criado || '-');
+
+  // inventario do personagem ativo (loja + gacha + PvP)
+  try{ pfInvLigarAbas(); pfInvPintar(); }catch(e){}
 
   var av = document.getElementById('pfAvatarBig');
   av.textContent = p.avatar || '?';
@@ -7998,7 +8198,7 @@ try{
       var all = loadColls();
       all[p.nome] = {
         id: p.nome, name: p.nome, avatar: p.av, cor: p.cor,
-        titulo: p.titulo, bio: p.bio, comprado: true,
+        titulo: p.titulo, bio: p.bio, comprado: true, origem: 'loja',
         criado: new Date().toISOString().slice(0,10)
       };
       saveColls(all);
