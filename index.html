@@ -866,6 +866,13 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
 .cd-linha .qc{margin-left:auto;color:#7f8cac;font-size:10px;white-space:nowrap}
 
 /* ===== INVENTÁRIO NO PERFIL (v48) ===== */
+.pf-armaduras{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
+.pf-arm{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:11px;background:var(--panel2);display:grid;place-items:center;cursor:pointer;transition:.15s;overflow:hidden}
+.pf-arm:hover{border-color:#7c5cf0}
+.pf-arm.on{border-color:#22d3ee;box-shadow:0 0 0 1px #22d3ee inset}
+.pf-arm canvas{image-rendering:pixelated;width:40px;height:52px}
+.pf-arm .nm{position:absolute;bottom:2px;left:0;right:0;font-size:7.5px;font-weight:800;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.3px;pointer-events:none;text-shadow:0 1px 2px #000}
+
 .pf-inv{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .pf-inv-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 11px}
 .pf-inv-resumo{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
@@ -1758,6 +1765,8 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
               <div class="pf-avatares" id="pfAvataresEdit" style="margin-top:10px"></div>
               <input id="pfTituloEdit" class="search" type="text" maxlength="24" placeholder="Título" style="margin-top:10px">
               <div class="pf-cores" id="pfCoresEdit" style="margin-top:10px"></div>
+              <div class="lbl" style="margin-top:12px">Armadura</div>
+              <div class="pf-armaduras" id="pfArmadurasEdit" style="margin-top:7px"></div>
               <textarea id="pfBioEdit" class="pf-ta" maxlength="160" style="margin-top:10px" spellcheck="false"></textarea>
               <div class="pf-row">
                 <button class="pri" id="pfSalvar">Salvar alterações</button>
@@ -5896,6 +5905,58 @@ function pfLer(){
 function pfGravar(p){
   try{ localStorage.setItem(STORE_PERFIL, JSON.stringify(p)); }catch(e){}
 }
+/* ===== SELETOR DE ARMADURA (v48) ===== */
+var PIX_NOMES_ARM = ['Couro','Ferro','Aço','Dourada','Pesada','Manto Azul','Oráculo','Carmesim'];
+
+function pfArmaduraPintar(){
+  var box = document.getElementById('pfArmadurasEdit');
+  if(!box) return;
+  var p = pfLer();
+  var atual = (p && p.armadura !== undefined) ? parseInt(p.armadura,10) : 0;
+
+  var out = '';
+  for(var i=0;i<PIX_NOMES_ARM.length;i++){
+    out += '<div class="pf-arm'+(i===atual?' on':'')+'" data-arm="'+i+'" title="'+PIX_NOMES_ARM[i]+'">'
+        +  '<canvas width="16" height="26" data-armcv="'+i+'"></canvas>'
+        +  '<span class="nm">'+PIX_NOMES_ARM[i]+'</span>'
+        +  '</div>';
+  }
+  box.innerHTML = out;
+
+  // desenha cada armadura vestindo o corpo, para pre-visualizar
+  var cvs = box.querySelectorAll('[data-armcv]');
+  for(var k=0;k<cvs.length;k++){
+    try{
+      var cv = cvs[k];
+      var idx = parseInt(cv.getAttribute('data-armcv'),10);
+      var ctx = cv.getContext('2d');
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,cv.width,cv.height);
+      ctx.imageSmoothingEnabled = false;
+      pxPersonagem(ctx, 'frente', idx, cv.width, cv.height, null);
+    }catch(e){}
+  }
+
+  var ops = box.querySelectorAll('[data-arm]');
+  for(var j=0;j<ops.length;j++){
+    ops[j].onclick = (function(v){
+      return function(){ pfArmaduraEscolher(v); };
+    })(parseInt(ops[j].getAttribute('data-arm'),10));
+  }
+}
+
+function pfArmaduraEscolher(i){
+  var p = pfLer();
+  if(!p){ toast('Crie o personagem primeiro.'); return; }
+  p.armadura = i;
+  pfGravar(p);
+  pfArmaduraPintar();
+  toast('Armadura trocada: ' + PIX_NOMES_ARM[i] + '.');
+  // o lobby e o PvP redesenham com a armadura nova
+  try{ if(typeof lbRender === 'function') lbRender(); }catch(e){}
+  try{ if(typeof renderPvpPick === 'function') renderPvpPick(); }catch(e){}
+}
+
 function pfEscolhido(tipo, valor){
   pfSel[tipo] = valor;
   pfPintar(tipo);
@@ -6165,6 +6226,7 @@ function pfRender(){
 
   // inventario do personagem ativo (loja + gacha + PvP)
   try{ pfInvLigarAbas(); pfInvPintar(); }catch(e){}
+  try{ pfArmaduraPintar(); }catch(e){}
 
   var av = document.getElementById('pfAvatarBig');
   av.textContent = p.avatar || '?';
@@ -7955,6 +8017,10 @@ try{
   var PXE = { W: 16, H: 30 };
 
   /* ===== AS 6 ARMAS DO USUÁRIO (pixel art, extraídas da arte) ===== */
+  var PIX_PAL = ["#e49c90", "#f0c0b4", "#845448", "#e4c0a8", "#000018", "#00000c", "#0c000c", "#000024", "#0c0000", "#607890", "#3c2424", "#484854", "#30303c", "#60606c", "#000030", "#b47878", "#cc8478", "#181824", "#6c483c", "#b4786c", "#a86054", "#304878", "#e4b4a8", "#241824", "#000c3c", "#241830", "#242430", "#18243c", "#000c30", "#000000", "#180c18", "#180000", "#24243c", "#183054", "#c0786c", "#3c609c", "#c0e4fc", "#3c3c48", "#789ca8", "#b4e4fc", "#54606c", "#243054", "#0c0c18", "#243048", "#30486c", "#181830", "#0c0018", "#303c54", "#48609c", "#609cc0", "#c0b49c", "#3c4854", "#483030", "#182448", "#000c24", "#6084a8", "#1854a8", "#d89084", "#0c1824", "#3c546c"];
+  var PIX_CORPO = {"frente": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".J111111111J.", ".01111111110.", ".01111111110.", "Mv222111222vM", "1GAAA111AAAG1", ".20G13131G02.", "..v1111111v..", "..2v11G11v2..", "..20YYYYY02..", ".01111111110.", "2101111111112", "2121110111012", "2120112110010", "0122100012010", "1020010100210", "1020010100010", "1021110111010", "1001011102112", "1001211122112", ".001020202202", "..011020002..", "..011020002..", "..011020002..", "..01102000...", "..21102202...", "..20102202...", "..20002202...", "...0002202...", "...000.20....", "...000.......", "...000......."]}, "frente2": {"w": 13, "h": 34, "mapa": ["...KG0000Y...", "..K0111111G..", ".K011111111J.", ".J1111111110K", ".01111111111K", ".011111111112", "Mv22211122212", "1GAAA011AAAv2", "2KGBBM11aBaG2", ".2001111110K.", "..K011111102.", "...2Y000022..", ".2111vvv1111.", ".111111111112", "2121111111110", "2121111111100", "2120110111010", "2120101101211", "2120001101211", "2120111101201", "1121111111001", "1021011101001", "1221001121000", ".221100211022", "..211120110..", "..211120110..", "...01120112..", "...01120112..", "...00020002..", "...2002000...", "...2002000...", "...2002000...", "...2002000...", "...2002000..."]}, "lado": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".J111111111J.", ".01111111110.", ".01111111110.", "Mv222111222vM", "1GAAA111AAAG1", ".20G13131G02.", "..v1111111v..", "..2v11G11v2..", "..20YYYYY02..", ".01111111110.", "2111111111012", "2101110111212", "0100112110212", "0102100012210", "0120010100201", "0100010100201", "0101110111201", "2112011101001", "2112211121001", "202202020100.", "..200020110..", "..200020110..", "..200020110..", "...00020110..", "...20220112..", "...20220102..", "...20220002..", "...2022000...", "....02.000...", ".......000...", ".......000..."]}, "lado_a": {"w": 13, "h": 34, "mapa": ["....2FFFFF2..", "....01111102.", "...211111110.", "...0111111112", "..21111111110", "..21111111110", "..22211111110", "..IAA20110110", "...BaG0102002", "..2001110200.", "..2111110002.", "....000002...", ".....2222....", ".....2000....", "....21111....", "....001112...", "....000112...", "....000010...", "....0001102..", "....0211002..", "....2111202..", "....0110002..", "....1100022..", "...2112002...", "....000002...", "....020002...", "...2100000...", "...21020002..", "...000.2000..", "..2002..0002.", "..002...2000.", ".200.....000.", "0100.....2002", "2002.....0102"]}, "lado_b": {"w": 11, "h": 34, "mapa": ["..2FFFFF2..", ".201111102.", ".011111110.", "21111111112", "01111111110", "01111111110", "02211111110", "AAA20120110", "2BaG0102002", "0101111200.", "0111110002.", ".2000002...", "....222....", "....000....", "...01112...", "..212110...", "..212110...", "..200010...", "..210010...", "..200210...", "..211010...", "...010112..", "...010112..", "..2110112..", "..211000...", "..21102....", "..21102....", "...0002....", "...2002....", "...2002....", "...2002....", "...2002....", "...100.....", "..2000....."]}, "lado_c": {"w": 13, "h": 34, "mapa": ["....2FFFFF2..", "....01111102.", "...211111110.", "...0111111112", "..21111111110", "..21111111110", "..22211111110", "..IAA20110110", "...BaG0102002", "..2001110200.", "..2111110002.", "....000002...", ".....2222....", ".....2000....", "....21011....", "....010112...", "....012110...", "....0100012..", "....0012110..", "....0011210..", "...02111210..", "...02111010..", "...020000112.", "....20110112.", "....01110002.", "....1110022..", "...2111000...", "...21100002..", "...10022000..", "..2002..2002.", "..000....000.", ".2002....000.", "0100.....200.", "2002.....000."]}, "costas_lado": {"w": 13, "h": 34, "mapa": ["..2FFFFF2....", ".201111102...", ".011111110...", "21111111112..", "01111111110..", "01111111110..", "01111111220..", "01102112AAA..", "2002011GaB2..", ".0021111010..", ".2000111110..", "...2000002...", "....2222.....", "....2002.....", "....01112....", "...211110....", "...011010....", "..2110210....", "..0110000....", "..01001002...", "..010011212..", "..012011212..", ".2112010202..", ".21120102....", ".20000110....", "..22001112...", "...0200110...", "..20020110...", "..0000.0012..", ".2000..2000..", ".0002...0002.", ".000....2000.", ".002.....2010", ".000......000"]}, "costas": {"w": 11, "h": 34, "mapa": ["..2FFFFF2..", ".201111102.", ".011111110.", "21111111112", "01111111110", "01111111110", "01111111220", "01102102AAA", "2002010GaB2", ".0021111010", ".2000111110", "...2000002.", "....222....", "....000....", "...21110...", "...011212..", "...011212..", "...011002..", "...011012..", "...010002..", "...012112..", "..211210...", "..211210...", "..2112112..", "...000112..", "....20112..", "....20112..", "....2000...", "....2002...", "....2002...", "....2002...", "....2002...", ".....001...", ".....0002.."]}, "costas_lado2": {"w": 13, "h": 34, "mapa": ["..2FFFFF2....", ".201111102...", ".011111110...", "21111111112..", "01111111110..", "01111111110..", "01111111220..", "01102112AAA..", "2002011GaB2..", ".0021111010..", ".2000111110..", "...2000002...", "....2222.....", "....2002.....", "....01112....", "...211100....", "...211100....", "...001000....", "..2001100....", "..2021120....", "..2000112....", "..2002110....", "..22002112...", "...2000110...", "...2000002...", "...2000202...", "...0000010...", "..20000010...", "..0000.0012..", ".20002.2000..", ".0000...2002.", ".000.....000.", "2002.....2010", "2010......000"]}, "costas2": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".01111111110.", ".01111111110.", ".01111111110.", "Mv111111111vM", "0v111111111v0", ".21111111112.", "..v1111111v..", "...2111112...", "..20YYYYY02..", ".01111011110.", "2111110111112", "2121110111212", "2120100010210", "0120010100200", "0020110110200", "0020110110200", "0020110110200", ".201110111200", "..01110111200", "..00002000202", "..0022220022.", "..010020002..", "..011020002..", "..01102000...", "..21102202...", "..20102202...", "...0002202...", "...0002202...", "...000.22....", "...000.......", "...002......."]}, "costas3": {"w": 13, "h": 34, "mapa": ["...KG0000Y...", "..K0111111G..", ".K011111111J.", ".J1111111110K", ".01111111111K", ".011111111112", "Mv11111111112", "1v11111111112", "2v111111111v2", ".2v11111111v.", "..K011111102.", "...2Y000022..", ".2011vvv1110.", ".011110111112", "2111111111110", "2121111111100", "2120101011000", "2120111111200", "2120111111200", "2120010110200", "0020111111001", "0021111111001", "0021111111000", ".220000000022", "..201020010..", "..211120110..", "...01120112..", "...01120112..", "...00020002..", "...2002000...", "...2002000...", "...2002000...", "...2002000...", "...2002000..."]}, "costas4": {"w": 13, "h": 34, "mapa": ["...K00000K...", "..K0111110K..", ".K011111110K.", ".01111111110.", ".01111111110.", ".01111111110.", "Mv111111111vM", "0v111111111v0", ".21111111112.", "..v1111111v..", "...2111112...", "..20YYYYY02..", ".01111011110.", "2111110111112", "2121110111212", "0120100010212", "0020010100210", "0020110110200", "0020110110200", "0020110110200", "002111011102.", "00211101110..", "20200020000..", ".2200222200..", "..200020010..", "..200020110..", "...00020110..", "...20220112..", "...20220102..", "...2022000...", "...2022000...", "....22.000...", ".......000...", ".......200..."]}};
+  var PIX_ARMAD = {"0": {"w": 23, "h": 22, "mapa": ["........QNQ...NND......", "....rReFoV6FooooF6sR...", "....IIqoFUJoooFNUVqIQ..", "...NVNDo2oooooAIUqII2B.", "..PI66UFFoJJJIJ2II2IIq.", "..qIA6UFJJFqIJJ8I2IIIIP", ".PIIJ6U682JJJ2k8qqIIIIN", ".WIIJ6NqAJJJ2q68qNIIJJP", "..IIK6NN22JAq26VJIIJqqP", "..kVV6NJI2NqqJV6NJJIII8", "...5k8IqKVq2IJq868VIIJ6", "...Nq6q2AqI2IIJ2A8AKqWU", "..sPq62VAAIIIIIIJ8NVbbN", "..6qq6qAIPIIIIIII8PqCCU", "..gqNN8IqqIIIIJJA6NPPB6", "..gIPP6IIqIIIJIIV66PIB6", ".QIIqPNqI2222IIqqUUIIPC", "g8Iqb8oo2PqqFoooqBBqqb.", "666qQ.FKooFooo2AIIICp..", ".666..qIoJoooo88qqq....", ".......IFJJoJJ86UbW....", "........JqqoFP466Q....."]}, "1": {"w": 22, "h": 22, "mapa": ["......jHHw....jH......", "....4BBQHbQ6NUDDDCf...", "...kQBBwb6UH6BDeD9b...", "...kDBBcHbU6HDDecD9H..", "..jDBHCbc6DcBecBbDcBj.", "..bDeHBBbocBoc9pb99Dj.", ".HBbcUBDbC9DocDCCBDDB.", ".HbcD6CCDbDD99DbHBBcDl", ".UBD9gHDCbe9oeDBHBBBDC", "kbBDB.kDCbeDBBDB6HeBDb", "gbCDj.7eDCDB9Dbe6RBDpB", "llllihkBCCDeeeeQ6.NQQN", ".....4AU6668666q6.....", ".....gNAq22JqqqN6.....", ".....4C6V222666bH.....", ".....4BbbCbCbBBBH.....", ".....HBpQQeee9c9eW....", ".....BCCCbeBccD9cH....", ".....bbBQD9ccD99DH....", ".....CBbbDBDBecDDH....", ".....CCCCDDBD9DDBj....", ".....SkCBBBDeDBH4....."]}, "2": {"w": 23, "h": 22, "mapa": [".........lQWQWWW.......", ".....r.sD686pacr.iWR...", "....i9f4Dl99cockgN99R..", "...4ePpgDp99ccpeBD999W.", "...6D6656e99l99xga3cxW.", "...gD8gxx5QW99eglaacxxp", "..99egHxxhoo99h999coc9h", ".l999eHxxcooQWet99cc99h", ".l9t99jxxcaaC9999tc9s6f", "..sklxHlxcccRolt9lRxxg.", "...5pAQilccch3c99Qxxxxi", "..RNl6Q9icccxlCblH9cc9i", "..5Dl6NDxccc9xxxxw9pllf", "..gDxgHDDeccc9999Ux9aa9", "..gWhQ6DDWa9cc999699ooD", "..gDpC6BDQooccc9k86Hx3D", ".h9exxClDlect9ce9lCxxhj", "469liWDxxQllcc3c9e9dx5.", "66gxlHDx9DD9ccc9xtoci..", ".66R..Qxck6999hg4c9e...", "......px9..R9tC66BW....", ".......sg...999665....."]}, "3": {"w": 23, "h": 22, "mapa": [".........A...4U..qU....", ".....IIiqA6kkAK6bKKI...", "....qqIV26gkJ0KVJ0VV7..", "...A2Ukk2VV23YNq02ttmr.", "..7VJ66kA222qBQ1qttanne", ".hLNJk6xxNNHem2Kqttnnne", ".hxVKkjmLnnaad2Immtttte", ".heeIARZLtnctn2VmfLttml", ".heeA0jmrxttt4KUmihfXXW", "..w4A2kWXLLrskGJ2g7tdth", "...4pNjZLtddZ52Vkpmnnth", "...ktxRmLtadtZs4kpmeVVV", "..kI2mgwLLdaRwwgklNK0Y2", "..72GqHbHrXRppbbpk2K002", "..NVI0ggbnneCWHHkg2qYKb", ".lxxBJ6QwlbWblbwk6V685B", ".WmZL67bbndteeRemr7tnde", "WgmttkifQpplWp9tmxmntnh", "4gkcxkmZZntnaantrtadnef", "lkgRilf9dkktccLkrmttXPh", "......pct..rttXk6pe4...", "........4...ttR64k7...."]}, "4": {"w": 22, "h": 22, "mapa": ["........44wSS.........", "......e4D5sDDrr9......", "....4SXQBDo9mZmco.....", "....7lmiccfXmL99s7....", "...rLf9ZmmmLmcsmmZm...", "..49LmS9LLiLcSfmZmxh..", "..4lL9wSccch59xLLccR4.", ".lfSo9sfRO747O9m9SXLSf", "4DSff4XLLLmmmXf44XLic9", "5D9j44srLLZmOO444ff9c9", ".CBbjjCbD99cccDAUwBcW4", ".4gwrjqqNANNNNNUq45C4l", "..4RrjrWQCCCH5qq2hjR4.", "..7frRffffXff4A2IrRlS.", "..7frRXiXXfXXSqNNWRlO.", "..4fxRXiXXmmLXff4rfiil", "..4LxRLffLmmmLXf4rfiLi", "..477fLfLmmmmmfmirrfLl", "....4XLmmmmmLmLmmWWfLf", "....7fmmmZZZLmZZm..Rf.", ".....RmZmZLmXmmSO.....", "......jliLlLXlf......."]}, "5": {"w": 20, "h": 22, "mapa": ["........E7EEO.......", "...99OXXm7OnZrOm....", "...ruuunrLdOuuuuLOOt", "...iZuuOddOXuuuuuuuE", "...sEduOddruuuuunOLE", "...ErduOtnruuuudXOXO", "...OOEnXOrLuuudOXLX.", "...OLOuLOXLLLZOOuuX.", "..OiLrrLELLXrOOLuuX.", "..ELuXnOSOrndnrOuuuE", ".XLuu7fXXLLXfh77XuuE", "ErXuXECb9DbBDlkEuuuE", "EXXtELrjPPjPPO7XuuLx", "EO7Z7uiiiEELLr7XLuX.", ".E7L7ufZZEOLLOmtmff.", "...xfuEZdXXLuOO7LEf.", "...LZOLndrLXuLE7fOf.", "...ruOundruuuuuuuul.", "...XuOundXuuuuuuuul.", "..OLOLitnnXuuXLuuuX.", "..OOEXXZZZrLLOSELuuE", ".....rrLLLOrR...rffX"]}, "6": {"w": 21, "h": 22, "mapa": ["......OO.....S7E.....", "....9OLLOSOSXtZZO....", "....4LtO74sLZLLLLf...", "...R4LtS77XZLttZZm...", "...m4OXZcZZttOOnnn...", "...mnOXhccZZLLnZnn...", "...tLnOL9iLOZnndaaX..", "...tLLLOmmXLndLaaaX..", "..XnnudLaandaaLaaaaX.", "..XndLanaadaaniaaaar.", ".9naa6RlooclC22Lnda7.", "7iidLgIKYIGKK2Indanr.", "8IBcXLqAIIIqqHsaaaLL.", "6VgDsnnnnnnnn77LaarZ.", ".7kA7nLLndaad7K0pnXZ.", ".ffX7nddnnnna42707Lt.", ".LLf7naaaaaaan77YSLt.", "7LLOnnaaaaaaaaac7fLZ.", "ELLOJKYJaaaaaaKK5XLLO", "...SFFo00v00vKKF4Xfff", "....nnannnnnnnnn7E...", "....rrRconnndiXr....."]}, "7": {"w": 20, "h": 22, "mapa": ["........4ggggw......", ".......lQCBBb.......", "......kqKKpBQ.......", "......4A4VBBC.......", ".....RI6k6KBb4......", ".....WI456KCb4......", "....w5IAUUKCQQjgS...", ".WV5CpgIKKqHCBBBCVw.", "..V2BBKQ6UbCbBpKKV..", "...II2qk5AIChCKKN4..", ".fVAIBKHkKNAq2IbblC.", ".PIqC2Vq8KBQQCq0JJ2.", ".RAKYKVqI6II2K0KqqN.", ".PIIV6UIIVIIKKIVIKK.", ".AqA64b2IV22qU54kqIU", ".QBH.WB2KCNANH454CCH", "5BBj.QBIKCBCCNk.4BCH", "5BBi.UUqICBUVIq..BBN", "VKKp.AIAVVVIKKq..BBN", "6Aq..6IKKKKKIqU.VIKU", "....sUVVVIIVVKK.4s44", "....6qq22222IUU....."]}};
+
   var ARTE_PAL = ["#000014", "#00001e", "#00000a", "#0a000a", "#000028", "#000032", "#0a0000", "#0a0014", "#464650", "#000a28", "#140000", "#000a32", "#000a3c", "#324678", "#001432", "#32323c", "#5a646e", "#14000a", "#000a1e", "#00143c", "#32466e", "#1e325a", "#6e463c", "#f0fafa", "#1e0000", "#325064", "#5a788c", "#466496", "#141e3c", "#46505a", "#001446", "#000000", "#1e3250", "#1e1e28", "#bee6fa", "#3c506e", "#1e1e32", "#142846", "#142850", "#1e1e3c", "#6e4632", "#64646e", "#3c4650", "#3c5064", "#648296", "#78a0aa", "#b4e6fa", "#001e46", "#1e2846", "#5a8296", "#463232", "#14141e", "#466482", "#e6fafa", "#14326e", "#505a64", "#4664a0", "#140a14", "#644632", "#32140a", "#282832", "#323246", "#78828c", "#323c46", "#000a14", "#64463c", "#324664", "#141428", "#0a1428", "#32506e", "#001e3c", "#1e283c", "#141e32", "#281e28", "#323c5a", "#00003c", "#0a1446", "#280000", "#1e1428", "#281428", "#283c5a", "#14325a", "#beb496", "#283246", "#64788c", "#141e50", "#0a143c", "#28283c", "#1e3246", "#46648c", "#3c64a0", "#0a1e50", "#001450", "#5a7896"];
   var ARTE_MAP = {
     "Armadura de Couro": { w:36, h:34, mapa:["............ddaad....Saaad..........", "...........ozzfzA6HOozzzzzo.........", ".......dS.zzzzoHH6zzzzzzzzz3Idd.....", "......azzazzzzvAzzzzzzzzzzAHoMMF....", ".....zzOzzzzzf8zzzzzzzxzMMAoMMMM8K..", "...zyozA3zzzzzzzzzzzzoMMMzoMzMMMzFS.", "...zooz33zyzzzzzzzzzzweeMzoMMMMMwoa.", "...zoMz333zzzzzzzzzzezfzMxzMMMMMMoz.", "...ywMMz33zzzzzzzooezzzzAoMMMMMMMwoz", "..zoMMMoH3ozzzfzzezzfzxzAMMMMMMMMMMy", "..aoMMzz37oHvvxMzzzfex736zzoMMMMMMMa", "..aoMMzz3HoozoMzzzfMoA33AzzzMMMfzzza", "..aoeeMzAHozMMfezMxoMO36AzzMMMzeoooz", "...ofMfMHvxofMMfMooofo336ozMffowMwza", "...zoooxHHzMMMMMoooozwO33vwzzozMeMMp", "....y3p76zMeMMMxooMMzMxz67voozzMMff7", ".....vozAowMMMxxoMMMMzMMz336MMMMMzo3", ".....3oz3oofewxooMMMMzzzoAAAzeefzyzv", ".....zoo3oMMOvooMMMMMMzzfMo6Hzzzzzz7", "...mpzzoHMMvzzozMMMMMMMMezz3a3Azoooy", "...zzozo6MAzzzazMMMMMMMMMMzAzzooFooa", "...zzo8o3o6oMzazMMMMMMMMMMoHzzoFzF87", "...zzoozzv6MooooMMMMwMzzzzH3zzyzozo7", "...zozzaz33MMMooMMMMzzMMMA3333z8zzo7", "..SXzzo8az3AMMMzzzzzMMxzzzzAHottozz7", "..aozMoozzooozMMMMMMwMwowfovvFzzozpz", "z3zozzoopozzwooooooMMzzzzfpFoz8zoy..", "063zooozAzzzzztzMMMzzzzzzyzzzoooz...", "763vzoo33zzzzzzzzzzzzzzzzoMMzooy....", "0663zo1..dzMzzzzzzzzzzxzooMMooa.....", ".z73Vz...mzMzzzzzzzzzz636Hoooz......", "..........dzzzzzzzzzzz633738a.......", "...........yzzfooozzxz33336X........", "............zzz...zz....730........."] },
@@ -8083,6 +8149,49 @@ try{
     }
   }
 
+  /* ===== PERSONAGEM: corpo humano + armadura por cima ===== */
+  // cada armadura ocupa a faixa do tronco/pernas do corpo
+  function pxPersonagem(ctx, pose, idxArm, alvoW, alvoH, cor){
+    var C = PIX_CORPO[pose] || PIX_CORPO['frente'];
+    if(!C) return false;
+    var A = PIX_ARMAD[idxArm] || null;
+    var CH = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+    // o corpo tem 34 de altura; a armadura cobre do ombro (y=12) ate a cintura (y=34)
+    var escala = alvoH / C.h;
+    var offX = (alvoW - C.w*escala) / 2;
+    var offY = 0;
+
+    function pinta(mapa, w, hh, ox, oy, esc){
+      for(var y=0;y<hh;y++){
+        var linha = mapa[y];
+        for(var x=0;x<w;x++){
+          var c = linha.charAt(x);
+          if(c === '.') continue;
+          var k = CH.indexOf(c);
+          if(k < 0) continue;
+          ctx.fillStyle = PIX_PAL[k];
+          ctx.fillRect(ox + x*esc, oy + y*esc, esc+0.5, esc+0.5);
+        }
+      }
+    }
+
+    // 1) o corpo
+    ctx.fillStyle = cor || '#f2c9b8';
+    pinta(C.mapa, C.w, C.h, offX, offY, escala);
+
+    // 2) a armadura por cima, no tronco
+    if(A){
+      var ai = parseInt(idxArm, 10) || 0;
+      var aEsc = escala;                       // mesma escala do corpo
+      var aW = A.w * aEsc;
+      var aOffX = (alvoW - aW) / 2;
+      var aOffY = offY + 9*escala;             // comeca nos ombros
+      pinta(A.mapa, A.w, A.h, aOffX, aOffY, aEsc);
+    }
+    return true;
+  }
+
   // desenha uma arte (arma ou armadura) bloco por bloco
   function pxArte(ctx, nome, alvoW, alvoH){
     var A = ARTE_MAP[nome];
@@ -8136,8 +8245,29 @@ try{
     }catch(e){}
   }
 
+  // personagem do lobby/PvP: usa o corpo humano vestido
+  function desenhaPersonagem(cv, cor, pose, armadura){
+    if(!cv || !cv.getContext) return false;
+    try{
+      var ctx = cv.getContext('2d');
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,cv.width,cv.height);
+      ctx.imageSmoothingEnabled = false;
+      var p = PIX_CORPO[pose] ? pose : 'frente';
+      return pxPersonagem(ctx, p, armadura||0, cv.width, cv.height, cor);
+    }catch(e){ return false; }
+  }
+
   function desenhaBoneco(cv, cor, pose){
     if(!cv || !cv.getContext) return;
+    // tenta o corpo humano vestido; se nao houver arte, cai no boneco antigo
+    var idxArm = 0;
+    try{
+      var pf = (typeof pfLer === 'function') ? pfLer() : null;
+      if(pf && pf.armadura !== undefined && pf.armadura !== null) idxArm = parseInt(pf.armadura,10) || 0;
+      if(!(ARTE_PAL && PIX_ARMAD[idxArm])) idxArm = 0;
+    }catch(e){}
+    if(desenhaPersonagem(cv, cor, pose, idxArm)) return;
     try{
       var ctx = cv.getContext('2d');
       ctx.setTransform(4,0,0,4,0,0);
