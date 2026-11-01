@@ -5917,7 +5917,7 @@ function pfArmaduraPintar(){
   var out = '';
   for(var i=0;i<PIX_NOMES_ARM.length;i++){
     out += '<div class="pf-arm'+(i===atual?' on':'')+'" data-arm="'+i+'" title="'+PIX_NOMES_ARM[i]+'">'
-        +  '<canvas width="16" height="26" data-armcv="'+i+'"></canvas>'
+        +  '<canvas width="34" height="52" data-armcv="'+i+'"></canvas>'
         +  '<span class="nm">'+PIX_NOMES_ARM[i]+'</span>'
         +  '</div>';
   }
@@ -7193,25 +7193,57 @@ function lbBoneco(estado, corPerfil){
   if(!cv){ console.warn('lbBoneco: canvas nao encontrado'); return; }
   if(!cv.getContext){ console.warn('lbBoneco: canvas sem suporte a 2d'); return; }
 
-  lbPxPal = pxPaleta(corPerfil);
-  lbPxEstado = estado || lbPxEstado;
-
   if(!lbPxCtx) lbPxCtx = cv.getContext('2d');
   if(!lbPxCtx){ console.warn('lbBoneco: nao consegui o contexto 2d'); return; }
 
-  // o canvas tem 88x119 pixels reais; o desenho ocupa 22x30 blocos,
-  // entao ampliamos 4x para o boneco preencher o espaco
-  lbPxCtx.setTransform(4, 0, 0, 4, 0, 0);
+  // ---- PERSONAGEM NOVO: corpo humano vestido com a armadura escolhida ----
+  var idxArm = 0;
+  try{
+    var pf = (typeof pfLer === 'function') ? pfLer() : null;
+    if(pf && pf.armadura !== undefined && pf.armadura !== null) idxArm = parseInt(pf.armadura,10) || 0;
+  }catch(e){}
 
-  // desenha agora, sem depender do intervalo
-  pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now());
+  lbPxCtx.setTransform(1,0,0,1,0,0);
+  lbPxCtx.clearRect(0,0,cv.width,cv.height);
+  lbPxCtx.imageSmoothingEnabled = false;
+
+  var poseLb = 'frente';
+  if(lbPxEstado === 'ataque' || lbPxEstado === 'guerra' || lbPxEstado === 'vitoria' || lbPxEstado === 'lado') poseLb = 'lado';
+
+  var desenhou = false;
+  try{
+    desenhou = pxPersonagem(lbPxCtx, poseLb, idxArm, cv.width, cv.height, corPerfil);
+  }catch(e){ desenhou = false; }
+
+  // reserva: se o corpo novo faltar, usa o boneco antigo
+  if(!desenhou){
+    lbPxPal = pxPaleta(corPerfil);
+    lbPxEstado = estado || lbPxEstado;
+    lbPxCtx.setTransform(4, 0, 0, 4, 0, 0);
+    pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now());
+  }
 
   // e reanima a respiracao
   if(lbPxTimer) clearInterval(lbPxTimer);
   lbPxTimer = setInterval(function(){
     if(!lbPxCtx) return;
-    try{ pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now()); }
-    catch(e){ clearInterval(lbPxTimer); lbPxTimer = null; console.warn('animacao do boneco parou:', e.message); }
+    try{
+      var i2 = 0;
+      try{
+        var p2 = (typeof pfLer === 'function') ? pfLer() : null;
+        if(p2 && p2.armadura !== undefined) i2 = parseInt(p2.armadura,10) || 0;
+      }catch(e){}
+      lbPxCtx.setTransform(1,0,0,1,0,0);
+      lbPxCtx.clearRect(0,0,cv.width,cv.height);
+      lbPxCtx.imageSmoothingEnabled = false;
+      if(!pxPersonagem(lbPxCtx, 'frente', i2, cv.width, cv.height, corPerfil)){
+        lbPxCtx.setTransform(4,0,0,4,0,0);
+        pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now());
+      }
+    }catch(e){
+      try{ pxDesenhar(lbPxCtx, lbPxPal, lbPxEstado, Date.now()); }
+      catch(e2){ clearInterval(lbPxTimer); lbPxTimer = null; console.warn('animacao do boneco parou:', e2.message); }
+    }
   }, 120);
 }
 
@@ -8007,6 +8039,17 @@ try{
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]); }); }
 
   // ja possui esse personagem? (vira uma colecao com o nome dele)
+  // ja possui uma arma desse grau? (comprada na loja ou ganha no gacha)
+  function temArma(grau){
+    try{
+      var lista = loadInv('weapons', coll) || [];
+      for(var i=0;i<lista.length;i++){
+        if(lista[i] && lista[i].cls === grau) return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
   function temPers(p){
     try{ var all = loadColls(); return !!all[p.nome]; }catch(e){ return false; }
   }
@@ -8157,9 +8200,10 @@ try{
     var A = PIX_ARMAD[idxArm] || null;
     var CH = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-    // o corpo tem 34 de altura; a armadura cobre do ombro (y=12) ate a cintura (y=34)
+    // usa escala INTEIRA quando possivel, para o pixel art nao borrar
     var escala = alvoH / C.h;
-    var offX = (alvoW - C.w*escala) / 2;
+    if(escala >= 1) escala = Math.floor(escala);
+    var offX = Math.round((alvoW - C.w*escala) / 2);
     var offY = 0;
 
     function pinta(mapa, w, hh, ox, oy, esc){
@@ -8171,7 +8215,7 @@ try{
           var k = CH.indexOf(c);
           if(k < 0) continue;
           ctx.fillStyle = PIX_PAL[k];
-          ctx.fillRect(ox + x*esc, oy + y*esc, esc+0.5, esc+0.5);
+          ctx.fillRect(Math.floor(ox + x*esc), Math.floor(oy + y*esc), Math.ceil(esc), Math.ceil(esc));
         }
       }
     }
@@ -8307,14 +8351,17 @@ try{
         var gr = GRADES[j];
         var mo = gr.moeda === 'dm' ? '💎' : '🪙';
         var ex = exemploArma();
+        var tem = temArma(gr.g);
         out += '<div class="lj-item" data-gra="'+gr.g+'">'
             +  '<div class="arte"><canvas data-arma="'+esc2(gr.g)+'" width="88" height="119"></canvas></div>'
             +  '<div class="info">'
             +  '<div class="nm">Arma mágica '+esc2(gr.g)+'</div>'
             +  '<div class="sub">Forjada na bigorna astral.<br>Ex.: <b>'+esc2(ex)+'</b></div>'
-            +  '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmt(gr.preco)
-            +  ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
-            +  '<button class="bt">Comprar</button>'
+            +  (tem
+                  ? '<div class="pr">✓ Já possui</div><button class="bt">Usar</button>'
+                  : '<div class="pr '+(gr.moeda==='dm'?'dm':'gc')+'">'+mo+' '+fmt(gr.preco)
+                    + ' <small>'+(gr.moeda==='dm'?'diamantes':'G-Coins')+'</small></div>'
+                    + '<button class="bt">Comprar</button>')
             +  '</div></div>';
       }
     }
@@ -8413,7 +8460,9 @@ try{
       + esc2(gr.g) + ', forjada na bigorna astral. Pode vir como espada, lâmina ou cajado — '
       + 'o nome é sorteado entre as armas da forja, e ela entra direto na sua coleção.</div>'
       + '<div class="sumrow" style="margin-top:14px">'
-      + '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmt(gr.preco)+'</button>'
+      + (temArma(gr.g)
+          ? '<button class="primary" id="ljUsarArma" style="width:100%">Usar esta arma</button>'
+          : '<button class="primary" id="ljComprarArma" style="width:100%">Comprar por '+mo+' '+fmt(gr.preco)+'</button>')
       + '</div><div id="ljMsg"></div>'
       + '<button class="secondary" id="ljVoltar" style="margin-top:10px;width:100%">‹ Voltar</button>'
       + '</div></div>';
@@ -8421,7 +8470,10 @@ try{
     desenhaArma(el2('ljDetCv'), gr.g);
     var vv2 = el2('ljVoltar');
     if(vv2) vv2.onclick = render;
-    el2('ljComprarArma').onclick = function(){ comprarArma(gr); };
+    var bComp = el2('ljComprarArma');
+    if(bComp) bComp.onclick = function(){ comprarArma(gr); };
+    var bUsar = el2('ljUsarArma');
+    if(bUsar) bUsar.onclick = function(){ msg('Essa arma já está na sua coleção.', true); render(); };
   }
 
   function msg(txt, ok){
