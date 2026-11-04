@@ -1280,6 +1280,26 @@ body.glow-paused .raio-anel,body.glow-paused .raio-raio,body.glow-paused .raio-t
   .lj-item .arte canvas{width:76px;height:103px}
   .lj-abas button{font-size:11.5px;padding:10px 6px}
 }
+
+/* PROJECT GACHA V48 — migração obrigatória de personagens */
+#pgMigOverlay{display:none;position:fixed;inset:0;z-index:999999;background:rgba(2,6,23,.88);backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:16px}
+#pgMigOverlay.on{display:flex}
+#pgMigCard{width:min(760px,100%);max-height:92vh;overflow:auto;background:#0f172a;color:#e5efff;border:1px solid #2563eb;border-radius:18px;box-shadow:0 24px 80px #000b;padding:22px}
+#pgMigCard h2{margin:0 0 8px;font-size:22px}
+#pgMigCard p{color:#a9bad8;line-height:1.5}
+.pg-mig-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:16px 0}
+.pg-mig-person{border:1px solid #334e78;border-radius:12px;padding:13px;background:#142746;display:flex;gap:10px;align-items:flex-start}
+.pg-mig-person.keep{border-color:#22c55e;background:#12352f}
+.pg-mig-person input{width:18px;height:18px;margin-top:3px;accent-color:#22c55e}
+.pg-mig-person strong{display:block;color:#fff}
+.pg-mig-person small{display:block;color:#a9bad8;margin-top:5px}
+#pgMigReward{background:#071426;border:1px solid #29466c;border-radius:12px;padding:13px;margin:12px 0;color:#dbeafe}
+#pgMigActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+#pgMigActions button{border:1px solid #31547e;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer;background:#071426;color:#dbeafe}
+#pgMigConfirm{background:linear-gradient(90deg,#22c55e,#0ea5e9)!important;color:#04111f!important;border:0!important}
+#pgMigConfirm:disabled{opacity:.45;cursor:not-allowed}
+#pgMigStatus{min-height:22px;color:#fbbf24;font-size:13px}
+
 </style>
 </head>
 <body>
@@ -6945,6 +6965,7 @@ function lgEntrou(){
   lgEl('lgSenha').value = '';
   try{ pfRender(); }catch(e){}
   toast('Bem-vindo, ' + s.usuario + '.');
+  setTimeout(pgMigAbrir, 900);
 }
 
 function lgSair(){
@@ -7014,6 +7035,8 @@ function lgInit(){
   if(!s){
     lgModo('entrar');
     lgMostrar(true);
+  } else {
+    setTimeout(pgMigAbrir, 1200);
   }
 }
 
@@ -8675,6 +8698,108 @@ try{
     setTimeout(iniciar, 60);
   }
 })();
+
+/* ===== PROJECT GACHA V48: migração de personagens ===== */
+var pgMigPreviewAtual = null;
+var pgMigEmCurso = false;
+function pgMigSessaoValida(){
+  var s = (typeof lgSessao === 'function') ? lgSessao() : null;
+  return s && s.passe;
+}
+async function pgMigRequisicao(acao, manter){
+  var s = lgSessao();
+  if(!s || !s.passe) throw new Error('Entre novamente na sua conta para continuar.');
+  var r = await fetch(LG_API + '/personagens-migracao', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.passe},
+    body:JSON.stringify({acao:acao, manter:manter || undefined})
+  });
+  var d = {};
+  try{ d = await r.json(); }catch(e){}
+  if(!r.ok) throw new Error(d.erro || ('Falha HTTP '+r.status));
+  return d;
+}
+function pgMigStatus(t, erro){
+  var e=document.getElementById('pgMigStatus');
+  if(e){e.textContent=t;e.style.color=erro?'#fca5a5':'#fbbf24';}
+}
+function pgMigSelecionados(){
+  return Array.prototype.slice.call(document.querySelectorAll('#pgMigList input[type=checkbox]:checked')).map(function(x){return x.value;});
+}
+function pgMigAtualizarSelecao(){
+  var sel=pgMigSelecionados();
+  var cards=document.querySelectorAll('.pg-mig-person');
+  cards.forEach(function(c){c.classList.toggle('keep',!!c.querySelector('input:checked'));});
+  var b=document.getElementById('pgMigConfirm');
+  if(b)b.disabled=sel.length!==2 || pgMigEmCurso;
+  pgMigStatus(sel.length===2?'Dois personagens selecionados. Confira a compensação antes de confirmar.':'Selecione exatamente dois personagens para manter.');
+}
+function pgMigRender(d){
+  pgMigPreviewAtual=d;
+  var lista=document.getElementById('pgMigList'), recompensa=document.getElementById('pgMigReward');
+  lista.innerHTML='';
+  var personagens=Array.isArray(d.personagens)?d.personagens:[];
+  personagens.forEach(function(p){
+    var nome=typeof p==='string'?p:p.nome;
+    var nivel=typeof p==='object'?(p.nivel||1):1;
+    var itens=typeof p==='object'?(p.itensInventario||0):0;
+    var card=document.createElement('label'); card.className='pg-mig-person';
+    var check=document.createElement('input'); check.type='checkbox';check.value=nome;
+    check.checked=(nome==='Beko'||nome==='TESTE');
+    check.addEventListener('change',pgMigAtualizarSelecao);
+    var info=document.createElement('span');
+    var strong=document.createElement('strong');strong.textContent=nome;
+    var small=document.createElement('small');small.textContent='Nível '+nivel+' · '+itens+' itens no inventário';
+    info.appendChild(strong);info.appendChild(small);card.appendChild(check);card.appendChild(info);lista.appendChild(card);
+  });
+  var b=d.politicaCompensacao||{};
+  recompensa.textContent='Compensação dos personagens arquivados: '+(b.gcoins||'1.000 por nível + 100 por item; máximo 500.000 por personagem')+' · '+(b.diamonds||'1 Diamond por 25 níveis; máximo 50 por personagem')+'. O valor final será calculado pelo servidor.';
+  pgMigAtualizarSelecao();
+  if(!personagens.some(function(p){return (typeof p==='string'?p:p.nome)==='Beko';}) ||
+     !personagens.some(function(p){return (typeof p==='string'?p:p.nome)==='TESTE';})){
+    pgMigStatus('Não encontrei Beko e TESTE nesta conta. Nenhuma alteração foi feita; confira se entrou na conta correta.',true);
+    document.getElementById('pgMigConfirm').disabled=true;
+  }
+}
+async function pgMigAbrir(){
+  if(!pgMigSessaoValida() || pgMigEmCurso)return;
+  try{
+    var d=await pgMigRequisicao('preview');
+    if(d.migrado){pgMigStatus('Esta conta já concluiu a migração V48.');return;}
+    if(d.necessario===false || d.migracaoNecessaria===false)return;
+    if(!d.migracaoNecessaria)return;
+    pgMigRender(d);
+    document.getElementById('pgMigOverlay').classList.add('on');
+  }catch(e){console.warn('Migração V48:',e);/* não interrompe a entrada do jogador */}
+}
+async function pgMigConfirmar(){
+  var manter=pgMigSelecionados();
+  if(manter.length!==2 || pgMigEmCurso)return;
+  if(manter.indexOf('Beko')<0 || manter.indexOf('TESTE')<0){
+    if(!confirm('Você alterou a seleção recomendada Beko + TESTE. Deseja manter os dois nomes selecionados?'))return;
+  }
+  if(!confirm('Confirmar? Os personagens excedentes serão arquivados e a compensação será creditada. Esta operação não pode ser desfeita pela interface.'))return;
+  pgMigEmCurso=true;
+  var btn=document.getElementById('pgMigConfirm');btn.disabled=true;btn.textContent='Processando...';
+  pgMigStatus('Validando e salvando a migração no servidor...');
+  try{
+    var d=await pgMigRequisicao('confirmar',manter);
+    if(!d.migrado && d.necessario===false)throw new Error('A conta não precisa de migração.');
+    pgMigStatus('Migração concluída. Mantidos: '+(d.manter||manter).join(' e ')+'. Arquivados: '+(d.arquivados||[]).join(', ')+'.');
+    document.getElementById('pgMigReward').textContent='Compensação creditada: '+((d.compensacao||{}).gc||0).toLocaleString('pt-BR')+' G-Coins e '+((d.compensacao||{}).dm||0)+' Diamonds.';
+    document.getElementById('pgMigList').innerHTML='';
+    document.getElementById('pgMigLater').style.display='none';
+    btn.style.display='none';
+    setTimeout(function(){document.getElementById('pgMigOverlay').classList.remove('on');location.reload();},3500);
+  }catch(e){pgMigStatus(e.message||'Falha na migração. Seus dados não devem ser considerados migrados.',true);btn.disabled=false;btn.textContent='Tentar novamente';}
+  finally{pgMigEmCurso=false;}
+}
+(function(){
+  var later=document.getElementById('pgMigLater'), confirmBtn=document.getElementById('pgMigConfirm');
+  if(later)later.onclick=function(){document.getElementById('pgMigOverlay').classList.remove('on');};
+  if(confirmBtn)confirmBtn.onclick=pgMigConfirmar;
+})();
+
 </script>
 
 <!-- ============ SINCRONIZACAO SEGURA (v23) ============ -->
@@ -8690,5 +8815,20 @@ try{
   <div id="syAvisoInfo"></div>
   <div class="btns" id="syAvisoBotoes"></div>
 </div>
+
+<div id="pgMigOverlay" role="dialog" aria-modal="true" aria-labelledby="pgMigTitle">
+ <div id="pgMigCard">
+  <h2 id="pgMigTitle">Migração de personagens — V48</h2>
+  <p>Sua conta precisa manter exatamente <b>2 personagens</b>. Escolha os dois que deseja preservar. Os demais serão arquivados com seus dados, e a compensação será creditada após a confirmação.</p>
+  <div id="pgMigStatus">Carregando seus personagens...</div>
+  <div id="pgMigList" class="pg-mig-list"></div>
+  <div id="pgMigReward"></div>
+  <div id="pgMigActions">
+   <button type="button" id="pgMigLater">Fazer depois</button>
+   <button type="button" id="pgMigConfirm" disabled>Confirmar migração</button>
+  </div>
+ </div>
+</div>
+
 </body>
 </html>
